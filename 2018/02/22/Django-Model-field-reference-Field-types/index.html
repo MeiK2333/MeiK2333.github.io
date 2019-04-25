@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/lurongkai/anti-baidu/js/anti-baidu-latest.min.js" charset="UTF-8"></script>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="//cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/favicon.ico?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="翻译自官方文档，django 中可用的模型字段及其含义。">
+<meta name="keywords" content="Python,Django">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Django Model field reference - Field types">
+<meta property="og:url" content="https://meik2333.com/2018/02/22/Django-Model-field-reference-Field-types/index.html">
+<meta property="og:site_name" content="MeiK&#39;s blog">
+<meta property="og:description" content="翻译自官方文档，django 中可用的模型字段及其含义。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-04-25T06:47:11.736Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Django Model field reference - Field types">
+<meta name="twitter:description" content="翻译自官方文档，django 中可用的模型字段及其含义。">
+
+
+
+
+
+
+  <link rel="canonical" href="https://meik2333.com/2018/02/22/Django-Model-field-reference-Field-types/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Django Model field reference - Field types | MeiK's blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-107784973-4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-107784973-4');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">MeiK's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">In solitude, where we are least alone.</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://meik2333.com/2018/02/22/Django-Model-field-reference-Field-types/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="MeiK">
+      <meta itemprop="description" content="In solitude, where we are least alone.">
+      <meta itemprop="image" content="/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MeiK's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Django Model field reference - Field types
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-02-22 00:00:01" itemprop="dateCreated datePublished" datetime="2018-02-22T00:00:01+08:00">2018-02-22</time>
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>翻译自<a href="https://docs.djangoproject.com/en/2.0/ref/models/fields/" target="_blank" rel="noopener">官方文档</a>，django 中可用的模型字段及其含义。<br><a id="more"></a></p>
+<h1 id="AutoField"><a href="#AutoField" class="headerlink" title="AutoField"></a>AutoField</h1><p>一个 id 自动递增的 IntegerField 字段，您通常不需要直接使用它，如果不指定主键字段，那么一个 AutoField 字段将被自动添加到模型中。</p>
+<hr>
+<h1 id="BigAutoField"><a href="#BigAutoField" class="headerlink" title="BigAutoField"></a>BigAutoField</h1><p>和 AutoField 类似，不同之处在于，它的数字范围是 1 到 9223372036854775807 。</p>
+<hr>
+<h1 id="BigIntegerField"><a href="#BigIntegerField" class="headerlink" title="BigIntegerField"></a>BigIntegerField</h1><p>一个 64 位整数，类似 IntegerField ，不同之处在于他的合法数字范围是 -9223372036854775808 到 9223372036854775807 。该字段的默认表单部件是 TextInput 。</p>
+<hr>
+<h1 id="BinaryField"><a href="#BinaryField" class="headerlink" title="BinaryField"></a>BinaryField</h1><p>用于存储原始二进制数据的字段，它只支持 bytes 。请注意，该字段的功能有限，比如不支持过滤查询集，也不可能包含在一个 ModelForm 中。</p>
+<p>尽管您可能会考虑将数据存储在数据库中，但 99% 的情况下这是糟糕的设计，请考虑使用静态文件来代替。</p>
+<hr>
+<h1 id="BooleanField"><a href="#BooleanField" class="headerlink" title="BooleanField"></a>BooleanField</h1><p>True / False</p>
+<p>该字段的默认表单部件是 CheckboxInput</p>
+<p>如果您需要接受 null 值，则应该使用 NullBooleanField 。</p>
+<hr>
+<h1 id="CharField"><a href="#CharField" class="headerlink" title="CharField"></a>CharField</h1><p>用于存储字符串，对于大量的文字，请使用 TextField 。</p>
+<p>该字段的默认部件是 TextInput 。</p>
+<p>CharField 有一个额外的必要参数：</p>
+<h2 id="CharField-max-length"><a href="#CharField-max-length" class="headerlink" title="CharField.max_length"></a>CharField.max_length</h2><p>字段的最大长度（以字符为单位）。在数据库级别和 django 验证中执行。</p>
+<hr>
+<h1 id="DateField"><a href="#DateField" class="headerlink" title="DateField"></a>DateField</h1><p>日期，由 Python 中的 datetime.date 实例表示，有一些额外的可选参数：</p>
+<h2 id="DateField-auto-now"><a href="#DateField-auto-now" class="headerlink" title="DateField.auto_now"></a>DateField.auto_now</h2><p>每次保存对象是自动将字段设置为现在，仅在 model.save() 时更新，使用其他方式更新字段时不会自动更新，比如 QuerySet.update() 。</p>
+<h2 id="DateField-auto-now-add"><a href="#DateField-auto-now-add" class="headerlink" title="DateField.auto_now_add"></a>DateField.auto_now_add</h2><p>首次创建对象时，自动将字段设置为现在。如果设置了此选项，则字段的 default 设置将失效。如果您希望自动保存其他形式的日期：</p>
+<ul>
+<li>For DateField: default=date.today - from  datetime.date.today()</li>
+<li>For DateTimeField: default=timezone.now - fromdjango.utils.timezone.now()</li>
+</ul>
+<p>该字段的默认部件为 TextInput。</p>
+<hr>
+<h1 id="DateTimeField"><a href="#DateTimeField" class="headerlink" title="DateTimeField"></a>DateTimeField</h1><p>日期和时间，由 Python 的 datetime.datetime 实例表示。默认部件为 TextInput 。</p>
+<p>与 DateField 有相同的额外参数（auto_now 和 auto_now_add）。</p>
+<hr>
+<h1 id="DecimalField"><a href="#DecimalField" class="headerlink" title="DecimalField"></a>DecimalField</h1><p>一个固定精度的十进制数，由 Python 中的 Decimal 实例表示，有两个必需的参数：</p>
+<h2 id="DecimalField-max-digits"><a href="#DecimalField-max-digits" class="headerlink" title="DecimalField.max_digits"></a>DecimalField.max_digits</h2><p>允许的最大位数，此数字必须大于等于 decimal_places 。</p>
+<h2 id="DecimalField-decimal-places"><a href="#DecimalField-decimal-places" class="headerlink" title="DecimalField.decimal_places"></a>DecimalField.decimal_places</h2><p>用数字存储的小数位数。</p>
+<p>例如，存储数字 999 ，精确到小数点后两位：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">models.DecimalField(..., max_digits=<span class="number">5</span>, decimal_places=<span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+<p>存可能到十亿的数字，精确到小数点后十位：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">models.DecimalField(..., max_digits=<span class="number">19</span>, decimal_places=<span class="number">10</span>)</span><br></pre></td></tr></table></figure>
+<p>该字段的默认表单控件为 NumberInput 。</p>
+<hr>
+<h1 id="DurationField"><a href="#DurationField" class="headerlink" title="DurationField"></a>DurationField</h1><p>用于存储时间段的字段，由 Python 中的 timedelta 表示。</p>
+<p>在不同的数据库中表现可能不同，请谨慎使用。</p>
+<hr>
+<h1 id="EmailField"><a href="#EmailField" class="headerlink" title="EmailField"></a>EmailField</h1><p>顾名思义……将会由 EmailValidator 验证。</p>
+<hr>
+<h1 id="FileField"><a href="#FileField" class="headerlink" title="FileField"></a>FileField</h1><p>文件上传字段，不支持 primary_key 参数，如果使用将出错。</p>
+<p>有两个可选的参数：</p>
+<h2 id="FileField-upload-to"><a href="#FileField-upload-to" class="headerlink" title="FileField.upload_to"></a>FileField.upload_to</h2><p>该属性提供了设置上传目录和文件名的方法，有两种设置方式：<br>您可以指定一个字符串值，它可以包含 strftime() 格式，将会被上传的时间所取代。例如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyModel</span><span class="params">(models.Model)</span>:</span></span><br><span class="line">    <span class="comment"># file will be uploaded to MEDIA_ROOT/uploads</span></span><br><span class="line">    upload = models.FileField(upload_to=<span class="string">'uploads/'</span>)</span><br><span class="line">    <span class="comment"># or...</span></span><br><span class="line">    <span class="comment"># file will be saved to MEDIA_ROOT/uploads/2017/02/21</span></span><br><span class="line">    upload = models.FileField(upload_to=<span class="string">'uploads/%Y/%m/%d/'</span>)</span><br></pre></td></tr></table></figure>
+<p>您也可以使用默认值 FileSystemStorage ，然而我没看懂使用默认值会如何处理。</p>
+<p>upload_to 可以被调用，返回上传路径。关于此项更详细的介绍，可以查看官方文档。</p>
+<h2 id="FileField-storage"><a href="#FileField-storage" class="headerlink" title="FileField.storage"></a>FileField.storage</h2><p>用于处理文件的存储和检索。请参阅<a href="https://docs.djangoproject.com/en/2.0/topics/files/" target="_blank" rel="noopener">Managing files</a></p>
+<p>该字段默认的部件是 ClearableFileInout 。</p>
+<p>在模型中使用 FileField 或者 ImageField 需要几个步骤：</p>
+<ol>
+<li>在 settings.py 中，需要定义 MEDIA_ROOT ，是您想要 django 存储上传文件的目录的完整路径，（出于性能考虑，这些文件不应当存在数据库中）。定义 MEDIA_URL （例如：”/media/“），确保该目录可以由 Web 服务器的用户账户写入。</li>
+</ol>
+<ol start="2">
+<li>将 FileField 或 ImageField 添加到您的模型中，定义 upload_to 选项以指定 MEDIA_ROOT 下用于上传文件的子目录。</li>
+</ol>
+<ol start="3">
+<li>所有存在数据库中的数据都是路径， django 提供了一个名为 url 的便利属性，如果你的 ImageField 的字段名为 mug_shot ，那么你可以在模板中获得图像的绝对路径：  。</li>
+</ol>
+<p>例如您 MEDIA_ROOT 的设置为 ‘/home/media’，并且 upload_to 设置为 ‘photos/%Y/%m/%d’，其中的’%Y/%m/%d’将会被 strftime() 格式化，假设在2007年1月15日上传文件，那么文件将被保存至目录 /home/media/photos/2007/01/15 。</p>
+<p>如果您想要检索上传文件的文件名或者文件大小，可以使用 name 和 size 属性，有关更多的可用属性和方法，请参阅 <a href="https://docs.djangoproject.com/en/2.0/ref/files/file/#django.core.files.File" target="_blank" rel="noopener">File</a>类的定义和<a href="https://docs.djangoproject.com/en/2.0/topics/files/" target="_blank" rel="noopener">Managing files</a> 。</p>
+<p>请注意，无论何时，都应该密切的关注上传的文件以及它们的类型，以避免安全漏洞。</p>
+<p>FileField 在数据库中创建为 varchar 的默认最大长度为 100 个字符的列，可以使用 max_length 参数来修改其最大长度。</p>
+<h2 id="FileField-和-FieldFile"><a href="#FileField-和-FieldFile" class="headerlink" title="FileField 和 FieldFile"></a>FileField 和 FieldFile</h2><p>当访问 FileField 模型时，会提供一个 FieldFile 实例作为访问基础文件的代理。</p>
+<p>实例从 File 类继承了诸如 read 和 write 等方法，save 与 delete 方法将会影响到 FieldFile 数据库中关联的模型对象。</p>
+<h3 id="FieldFile-name"><a href="#FieldFile-name" class="headerlink" title="FieldFile.name"></a>FieldFile.name</h3><p>文件的名称</p>
+<h3 id="FieldFile-size"><a href="#FieldFile-size" class="headerlink" title="FieldFile.size"></a>FieldFile.size</h3><p>文件大小</p>
+<h3 id="FieldFile-url"><a href="#FieldFile-url" class="headerlink" title="FieldFile.url"></a>FieldFile.url</h3><p>访问文件的相对 URL</p>
+<h3 id="FieldFile-open-mode-’rb’"><a href="#FieldFile-open-mode-’rb’" class="headerlink" title="FieldFile.open(mode=’rb’)"></a>FieldFile.open(mode=’rb’)</h3><p>pass</p>
+<h3 id="FieldFile-close"><a href="#FieldFile-close" class="headerlink" title="FieldFile.close()"></a>FieldFile.close()</h3><p>pass</p>
+<h3 id="FieldFile-save-name-content-save-True"><a href="#FieldFile-save-name-content-save-True" class="headerlink" title="FieldFile.save(name, content, save=True)"></a>FieldFile.save(name, content, save=True)</h3><p>此方法获取文件名和文件内容，并将它们传递给字段的存储类。</p>
+<p>coutent 参数 应该是 django.core.files 对象的一个实例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.core.files <span class="keyword">import</span> File</span><br><span class="line"><span class="comment"># Open an existing file using Python's built-in open()</span></span><br><span class="line">f = open(<span class="string">'/path/to/hello.world'</span>)</span><br><span class="line">myfile = File(f)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用 Python 字符串构造</span></span><br><span class="line"><span class="keyword">from</span> django.core.files.base <span class="keyword">import</span> ContentFile</span><br><span class="line">myfile = ContentFile(<span class="string">"hello world"</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="FieldFile-delete-save-True"><a href="#FieldFile-delete-save-True" class="headerlink" title="FieldFile.delete(save=True)"></a>FieldFile.delete(save=True)</h3><p>删除与此实例相关联的文件并清除字段上的所有属性，可选参数 save 空值在删除文件后是否保存模型实例，默认为 True 。</p>
+<p>请注意：删除模型时，相关的文件不会被删除，您需要自己处理它。</p>
+<hr>
+<h1 id="FilePathField"><a href="#FilePathField" class="headerlink" title="FilePathField"></a>FilePathField</h1><p>请参照官方文档（我确实不知道是干啥的）。</p>
+<hr>
+<h1 id="FloatField"><a href="#FloatField" class="headerlink" title="FloatField"></a>FloatField</h1><p>由 Python 中的 float 表示的浮点数。</p>
+<p>默认控件为 NumberInput 。</p>
+<hr>
+<h1 id="ImageField"><a href="#ImageField" class="headerlink" title="ImageField"></a>ImageField</h1><p>继承 FileField 的所有属性和方法，同时会验证上传的是有效的图像。</p>
+<p>有两个额外的可选参数：</p>
+<ul>
+<li>ImageField.height_field</li>
+</ul>
+<ul>
+<li>ImageField.width_field</li>
+</ul>
+<p>需要 pillow 库。</p>
+<p>该字段的默认表单部件是 ClearableInput 。</p>
+<hr>
+<h1 id="IntegerField"><a href="#IntegerField" class="headerlink" title="IntegerField"></a>IntegerField</h1><p>一个整数 -2147483648 到 2147483647 ，默认表单控件为 NumberInput 。</p>
+<hr>
+<h1 id="GenericIpAddressField"><a href="#GenericIpAddressField" class="headerlink" title="GenericIpAddressField"></a>GenericIpAddressField</h1><p>字符串格式的 IPv4 或者 IPv6 地址，默认表单控件为 TextInput 。</p>
+<p>具体的请参照官方文档。</p>
+<hr>
+<h1 id="NullBooleanField"><a href="#NullBooleanField" class="headerlink" title="NullBooleanField"></a>NullBooleanField</h1><p>类似 BooleanField ，但允许 NULL 作为其中一个选项，默认表单部件为 NullBooleanSelect 。</p>
+<hr>
+<h1 id="PositiveIntegerField"><a href="#PositiveIntegerField" class="headerlink" title="PositiveIntegerField"></a>PositiveIntegerField</h1><p>类似 IntegerField ，但是必须是正数或 0 ，范围是 0 到 2147483647 。</p>
+<hr>
+<h1 id="PositiveSmallIntegerField"><a href="#PositiveSmallIntegerField" class="headerlink" title="PositiveSmallIntegerField"></a>PositiveSmallIntegerField</h1><p>类似 PositiveIntegerField ，范围是 0 到 32767 。</p>
+<hr>
+<h1 id="SlugField"><a href="#SlugField" class="headerlink" title="SlugField"></a>SlugField</h1><p>一个短的标签，只包含字母、数字、下划线和连字符，通常被用于 URL ，长度限制为 50 。</p>
+<hr>
+<h1 id="SmallIntegerField"><a href="#SmallIntegerField" class="headerlink" title="SmallIntegerField"></a>SmallIntegerField</h1><p>类似 IntegerField ，范围 -32768 到 32767 。</p>
+<hr>
+<h1 id="TextField"><a href="#TextField" class="headerlink" title="TextField"></a>TextField</h1><p>一个大文本字段，默认表单小部件为 Textarea 。</p>
+<hr>
+<h1 id="TimeField"><a href="#TimeField" class="headerlink" title="TimeField"></a>TimeField</h1><p>一个时间，由 Python 中的 datetime.time 实例表示，与 DateField 可以使用相同的自动填充选项。</p>
+<p>该字段的默认表单部件为 TextInput 。</p>
+<hr>
+<h1 id="URLField"><a href="#URLField" class="headerlink" title="URLField"></a>URLField</h1><p>一个 CharField ，代表一个 URL ，默认长度限制为 200 。</p>
+<p>默认部件为 TextInput 。</p>
+<hr>
+<h1 id="UUIDField"><a href="#UUIDField" class="headerlink" title="UUIDField"></a>UUIDField</h1><p>用于存储通用唯一标识符的字段，使用 Python 的 uuid 类。</p>
+<p>可用于 AutoField 的 primary_key</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> uuid</span><br><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> models</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyUUIDModel</span><span class="params">(models.Model)</span>:</span></span><br><span class="line">    id = models.UUIDField(primary_key=<span class="keyword">True</span>, default=uuid.uuid4, editable=<span class="keyword">False</span>)</span><br><span class="line">    <span class="comment"># other fields</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag"># Python</a>
+          
+            <a href="/tags/Django/" rel="tag"># Django</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/22/Django-Model-field-reference-Field-options/" rel="next" title="Django Model field reference - Field options">
+                <i class="fa fa-chevron-left"></i> Django Model field reference - Field options
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/02/22/Django-tutorial/" rel="prev" title="Django tutorial">
+                Django tutorial <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+      <div id="gitalk-container"></div>
+      <link rel="stylesheet" href="https://unpkg.com/gitalk@1.4.1/dist/gitalk.css">
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/avatar.png"
+                alt="MeiK" />
+            
+              <p class="site-author-name" itemprop="name">MeiK</p>
+              <p class="site-description motion-element" itemprop="description">In solitude, where we are least alone.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/MeiK2333" target="_blank" title="GitHub"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://twitter.com/MeiK2333" target="_blank" title="Twitter"><i class="fa fa-fw fa-globe"></i>Twitter</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.zhihu.com/people/MeiK2333/activities" target="_blank" title="ZhiHu"><i class="fa fa-fw fa-globe"></i>ZhiHu</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:meik2333@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-globe"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#AutoField"><span class="nav-number">1.</span> <span class="nav-text">AutoField</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BigAutoField"><span class="nav-number">2.</span> <span class="nav-text">BigAutoField</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BigIntegerField"><span class="nav-number">3.</span> <span class="nav-text">BigIntegerField</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BinaryField"><span class="nav-number">4.</span> <span class="nav-text">BinaryField</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BooleanField"><span class="nav-number">5.</span> <span class="nav-text">BooleanField</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CharField"><span class="nav-number">6.</span> <span class="nav-text">CharField</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#CharField-max-length"><span class="nav-number">6.1.</span> <span class="nav-text">CharField.max_length</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DateField"><span class="nav-number">7.</span> <span class="nav-text">DateField</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#DateField-auto-now"><span class="nav-number">7.1.</span> <span class="nav-text">DateField.auto_now</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DateField-auto-now-add"><span class="nav-number">7.2.</span> <span class="nav-text">DateField.auto_now_add</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DateTimeField"><span class="nav-number">8.</span> <span class="nav-text">DateTimeField</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DecimalField"><span class="nav-number">9.</span> <span class="nav-text">DecimalField</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#DecimalField-max-digits"><span class="nav-number">9.1.</span> <span class="nav-text">DecimalField.max_digits</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DecimalField-decimal-places"><span class="nav-number">9.2.</span> <span class="nav-text">DecimalField.decimal_places</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DurationField"><span class="nav-number">10.</span> <span class="nav-text">DurationField</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#EmailField"><span class="nav-number">11.</span> <span class="nav-text">EmailField</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#FileField"><span class="nav-number">12.</span> <span class="nav-text">FileField</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#FileField-upload-to"><span class="nav-number">12.1.</span> <span class="nav-text">FileField.upload_to</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FileField-storage"><span class="nav-number">12.2.</span> <span class="nav-text">FileField.storage</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FileField-和-FieldFile"><span class="nav-number">12.3.</span> <span class="nav-text">FileField 和 FieldFile</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#FieldFile-name"><span class="nav-number">12.3.1.</span> <span class="nav-text">FieldFile.name</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FieldFile-size"><span class="nav-number">12.3.2.</span> <span class="nav-text">FieldFile.size</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FieldFile-url"><span class="nav-number">12.3.3.</span> <span class="nav-text">FieldFile.url</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FieldFile-open-mode-’rb’"><span class="nav-number">12.3.4.</span> <span class="nav-text">FieldFile.open(mode=’rb’)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FieldFile-close"><span class="nav-number">12.3.5.</span> <span class="nav-text">FieldFile.close()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FieldFile-save-name-content-save-True"><span class="nav-number">12.3.6.</span> <span class="nav-text">FieldFile.save(name, content, save=True)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FieldFile-delete-save-True"><span class="nav-number">12.3.7.</span> <span class="nav-text">FieldFile.delete(save=True)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#FilePathField"><span class="nav-number">13.</span> <span class="nav-text">FilePathField</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#FloatField"><span class="nav-number">14.</span> <span class="nav-text">FloatField</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ImageField"><span class="nav-number">15.</span> <span class="nav-text">ImageField</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IntegerField"><span class="nav-number">16.</span> <span class="nav-text">IntegerField</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GenericIpAddressField"><span class="nav-number">17.</span> <span class="nav-text">GenericIpAddressField</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#NullBooleanField"><span class="nav-number">18.</span> <span class="nav-text">NullBooleanField</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PositiveIntegerField"><span class="nav-number">19.</span> <span class="nav-text">PositiveIntegerField</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PositiveSmallIntegerField"><span class="nav-number">20.</span> <span class="nav-text">PositiveSmallIntegerField</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SlugField"><span class="nav-number">21.</span> <span class="nav-text">SlugField</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SmallIntegerField"><span class="nav-number">22.</span> <span class="nav-text">SmallIntegerField</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#TextField"><span class="nav-number">23.</span> <span class="nav-text">TextField</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#TimeField"><span class="nav-number">24.</span> <span class="nav-text">TimeField</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#URLField"><span class="nav-number">25.</span> <span class="nav-text">URLField</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#UUIDField"><span class="nav-number">26.</span> <span class="nav-text">UUIDField</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">MeiK</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+    
+      <script src="https://unpkg.com/gitalk@1.4.1/dist/gitalk.min.js"></script>
+      <script type="text/javascript">
+        const gitalk = new Gitalk({
+          id: (decodeURI(location.pathname)).split("/")[4].substring(0, 49),
+          clientID: '4d2994f790117e7633bd',
+          clientSecret: '09947e1a30bd8f44fd4f648114b65fe5e6c5156a',
+          repo: 'MeiK2333.github.io',
+          owner: 'MeiK2333',
+          admin: 'MeiK2333'.split(','),
+          pagerDirection: 'first',
+          // facebook-like distraction free mode
+          distractionFreeMode: false
+        })
+        gitalk.render('gitalk-container')
+      </script>
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

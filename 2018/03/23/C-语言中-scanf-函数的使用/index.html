@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/lurongkai/anti-baidu/js/anti-baidu-latest.min.js" charset="UTF-8"></script>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="//cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/favicon.ico?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="我在大学里学的第一门语言就是 C 语言，几年里用 C 语言在 OJ 上交了成百上千发题目，却连最基本的 scanf 函数的用法都不了解。碰到一些字符串和数字混杂输入的题目，基本就只能靠猜来输入……这次来具体的看一下 scanf 函数的用法。">
+<meta name="keywords" content="C 语言,scanf">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C 语言中 scanf 函数的使用">
+<meta property="og:url" content="https://meik2333.com/2018/03/23/C-语言中-scanf-函数的使用/index.html">
+<meta property="og:site_name" content="MeiK&#39;s blog">
+<meta property="og:description" content="我在大学里学的第一门语言就是 C 语言，几年里用 C 语言在 OJ 上交了成百上千发题目，却连最基本的 scanf 函数的用法都不了解。碰到一些字符串和数字混杂输入的题目，基本就只能靠猜来输入……这次来具体的看一下 scanf 函数的用法。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://meik2333.com/2018/03/23/C-语言中-scanf-函数的使用/sowhereissold.jpg">
+<meta property="og:updated_time" content="2019-04-25T06:47:11.729Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="C 语言中 scanf 函数的使用">
+<meta name="twitter:description" content="我在大学里学的第一门语言就是 C 语言，几年里用 C 语言在 OJ 上交了成百上千发题目，却连最基本的 scanf 函数的用法都不了解。碰到一些字符串和数字混杂输入的题目，基本就只能靠猜来输入……这次来具体的看一下 scanf 函数的用法。">
+<meta name="twitter:image" content="https://meik2333.com/2018/03/23/C-语言中-scanf-函数的使用/sowhereissold.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="https://meik2333.com/2018/03/23/C-语言中-scanf-函数的使用/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>C 语言中 scanf 函数的使用 | MeiK's blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-107784973-4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-107784973-4');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">MeiK's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">In solitude, where we are least alone.</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://meik2333.com/2018/03/23/C-语言中-scanf-函数的使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="MeiK">
+      <meta itemprop="description" content="In solitude, where we are least alone.">
+      <meta itemprop="image" content="/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MeiK's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">C 语言中 scanf 函数的使用
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-03-23 20:38:08" itemprop="dateCreated datePublished" datetime="2018-03-23T20:38:08+08:00">2018-03-23</time>
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>我在大学里学的第一门语言就是 C 语言，几年里用 C 语言在 OJ 上交了成百上千发题目，却连最基本的 scanf 函数的用法都不了解。碰到一些字符串和数字混杂输入的题目，基本就只能靠猜来输入……这次来具体的看一下 scanf 函数的用法。</p>
+<a id="more"></a>
+<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>scanf 函数的介绍信息转自 <a href="http://www.runoob.com/cprogramming/c-function-scanf.html" target="_blank" rel="noopener">菜鸟教程</a></p>
+<h2 id="描述"><a href="#描述" class="headerlink" title="描述"></a>描述</h2><p>C 库函数 <code>int scanf(const char *format, ...)</code> 从标准输入 <code>stdin</code> 读取格式化输入。</p>
+<h2 id="声明"><a href="#声明" class="headerlink" title="声明"></a>声明</h2><p>下面是 <code>scanf()</code> 函数的声明。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">scanf</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *format, ...)</span></span></span><br></pre></td></tr></table></figure>
+<h2 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h2><ul>
+<li>format – 这是 C 字符串，包含了以下各项中的一个或多个：空格字符、非空格字符 和 format 说明符。</li>
+<li>format 说明符形式为 [=%[*][width][modifiers]type=]，具体讲解如下：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>*</td>
+<td>这是一个可选的星号，表示数据是从流 stream 中读取的，但是可以被忽视，即它不存储在对应的参数中。</td>
+</tr>
+<tr>
+<td>width</td>
+<td>这指定了在当前读取操作中读取的最大字符数。</td>
+</tr>
+<tr>
+<td>modifiers</td>
+<td>为对应的附加参数所指向的数据指定一个不同于整型（针对 d、i 和 n）、无符号整型（针对 o、u 和 x）或浮点型（针对 e、f 和 g）的大小： h ：短整型（针对 d、i 和 n），或无符号短整型（针对 o、u 和 x） l ：长整型（针对 d、i 和 n），或无符号长整型（针对 o、u 和 x），或双精度型（针对 e、f 和 g） L ：长双精度型（针对 e、f 和 g）</td>
+</tr>
+<tr>
+<td>type</td>
+<td>一个字符，指定了要被读取的数据类型以及数据读取方式。具体参见下一个表格。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="scanf-类型说明符："><a href="#scanf-类型说明符：" class="headerlink" title="scanf 类型说明符："></a>scanf 类型说明符：</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>合格的输入</th>
+<th>参数的类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>c</td>
+<td>单个字符：读取下一个字符。如果指定了一个不为 1 的宽度 width，函数会读取 width 个字符，并通过参数传递，把它们存储在数组中连续位置。在末尾不会追加空字符。</td>
+<td>char *</td>
+</tr>
+<tr>
+<td>d</td>
+<td>十进制整数：数字前面的 + 或 - 号是可选的。</td>
+<td>int *</td>
+</tr>
+<tr>
+<td>e,E,f,g,G</td>
+<td>浮点数：包含了一个小数点、一个可选的前置符号 + 或 -、一个可选的后置字符 e 或 E，以及一个十进制数字。两个有效的实例 -732.103 和 7.12e4</td>
+<td>float *</td>
+</tr>
+<tr>
+<td>o</td>
+<td>八进制整数。</td>
+<td>int *</td>
+</tr>
+<tr>
+<td>s</td>
+<td>字符串。这将读取连续字符，直到遇到一个空格字符（空格字符可以是空白、换行和制表符）。</td>
+<td>char *</td>
+</tr>
+<tr>
+<td>u</td>
+<td>无符号的十进制整数。</td>
+<td>unsigned int *</td>
+</tr>
+<tr>
+<td>x,X</td>
+<td>十六进制整数。</td>
+<td>int *</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>附加参数 – 根据不同的 format 字符串，函数可能需要一系列的附加参数，每个参数包含了一个要被插入的值，替换了 format 参数中指定的每个 % 标签。参数的个数应与 % 标签的个数相同。</li>
+</ul>
+<h2 id="返回值"><a href="#返回值" class="headerlink" title="返回值"></a>返回值</h2><p>如果成功，该函数返回成功匹配和赋值的个数。如果到达文件末尾或发生读错误，则返回 EOF。</p>
+<hr>
+<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>说实话，菜鸟教程的这个文档也不是很容易看，因为它基本是直接翻译的（<a href="https://www.tutorialspoint.com/c_standard_library/c_function_scanf.htm" target="_blank" rel="noopener">原文档</a>）……有些地方翻译的不是很通顺。要想了解具体的使用方法，还是要实际的敲一下。</p>
+<h2 id="在-OJ-中的使用"><a href="#在-OJ-中的使用" class="headerlink" title="在 OJ 中的使用"></a>在 OJ 中的使用</h2><h3 id="OJ-评测的原理"><a href="#OJ-评测的原理" class="headerlink" title="OJ 评测的原理"></a>OJ 评测的原理</h3><p>关于 OJ 评测的具体原理，我之后写一篇博客来说明一下，这里只说一下关于评测时的输入输出问题：</p>
+<p>在 OJ 评测时，会通过流重定向的方式，用输入文件来替换待评测程序的标准输入，通过对比程序标准输出和输出文件来确定运行结果。</p>
+<h3 id="scanf-读取数据原理"><a href="#scanf-读取数据原理" class="headerlink" title="scanf 读取数据原理"></a>scanf 读取数据原理</h3><p>文档中说明了，scanf 是从标准输入流 stream 中读取数据的。在评测开始的时候，（可以认为）一次性把所有输入数据扔到标准输入流的缓冲池中，此时我们可以把整个标准输入流当成一个输入数据的字符串，读取数据就是根据某种规则从这个字符串中解析出自己想要的数据。</p>
+<p>在读取的时候，会有一个指针指向输入数据字符串中要读取的下一个字符，我们要做的就是正确的读取所有数据。</p>
+<p>scanf 函数在读取的时候，每遇到一个类型说明符，都会尝试去匹配指针所指字符，当读取完所有符合规则的字符之后，将解析后的数据存在用户给定的变量中。</p>
+<p>那怎样才能知道已经读取完符合规则的字符了呢？ scanf 用以下条件来进行判断：</p>
+<ul>
+<li>读取达到宽度限制（<code>%3d</code> 用于读取 3 位数字）</li>
+<li>遇到（相对当前类型说明符的）非法输入（比如 <code>%d</code> 读取到了一个 <code>&#39;a&#39;</code>）</li>
+</ul>
+<p><code>scanf</code> 遇到以上条件时就会停止当前的匹配，开始下一个类型说明符的匹配。</p>
+<h3 id="具体示例"><a href="#具体示例" class="headerlink" title="具体示例"></a>具体示例</h3><p>比如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> ch;</span><br><span class="line"><span class="keyword">char</span> str[<span class="number">100</span>];</span><br><span class="line"><span class="built_in">scanf</span>(<span class="string">"%c%s"</span>, &amp;ch, str);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"ch: %c\nstr: %s"</span>, ch, str);</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> HelloWorld!</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> ch: H</span></span><br><span class="line">str: elloWorld!</span><br></pre></td></tr></table></figure>
+<p>在程序开始运行的时候，标准输入流中的字符串为 <code>&quot;HelloWorld!&quot;</code> ，<code>scanf</code> 首先尝试匹配 <code>&#39;%c&#39;</code> ：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HelloWorld!</span><br><span class="line">^</span><br></pre></td></tr></table></figure>
+<p><code>&#39;%c&#39;</code> 匹配了指针指向的字符 <code>&#39;H&#39;</code> ，指针后移一位，长度达到限制， <code>&#39;%c&#39;</code> 停止匹配。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HelloWorld!</span><br><span class="line"> ^</span><br></pre></td></tr></table></figure>
+<p>此时 <code>scanf</code> 尝试匹配 <code>&#39;%s&#39;</code> ， <code>&#39;%s&#39;</code> 的匹配规则为：匹配连续字符，直到遇到空白符（空格、换行或者格式制表符等）。 <code>&#39;%s&#39;</code> 成功匹配该行剩下的所有字符 <code>&quot;elloWorld!&quot;</code> ，并将其存到字符数组 <code>str</code> 中。</p>
+<p>另一个例子：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> ch;</span><br><span class="line"><span class="keyword">char</span> str1[<span class="number">100</span>], str2[<span class="number">100</span>];</span><br><span class="line"><span class="built_in">scanf</span>(<span class="string">"%c%s%s"</span>, &amp;ch, str1, str2);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"ch: %c\nstr1: %s\nstr2: %s\n"</span>, ch, str1, str2);</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> Hello                         World!</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> ch: H</span></span><br><span class="line">str1: ello</span><br><span class="line">str2: World!</span><br></pre></td></tr></table></figure>
+<p>当 <code>ch</code> 和 <code>str1</code> 读取结束的时候，指针的位置如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Hello                         World!</span><br><span class="line">     ^</span><br></pre></td></tr></table></figure>
+<p>那为什么 <code>str2</code> 读取到的却是 <code>&quot;World!&quot;</code> 呢？原因很简单，因为 <code>&#39;%s&#39;</code> 类型说明符在匹配的时候会忽略字符串开头所有的空白符，指针会一直后移直到指向 <code>&#39;W&#39;</code> 的时候才正式开始匹配。</p>
+<p>同样的程序，我们换一组输入：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> Hello</span></span><br><span class="line">World!</span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> ch: H</span></span><br><span class="line">str1: ello</span><br><span class="line">str2: World!</span><br></pre></td></tr></table></figure>
+<p>原理同上，在字符串中，换行和其他空白符没有本质上的区别，读取的字符串实际上是： <code>&quot;Hello\nWorld!&quot;</code> ，对于 <code>&#39;\n&#39;</code> 的处理和对其他空白符的处理是一样的，因此会出现和上面的程序一样的结果。</p>
+<p>但是如果我们把上面程序的格式说明符交换一下位置的话就会出现问题：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> ch;</span><br><span class="line"><span class="keyword">char</span> str1[<span class="number">100</span>], str2[<span class="number">100</span>];</span><br><span class="line"><span class="built_in">scanf</span>(<span class="string">"%s%c%s"</span>, str1, &amp;ch, str2);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"ch: %c\nstr1: %s\nstr2: %s\n"</span>, ch, str1, str2);</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> Hello</span></span><br><span class="line">World!</span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> ch: </span></span><br><span class="line"></span><br><span class="line">str1: Hello</span><br><span class="line">str2: World!</span><br></pre></td></tr></table></figure>
+<p><code>ch</code> 读取到了个空？并不是， 在 <code>str1</code> 读取结束的时候，指针刚好指到第一行的最后： <code>&#39;\n&#39;</code> ，<code>&#39;%c&#39;</code> 在读取的时候可不管三七二十一，只要它上场，就会读取当前指针所指的那个字符，因此， <code>&#39;%c&#39;</code> 实际上是把第一行末尾的 <code>&#39;\n&#39;</code> 给读取走了。因为 <code>&#39;\n&#39;</code> 在控制台下会表现为一个换行，因此会给人一种什么也没有读取到的感觉。</p>
+<h3 id="空格-的使用"><a href="#空格-的使用" class="headerlink" title="[空格] 的使用"></a>[空格] 的使用</h3><p>在使用 OJ 的过程中，绝大部分人（我认识的所有人）都曾经被数据中的不可见字符给坑过，其中，每行末尾的换行符可以说卡死过无数人。其实，只要明白了换行符也只不过是一个空白符，稍加注意，就可以避免这些问题。但是，有时候问题并非出现在我们身上，也有可能是数据的锅（POJ 某题曾经卡过我很久，最后发现是他数据中有多余的空格），那这时候我们就要尽量的提高我们代码的鲁棒性，在数据有一些问题的情况下，依然能够尽量正确的读取数据。</p>
+<p><img src="sowhereissold.jpg" alt="sowhereissold.jpg"></p>
+<p>那么，在哪里才能买到……啊不是，我们要怎么做呢？</p>
+<p>其实，仔细看一下文档，就会发现一个神奇的格式说明符，就是 [空格] 。在菜鸟教程翻译的文档中，只是提到了有空格这个说明符，对其作用却并没有说明。查看英文文档，我发现，[空格] 这个格式说明符可以在很大程度上避免因不可见字符而读取到错误的结果。</p>
+<p>[空格] 的作用：读取 0 个、 1 个或多个连续的空白字符。</p>
+<p>从描述上就可以看出，如果不是主动想要读取空白字符，那么在原有的格式说明符两侧加 [空格] 是不会产生任何问题的，而且还可以完美避免因空白字符而导致的锅。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> ch;</span><br><span class="line"><span class="keyword">char</span> str1[<span class="number">100</span>], str2[<span class="number">100</span>];</span><br><span class="line"><span class="built_in">scanf</span>(<span class="string">"%s %c %s"</span>, str1, &amp;ch, str2);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"ch: %c\nstr1: %s\nstr2: %s\n"</span>, ch, str1, str2);</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> Hello</span></span><br><span class="line">World!</span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> ch: W</span></span><br><span class="line">str1: Hello</span><br><span class="line">str2: orld!</span><br></pre></td></tr></table></figure>
+<p>加上 [空格] 之后，产生了期望的结果。</p>
+<p>（其他空白符有同样的效果，但是空白符最顺手）</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul>
+<li>多看英文文档比啥都好</li>
+<li>在格式说明符两侧加空格能有效增强 OJ 体验</li>
+</ul>
+<p>以上就是我对 scanf 函数的理解，如果有什么不对的或者纰漏，还请斧正，如果能对你有些许的帮助，也希望你能给我留个言~</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C-语言/" rel="tag"># C 语言</a>
+          
+            <a href="/tags/scanf/" rel="tag"># scanf</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/23/CentOS-配置-PHP5-2-Apache-MySQL/" rel="next" title="CentOS 配置 PHP5.2 + Apache + MySQL">
+                <i class="fa fa-chevron-left"></i> CentOS 配置 PHP5.2 + Apache + MySQL
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/03/Django-动态更改文件上传路径/" rel="prev" title="Django 动态更改文件上传路径">
+                Django 动态更改文件上传路径 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+      <div id="gitalk-container"></div>
+      <link rel="stylesheet" href="https://unpkg.com/gitalk@1.4.1/dist/gitalk.css">
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/avatar.png"
+                alt="MeiK" />
+            
+              <p class="site-author-name" itemprop="name">MeiK</p>
+              <p class="site-description motion-element" itemprop="description">In solitude, where we are least alone.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/MeiK2333" target="_blank" title="GitHub"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://twitter.com/MeiK2333" target="_blank" title="Twitter"><i class="fa fa-fw fa-globe"></i>Twitter</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.zhihu.com/people/MeiK2333/activities" target="_blank" title="ZhiHu"><i class="fa fa-fw fa-globe"></i>ZhiHu</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:meik2333@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-globe"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#描述"><span class="nav-number">1.1.</span> <span class="nav-text">描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#声明"><span class="nav-number">1.2.</span> <span class="nav-text">声明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参数"><span class="nav-number">1.3.</span> <span class="nav-text">参数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#scanf-类型说明符："><span class="nav-number">1.3.1.</span> <span class="nav-text">scanf 类型说明符：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#返回值"><span class="nav-number">1.4.</span> <span class="nav-text">返回值</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用"><span class="nav-number">2.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#在-OJ-中的使用"><span class="nav-number">2.1.</span> <span class="nav-text">在 OJ 中的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#OJ-评测的原理"><span class="nav-number">2.1.1.</span> <span class="nav-text">OJ 评测的原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#scanf-读取数据原理"><span class="nav-number">2.1.2.</span> <span class="nav-text">scanf 读取数据原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#具体示例"><span class="nav-number">2.1.3.</span> <span class="nav-text">具体示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#空格-的使用"><span class="nav-number">2.1.4.</span> <span class="nav-text">[空格] 的使用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">MeiK</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+    
+      <script src="https://unpkg.com/gitalk@1.4.1/dist/gitalk.min.js"></script>
+      <script type="text/javascript">
+        const gitalk = new Gitalk({
+          id: (decodeURI(location.pathname)).split("/")[4].substring(0, 49),
+          clientID: '4d2994f790117e7633bd',
+          clientSecret: '09947e1a30bd8f44fd4f648114b65fe5e6c5156a',
+          repo: 'MeiK2333.github.io',
+          owner: 'MeiK2333',
+          admin: 'MeiK2333'.split(','),
+          pagerDirection: 'first',
+          // facebook-like distraction free mode
+          distractionFreeMode: false
+        })
+        gitalk.render('gitalk-container')
+      </script>
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

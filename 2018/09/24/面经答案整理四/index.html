@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/lurongkai/anti-baidu/js/anti-baidu-latest.min.js" charset="UTF-8"></script>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="//cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/favicon.ico?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="转自牛客网《一名渣渣C++程序员的心酸春招/秋招记》。 最近的这几篇面经里面概念性的问题比较多，这些问题其实并不适合整理下来，还有有很多问题之前的几篇里面已经解答过了，这里过滤掉这些题目。 有好多题目我直接贴了别的博客的链接，并不是我没有好好考虑过这个问题，而是我感觉我不能比我贴的博客讲的更好。">
+<meta name="keywords" content="C++,面经">
+<meta property="og:type" content="article">
+<meta property="og:title" content="面经答案整理四">
+<meta property="og:url" content="https://meik2333.com/2018/09/24/面经答案整理四/index.html">
+<meta property="og:site_name" content="MeiK&#39;s blog">
+<meta property="og:description" content="转自牛客网《一名渣渣C++程序员的心酸春招/秋招记》。 最近的这几篇面经里面概念性的问题比较多，这些问题其实并不适合整理下来，还有有很多问题之前的几篇里面已经解答过了，这里过滤掉这些题目。 有好多题目我直接贴了别的博客的链接，并不是我没有好好考虑过这个问题，而是我感觉我不能比我贴的博客讲的更好。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-04-25T06:47:11.772Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="面经答案整理四">
+<meta name="twitter:description" content="转自牛客网《一名渣渣C++程序员的心酸春招/秋招记》。 最近的这几篇面经里面概念性的问题比较多，这些问题其实并不适合整理下来，还有有很多问题之前的几篇里面已经解答过了，这里过滤掉这些题目。 有好多题目我直接贴了别的博客的链接，并不是我没有好好考虑过这个问题，而是我感觉我不能比我贴的博客讲的更好。">
+
+
+
+
+
+
+  <link rel="canonical" href="https://meik2333.com/2018/09/24/面经答案整理四/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>面经答案整理四 | MeiK's blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-107784973-4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-107784973-4');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">MeiK's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">In solitude, where we are least alone.</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://meik2333.com/2018/09/24/面经答案整理四/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="MeiK">
+      <meta itemprop="description" content="In solitude, where we are least alone.">
+      <meta itemprop="image" content="/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MeiK's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">面经答案整理四
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-09-24 15:02:29" itemprop="dateCreated datePublished" datetime="2018-09-24T15:02:29+08:00">2018-09-24</time>
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>转自牛客网<a href="https://www.nowcoder.com/discuss/57942" target="_blank" rel="noopener">《一名渣渣C++程序员的心酸春招/秋招记》</a>。</p>
+<p>最近的这几篇面经里面概念性的问题比较多，这些问题其实并不适合整理下来，还有有很多问题之前的几篇里面已经解答过了，这里过滤掉这些题目。</p>
+<p>有好多题目我直接贴了别的博客的链接，并不是我没有好好考虑过这个问题，而是我感觉我不能比我贴的博客讲的更好。</p>
+<a id="more"></a>
+<h1 id="C"><a href="#C" class="headerlink" title="C++"></a>C++</h1><h2 id="各种排序的时间复杂度，空间复杂度，是否稳定，时间复杂度是否与初始序列有关"><a href="#各种排序的时间复杂度，空间复杂度，是否稳定，时间复杂度是否与初始序列有关" class="headerlink" title="各种排序的时间复杂度，空间复杂度，是否稳定，时间复杂度是否与初始序列有关?"></a>各种排序的时间复杂度，空间复杂度，是否稳定，时间复杂度是否与初始序列有关?</h2><p>稳定的排序是指：序列中相同的数字，在排序前后的相对次序不会发生改变。</p>
+<table>
+<thead>
+<tr>
+<th>排序</th>
+<th>平均时间复杂度</th>
+<th>最优时间复杂度</th>
+<th>最差时间复杂度</th>
+<th>空间复杂度</th>
+<th>是否稳定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>冒泡排序</td>
+<td>O(n²)</td>
+<td>O(n²)</td>
+<td>O(n²)</td>
+<td>O(1)</td>
+<td>稳定</td>
+</tr>
+<tr>
+<td>简单选择排序</td>
+<td>O(n²)</td>
+<td>O(n²)</td>
+<td>O(n²)</td>
+<td>O(1)</td>
+<td>不稳定</td>
+</tr>
+<tr>
+<td>直接插入排序</td>
+<td>O(n²)</td>
+<td>O(n²)</td>
+<td>O(n²)</td>
+<td>O(1)</td>
+<td>稳定</td>
+</tr>
+<tr>
+<td>希尔排序</td>
+<td></td>
+<td></td>
+<td></td>
+<td>O(1)</td>
+<td>不稳定</td>
+</tr>
+<tr>
+<td>快速排序</td>
+<td>O(n * log(n))</td>
+<td>O(n * log(n))</td>
+<td>O(n²)</td>
+<td>O(1)</td>
+<td>不稳定</td>
+</tr>
+<tr>
+<td>归并排序</td>
+<td>O(n * log(n))</td>
+<td>O(n * log(n))</td>
+<td>O(n * log(n))</td>
+<td>O(n)</td>
+<td>稳定</td>
+</tr>
+<tr>
+<td>堆排序</td>
+<td>O(n * log(n))</td>
+<td>O(n * log(n))</td>
+<td>O(n * log(n))</td>
+<td>O(1)</td>
+<td>不稳定</td>
+</tr>
+<tr>
+<td>基数排序</td>
+<td>O(k * n)</td>
+<td>O(k * n)</td>
+<td>O(k * n)</td>
+<td>O(n + k)</td>
+<td>不稳定</td>
+</tr>
+<tr>
+<td>计数排序</td>
+<td>O(n + k)</td>
+<td>O(n + k)</td>
+<td>O(n + k)</td>
+<td>O(n + k)</td>
+<td>不稳定</td>
+</tr>
+</tbody>
+</table>
+<h2 id="指针和引用的区别？"><a href="#指针和引用的区别？" class="headerlink" title="指针和引用的区别？"></a>指针和引用的区别？</h2><ul>
+<li>指针是一个实体，需要分配内存空间。引用是变量的别名，不需要分配额外空间。</li>
+<li>引用必须在定义的时候进行初始化，并且后续不能改变。指针定义时不需要初始化，并且指向可以改变。</li>
+<li>引用只能由一级，指针可以有多级。</li>
+<li>指针和引用的自增运算结果不同。</li>
+<li><code>sizeof</code> 一个引用得到的是所指向的变量的空间，<code>sizeof</code> 指针的值是指针本身的大小。</li>
+<li>引用访问一个变量是直接访问，指针访问一个变量是间接访问。</li>
+<li>引用底层是通过指针实现的。</li>
+</ul>
+<h2 id="悬空指针和野指针有什么区别？"><a href="#悬空指针和野指针有什么区别？" class="headerlink" title="悬空指针和野指针有什么区别？"></a>悬空指针和野指针有什么区别？</h2><p>野指针指向一个已删除的对象或未申请访问受限内存区域的指针。与空指针不同，野指针无法通过简单地判断是否为 NULL避免，而只能通过养成良好的编程习惯来尽力减少。对野指针进行操作很容易造成程序错误。需对指针进行初始化，</p>
+<p>一个指针的指向对象已被删除，那么就成了悬空指针。野指针是那些未初始化的指针。</p>
+<h2 id="什么是内存泄漏？怎么产生的？如何检测？"><a href="#什么是内存泄漏？怎么产生的？如何检测？" class="headerlink" title="什么是内存泄漏？怎么产生的？如何检测？"></a>什么是内存泄漏？怎么产生的？如何检测？</h2><p>在计算机科学中，内存泄漏指由于疏忽或错误造成程序未能释放已经不再使用的内存。内存泄漏并非指内存在物理上的消失，而是应用程序分配某段内存后，由于设计错误，导致在释放该段内存之前就失去了对该段内存的控制，从而造成了内存的浪费。</p>
+<p>可以 mock <code>malloc</code> 和 <code>free</code>，然后进行分析。</p>
+<h2 id="static-和-const-区别？"><a href="#static-和-const-区别？" class="headerlink" title="static 和 const 区别？"></a>static 和 const 区别？</h2><p>参照我的博客<a href="/2018/09/24/C-C-中-static-与-const-的用法与区别/">《C/C++ 中 static 与 const 的用法与区别》</a>。</p>
+<h2 id="const-和-define-的区别？"><a href="#const-和-define-的区别？" class="headerlink" title="const 和 define 的区别？"></a>const 和 define 的区别？</h2><ul>
+<li>const 需要占用内存，define 不需要</li>
+<li>define 在预处理阶段展开，const 在编译阶段使用</li>
+<li>define 可以定义一些函数或者表达式，有很多方便的用法（比如 @、@@）</li>
+</ul>
+<p>在定义常量时，const 比 define 更有优势，因为：</p>
+<ul>
+<li>const 有类型检查，define 没有</li>
+<li>const 便于调试，define 在预处理时被全部替换了，不利于调试</li>
+</ul>
+<h2 id="struct-和-class-的区别？"><a href="#struct-和-class-的区别？" class="headerlink" title="struct 和 class 的区别？"></a>struct 和 class 的区别？</h2><p>在 C++ 中，struct 就是一个默认权限为 public 的 class，两者可以相互继承。事实上，C++ 中的 struct 也可以使用 private、public 等权限控制。</p>
+<p>在实际编码时，使用 struct 还是 class 几乎完全没有区别，但是一般来说，如果要定义的是一种数据结构的话，那么就使用 struct，否则的话应该使用 class。</p>
+<h2 id="sizeof-和-strlen-的区别？"><a href="#sizeof-和-strlen-的区别？" class="headerlink" title="sizeof 和 strlen 的区别？"></a>sizeof 和 strlen 的区别？</h2><p>sizeof 是运算符，值会在编译时被计算出来。在不同的情况下，其值有不同的含义：</p>
+<ul>
+<li>当参数为数组时，值为编译时分配的数组大小</li>
+<li>当参数为指针时，值为指针所占用的空间大小</li>
+<li>当参数为类型时，值为该类型所占的空间大小</li>
+<li>当参数为对象时，值为该对象所占用的空间大小</li>
+<li>当参数为函数时，值为该函数的返回值所占用的空间大小</li>
+</ul>
+<p>strlen 是函数，在执行函数时才会返回，作用是返回参数的字符串的长度。</p>
+<p>在计算常量字符串（像 <code>char str[] = &quot;Hello World!&quot;;</code> 这样定义的）的长度时，sizeof 的值会比 strlen 的值大 1，因为 strlen 不计最后的 ‘\0’。</p>
+<h2 id="32位，64位系统中，各种常用内置数据类型占用的字节数？"><a href="#32位，64位系统中，各种常用内置数据类型占用的字节数？" class="headerlink" title="32位，64位系统中，各种常用内置数据类型占用的字节数？"></a>32位，64位系统中，各种常用内置数据类型占用的字节数？</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"bool: "</span> &lt;&lt; <span class="keyword">sizeof</span>(<span class="keyword">bool</span>) &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"char: "</span> &lt;&lt; <span class="keyword">sizeof</span>(<span class="keyword">char</span>) &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"unsigned char: "</span> &lt;&lt; <span class="keyword">sizeof</span>(<span class="keyword">unsigned</span> <span class="keyword">char</span>) &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"short: "</span> &lt;&lt; <span class="keyword">sizeof</span>(<span class="keyword">short</span>) &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"int: "</span> &lt;&lt; <span class="keyword">sizeof</span>(<span class="keyword">int</span>) &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"unsigned int: "</span> &lt;&lt; <span class="keyword">sizeof</span>(<span class="keyword">unsigned</span> <span class="keyword">int</span>) &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"long: "</span> &lt;&lt; <span class="keyword">sizeof</span>(<span class="keyword">int</span>) &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"long long: "</span> &lt;&lt; <span class="keyword">sizeof</span>(<span class="keyword">long</span> <span class="keyword">long</span>) &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"float: "</span> &lt;&lt; <span class="keyword">sizeof</span>(<span class="keyword">float</span>) &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"double: "</span> &lt;&lt; <span class="keyword">sizeof</span>(<span class="keyword">double</span>) &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"*: "</span> &lt;&lt; <span class="keyword">sizeof</span>(<span class="keyword">char</span> *) &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>64 位系统下运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">bool: 1</span><br><span class="line">char: 1</span><br><span class="line">unsigned char: 1</span><br><span class="line">short: 2</span><br><span class="line">int: 4</span><br><span class="line">unsigned int: 4</span><br><span class="line">long: 4</span><br><span class="line">long long: 8</span><br><span class="line"><span class="built_in">float</span>: 4</span><br><span class="line">double: 8</span><br><span class="line">*: 8</span><br></pre></td></tr></table></figure>
+<p>32 位系统下，指针类型占 4 个字节。</p>
+<h2 id="virtual、inline、decltype、volatile、static、const-关键字的作用？使用场景？"><a href="#virtual、inline、decltype、volatile、static、const-关键字的作用？使用场景？" class="headerlink" title="virtual、inline、decltype、volatile、static、const 关键字的作用？使用场景？"></a>virtual、inline、decltype、volatile、static、const 关键字的作用？使用场景？</h2><h3 id="virtual"><a href="#virtual" class="headerlink" title="virtual"></a>virtual</h3><p>声明虚函数或者虚基类。</p>
+<h3 id="inline"><a href="#inline" class="headerlink" title="inline"></a>inline</h3><p>声明函数为内联函数，inline 必须与函数定义体放在一起才能使函数成为内联，仅将 inline 放在函数声明前面不起任何作用。</p>
+<p>inline 仅仅是个建议，如果内联函数内有类似递归等复杂操作，编译器会忽略 inline。</p>
+<h3 id="decltype"><a href="#decltype" class="headerlink" title="decltype"></a>decltype</h3><p>decltype 类型说明符生成指定表达式的类型，常用在模板函数中，与 auto 搭配声明返回类型。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//C++11</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> U&gt;</span><br><span class="line">auto myFunc(T&amp;&amp; t, U&amp;&amp; u) -&gt; decltype (forward&lt;T&gt;(t) + forward&lt;U&gt;(u))</span><br><span class="line">        &#123; <span class="keyword">return</span> forward&lt;T&gt;(t) + forward&lt;U&gt;(u); &#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//C++14</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> U&gt;</span><br><span class="line"><span class="keyword">decltype</span>(<span class="keyword">auto</span>) myFunc(T&amp;&amp; t, U&amp;&amp; u)</span><br><span class="line">        &#123; <span class="keyword">return</span> forward&lt;T&gt;(t) + forward&lt;U&gt;(u); &#125;;</span><br></pre></td></tr></table></figure>
+<p>具体内容请参照 <a href="https://docs.microsoft.com/zh-cn/cpp/cpp/decltype-cpp?view=vs-2017" target="_blank" rel="noopener">MSDN</a>。</p>
+<h3 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h3><p>在 C 以及 C++ 中，volatile 关键字的作用：</p>
+<ul>
+<li>允许访问内存映射设备</li>
+<li>允许在 setjmp 和 longjmp 之间使用变量</li>
+<li>允许在信号处理函数中使用 sig_atomic_t 变量</li>
+</ul>
+<h2 id="C-中函数指针的作用？由哪些属性唯一决定一个函数指针？"><a href="#C-中函数指针的作用？由哪些属性唯一决定一个函数指针？" class="headerlink" title="C++ 中函数指针的作用？由哪些属性唯一决定一个函数指针？"></a>C++ 中函数指针的作用？由哪些属性唯一决定一个函数指针？</h2><p><a href="https://www.zhihu.com/question/38955439/answer/79101717" target="_blank" rel="noopener">C++中如何定义指向函数指针的指针？ - 王霄池的回答 - 知乎</a></p>
+<h2 id="C-中如何唯一确定一个重载函数？"><a href="#C-中如何唯一确定一个重载函数？" class="headerlink" title="C++ 中如何唯一确定一个重载函数？"></a>C++ 中如何唯一确定一个重载函数？</h2><p>通过参数个数与参数类型来确定一个重载函数，相同参数不同返回值的函数不能重载。</p>
+<h2 id="C-多态的实现机制？虚函数表的内部实现机制？"><a href="#C-多态的实现机制？虚函数表的内部实现机制？" class="headerlink" title="C++ 多态的实现机制？虚函数表的内部实现机制？"></a>C++ 多态的实现机制？虚函数表的内部实现机制？</h2><p>C++ 中使用虚表实现了多态，虚表内使用虚表指针指向对象所属的类的虚表。</p>
+<h2 id="C-中重载、覆盖、隐藏的区别？"><a href="#C-中重载、覆盖、隐藏的区别？" class="headerlink" title="C++ 中重载、覆盖、隐藏的区别？"></a>C++ 中重载、覆盖、隐藏的区别？</h2><p><a href="http://www.cppblog.com/zgysx/archive/2007/03/12/19662.html" target="_blank" rel="noopener">重载(overload)，覆盖(override),隐藏(hide)的区别</a></p>
+<h2 id="深拷贝与浅拷贝的区别？"><a href="#深拷贝与浅拷贝的区别？" class="headerlink" title="深拷贝与浅拷贝的区别？"></a>深拷贝与浅拷贝的区别？</h2><p><a href="https://blog.csdn.net/u010700335/article/details/39830425" target="_blank" rel="noopener">c++深拷贝和浅拷贝</a></p>
+<h2 id="派生类中构造函数、析构函数调用顺序？"><a href="#派生类中构造函数、析构函数调用顺序？" class="headerlink" title="派生类中构造函数、析构函数调用顺序？"></a>派生类中构造函数、析构函数调用顺序？</h2><p><a href="https://my.oschina.net/qihh/blog/57684" target="_blank" rel="noopener">继承中构造函数和析构函数的调用顺序</a></p>
+<h2 id="C-类中数据成员初始化顺序？"><a href="#C-类中数据成员初始化顺序？" class="headerlink" title="C++ 类中数据成员初始化顺序？"></a>C++ 类中数据成员初始化顺序？</h2><p><a href="https://blog.csdn.net/qq_37059483/article/details/78608375" target="_blank" rel="noopener">C++类成员初始化顺序问题</a></p>
+<p>需要额外注意：成员变量在使用初始化列表初始化时，与构造函数中初始化成员列表的顺序无关，只与定义成员变量的顺序有关。</p>
+<p>还需要额外注意的是：C++ 类中 <code>static const</code> 定义的变量是可以直接在声明的时候赋值的，而 C++11 之后，可以在声明普通成员变量时赋值。</p>
+<h2 id="结构体内存对齐问题？结构体-类大小的计算？"><a href="#结构体内存对齐问题？结构体-类大小的计算？" class="headerlink" title="结构体内存对齐问题？结构体/类大小的计算？"></a>结构体内存对齐问题？结构体/类大小的计算？</h2><p>结构体的内存对齐：</p>
+<ol>
+<li>前面的地址必须是后面的地址整数倍，不是就补齐</li>
+<li>整个 struct 的地址必须是最大字节的整数倍</li>
+</ol>
+<p>比如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">cls1</span> &#123;</span></span><br><span class="line">    <span class="keyword">char</span> ch1;</span><br><span class="line">    <span class="keyword">char</span> ch2;</span><br><span class="line">    <span class="keyword">char</span> ch3;</span><br><span class="line">    <span class="keyword">char</span> ch4;</span><br><span class="line">    <span class="keyword">int</span> int1;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="built_in">cout</span> &lt;&lt; <span class="keyword">sizeof</span>(cls1) &lt;&lt; <span class="built_in">endl</span>; <span class="comment">// 8</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">cls2</span> &#123;</span></span><br><span class="line">    <span class="keyword">char</span> ch1;</span><br><span class="line">    <span class="keyword">char</span> ch2;</span><br><span class="line">    <span class="keyword">char</span> ch3;</span><br><span class="line">    <span class="keyword">int</span> int1;</span><br><span class="line">    <span class="keyword">char</span> ch4;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="built_in">cout</span> &lt;&lt; <span class="keyword">sizeof</span>(cls2) &lt;&lt; <span class="built_in">endl</span>;  <span class="comment">// 12</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">cls3</span> &#123;</span></span><br><span class="line">    <span class="keyword">char</span> ch1;</span><br><span class="line">    <span class="keyword">char</span> ch2;</span><br><span class="line">    <span class="keyword">char</span> ch3;</span><br><span class="line">    <span class="keyword">int</span> int1;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="built_in">cout</span> &lt;&lt; <span class="keyword">sizeof</span>(cls3) &lt;&lt; <span class="built_in">endl</span>;  <span class="comment">// 8</span></span><br></pre></td></tr></table></figure>
+<p>如果是个空类，也会占用 1 个字节。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">cls4</span> &#123;</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="built_in">cout</span> &lt;&lt; <span class="keyword">sizeof</span>(cls4) &lt;&lt; <span class="built_in">endl</span>;  <span class="comment">// 1</span></span><br></pre></td></tr></table></figure>
+<p>类的普通成员函数不占用类的空间：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">cls5</span> &#123;</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">func1</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">func2</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">func3</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="built_in">cout</span> &lt;&lt; <span class="keyword">sizeof</span>(cls5) &lt;&lt; <span class="built_in">endl</span>;  <span class="comment">// 1</span></span><br></pre></td></tr></table></figure>
+<p>如果类内有虚函数的话，那么会多占用 8 个字节（32 位为 4 个字节）：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">cls6</span> &#123;</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">func1</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">func2</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">func3</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="built_in">cout</span> &lt;&lt; <span class="keyword">sizeof</span>(cls6) &lt;&lt; <span class="built_in">endl</span>;  <span class="comment">// 8</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">cls7</span> &#123;</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">func1</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">func2</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">func3</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="built_in">cout</span> &lt;&lt; <span class="keyword">sizeof</span>(cls7) &lt;&lt; <span class="built_in">endl</span>;  <span class="comment">// 8</span></span><br></pre></td></tr></table></figure>
+<p>如果有类继承的话，那么子类的大小会加上基类的大小：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">cls1</span> &#123;</span></span><br><span class="line">    <span class="keyword">char</span> ch;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">cls2</span>:</span> <span class="keyword">public</span> cls1 &#123;</span><br><span class="line">    <span class="keyword">char</span> ch;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="built_in">cout</span> &lt;&lt; <span class="keyword">sizeof</span>(cls2) &lt;&lt; <span class="built_in">endl</span>;  <span class="comment">// 2</span></span><br></pre></td></tr></table></figure>
+<p>对于虚拟继承，除了应有的大小之外，同时还会有一个指向基类的指针：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">cls1</span> &#123;</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">cls2</span>:</span> <span class="keyword">virtual</span> cls1 &#123;</span><br><span class="line">    <span class="keyword">char</span> ch;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="built_in">cout</span> &lt;&lt; <span class="keyword">sizeof</span>(cls2) &lt;&lt; <span class="built_in">endl</span>;  <span class="comment">// 8</span></span><br></pre></td></tr></table></figure>
+<h2 id="static-cast、dynamic-cast、const-cast、reinpreter-cast-的区别？"><a href="#static-cast、dynamic-cast、const-cast、reinpreter-cast-的区别？" class="headerlink" title="static_cast、dynamic_cast、const_cast、reinpreter_cast 的区别？"></a>static_cast、dynamic_cast、const_cast、reinpreter_cast 的区别？</h2><ul>
+<li>reinterpret_cast<br>指针类型转换，不分青红皂白，对内容不做任何类型的检查和转换。如果转换前后的类型不能以同样的内存布局获得数据的话，那么使用将会出现问题（但是还是可以转换）。</li>
+<li>static_cast<br>可以用于子类与父类之间的互相转换，也可以用于基本类型的转换。</li>
+<li>dynamic_cast<br>只用于对象的指针和引用。当用于多态类型时，它允许任意的隐式类型转换以及相反过程。不过，与static_cast不同，在后一种情况里（注：即隐式转换的相反过程），dynamic_cast会检查操作是否有效。也就是说，它会检查转换是否会返回一个被请求的有效的完整对象。</li>
+<li>const_cast<br>这个转换类型操纵传递对象的const属性，或者是设置或者是移除。</li>
+</ul>
+<h2 id="shared-ptr、unique-ptr、weak-ptr-的区别？auto-ptr-与-shared-ptr-的区别？weak-ptr-主要是为了解决什么问题的？shared-ptr-的内部实现？"><a href="#shared-ptr、unique-ptr、weak-ptr-的区别？auto-ptr-与-shared-ptr-的区别？weak-ptr-主要是为了解决什么问题的？shared-ptr-的内部实现？" class="headerlink" title="shared_ptr、unique_ptr、weak_ptr 的区别？auto_ptr 与 shared_ptr 的区别？weak_ptr 主要是为了解决什么问题的？shared_ptr 的内部实现？"></a>shared_ptr、unique_ptr、weak_ptr 的区别？auto_ptr 与 shared_ptr 的区别？weak_ptr 主要是为了解决什么问题的？shared_ptr 的内部实现？</h2><ul>
+<li><p>shared_ptr<br>智能指针，会通过引用计数来自动销毁。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cls</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Cls() &#123;</span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; <span class="string">"new cls"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ~Cls() &#123;</span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; <span class="string">"delete cls"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">test1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"in test1"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="keyword">auto</span> *cls = <span class="keyword">new</span> Cls;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"out test1"</span> &lt;&lt; <span class="built_in">endl</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">test2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"in test2"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="built_in">shared_ptr</span>&lt;Cls&gt; cls = make_shared&lt;Cls&gt;();</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"out test2"</span> &lt;&lt; <span class="built_in">endl</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    test1();</span><br><span class="line">    test2();</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* 输出</span></span><br><span class="line"><span class="comment">in test1</span></span><br><span class="line"><span class="comment">new cls</span></span><br><span class="line"><span class="comment">out test1</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">in test2</span></span><br><span class="line"><span class="comment">new cls</span></span><br><span class="line"><span class="comment">out test2</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">delete cls</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>auto_ptr<br>创建一个智能指针，当出现复制构造与赋值操作时原有的指针会失效。</p>
+</li>
+<li>unique_ptr<br>创建一个智能指针，行为类似 auto_ptr，但是无法进行复制构造与赋值操作。</li>
+<li>weak_ptr<br>复制和传递 shared_ptr 时使用，不会扰乱引用计数，而如果对应的智能指针被销毁，weak_ptr 也会自动变成 nullptr。</li>
+</ul>
+<h3 id="auto-ptr-实现关键点"><a href="#auto-ptr-实现关键点" class="headerlink" title="auto_ptr 实现关键点"></a>auto_ptr 实现关键点</h3><ol>
+<li>利用特点“栈上对象在离开作用范围时会自动析构”。</li>
+<li>对于动态分配的内存，其作用范围是程序员手动控制的，这给程序员带来了方便但也不可避免疏忽造成的内存泄漏，毕竟只有编译器是最可靠的。</li>
+<li>auto_ptr通过在栈上构建一个对象a，对象a中wrap了动态分配内存的指针p，所有对指针p的操作都转为对对象a的操作。而在a的析构函数中会自动释放p的空间，而该析构函数是编译器自动调用的，无需程序员操心。</li>
+</ol>
+<h2 id="new-delete-和-malloc-free-的区别？"><a href="#new-delete-和-malloc-free-的区别？" class="headerlink" title="new/delete 和 malloc/free 的区别？"></a>new/delete 和 malloc/free 的区别？</h2><table>
+<thead>
+<tr>
+<th>特征</th>
+<th>new/delete</th>
+<th>malloc/free</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>分配内存的位置</td>
+<td>自由存储区</td>
+<td>堆</td>
+</tr>
+<tr>
+<td>内存分配成功的返回值</td>
+<td>完整类型指针</td>
+<td>void*</td>
+</tr>
+<tr>
+<td>内存分配失败的返回值</td>
+<td>默认抛出异常</td>
+<td>返回NULL</td>
+</tr>
+<tr>
+<td>分配内存的大小</td>
+<td>由编译器根据类型计算得出</td>
+<td>必须显式指定字节数</td>
+</tr>
+<tr>
+<td>处理数组</td>
+<td>有处理数组的 new 版本 new[]</td>
+<td>需要用户计算数组的大小后进行内存分配</td>
+</tr>
+<tr>
+<td>已分配内存的扩充</td>
+<td>无法直观地处理</td>
+<td>使用 realloc 简单完成</td>
+</tr>
+<tr>
+<td>是否相互调用</td>
+<td>可以，看具体的 operator new/delete 实现</td>
+<td>不可调用 new</td>
+</tr>
+<tr>
+<td>分配内存时内存不足</td>
+<td>客户能够指定处理函数或重新制定分配器</td>
+<td>无法通过用户代码进行处理</td>
+</tr>
+<tr>
+<td>函数重载</td>
+<td>允许</td>
+<td>不允许</td>
+</tr>
+<tr>
+<td>构造函数与析构函数</td>
+<td>调用</td>
+<td>不调用</td>
+</tr>
+</tbody>
+</table>
+<p>– 来自<a href="https://www.cnblogs.com/QG-whz/p/5140930.html" target="_blank" rel="noopener">《细说new与malloc的10点区别》</a></p>
+<h2 id="new-operator、operator-new、placement-new-的区别？"><a href="#new-operator、operator-new、placement-new-的区别？" class="headerlink" title="new operator、operator new、placement new 的区别？"></a>new operator、operator new、placement new 的区别？</h2><p><a href="https://www.jianshu.com/p/5921001f7ad4" target="_blank" rel="noopener">C++ 里面的new，operator new ，placement new的关系和区别</a>。</p>
+<h2 id="单例模式？懒汉式？饿汉式？"><a href="#单例模式？懒汉式？饿汉式？" class="headerlink" title="单例模式？懒汉式？饿汉式？"></a>单例模式？懒汉式？饿汉式？</h2><h3 id="单例模式的定义"><a href="#单例模式的定义" class="headerlink" title="单例模式的定义"></a>单例模式的定义</h3><p>保证一个类仅有一个实例，并提供一个访问它的全局访问点，该实例被所有程序模块共享。</p>
+<p>那么我们就必须保证：</p>
+<ol>
+<li>该类不能被复制。</li>
+<li>该类不能被公开的创造。</li>
+</ol>
+<p>那么对于C++来说，它的构造函数，拷贝构造函数和赋值函数都不能被公开调用。</p>
+<h3 id="懒汉式"><a href="#懒汉式" class="headerlink" title="懒汉式"></a>懒汉式</h3><p>懒汉模式的特点是延迟加载，比如配置文件，采用懒汉式的方法，顾名思义，懒汉么，很懒的，配置文件的实例直到用到的时候才会加载，不到万不得已就不会去实例化类，也就是说在第一次用到类实例的时候才会去实例化。</p>
+<h3 id="饿汉式"><a href="#饿汉式" class="headerlink" title="饿汉式"></a>饿汉式</h3><p>饿汉式会在单例类定义的时候就进行初始化，在 main 函数之前已经完成了初始化，因此不用担心多线程的问题。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://msdn.microsoft.com" target="_blank" rel="noopener">Visual C++文档</a> - MSDN</li>
+<li><a href="https://blog.csdn.net/tujiaw/article/details/6753498" target="_blank" rel="noopener">《C++多态的实现原理》</a></li>
+<li><a href="http://www.cnblogs.com/welfare/articles/336091.html" target="_blank" rel="noopener">《C++的四种cast操作符的区别–类型转换》</a> - 博客园</li>
+<li><a href="https://blog.csdn.net/MONKEY_D_MENG/article/details/5901392" target="_blank" rel="noopener">《C++ auto_ptr智能指针的用法》</a></li>
+<li><a href="https://www.cnblogs.com/QG-whz/p/5140930.html" target="_blank" rel="noopener">《细说new与malloc的10点区别》</a> - CSDN</li>
+<li><a href="https://blog.csdn.net/q5707802/article/details/79251148" target="_blank" rel="noopener">《用C++实现单例模式1——懒汉模式和饿汉式》</a> - CSDN</li>
+</ul>
+<h1 id="计算机网络"><a href="#计算机网络" class="headerlink" title="计算机网络"></a>计算机网络</h1><h2 id="TCP粘包问题？如何解决？"><a href="#TCP粘包问题？如何解决？" class="headerlink" title="TCP粘包问题？如何解决？"></a>TCP粘包问题？如何解决？</h2><p>TCP 是流传输协议，因此，如果想要连续发送两个包，那么这两个包可能会在一起发送，也有可能在一次传输中只传输了一部分。如果没有分开传输两个包的话，那么会对我们的接收产生影响，此时就产生了粘包问题。（UDP 有消息边界所以没有这个问题）</p>
+<p>解决方法有：</p>
+<ul>
+<li>每传输一次数据都重新建立一个新的 TCP 连接，发送完后立即关闭。<br>但是这样就和 TCP 的原则背道而驰了。</li>
+<li>强行 push。<br>同上，效率较低</li>
+<li>自行定义数据结构，比如：在每个消息头部说明消息的长度、使用特殊字符作为分割、设置定长结构等<br>这种方法可以利用 TCP 的效率，同时也能有效解决粘包问题，唯一的问题就是有一定技术门槛，要求操作底层数据包。</li>
+</ul>
+<h2 id="如何使用UDP建立可靠连接？"><a href="#如何使用UDP建立可靠连接？" class="headerlink" title="如何使用UDP建立可靠连接？"></a>如何使用UDP建立可靠连接？</h2><ol>
+<li>将数据包进行编号，按包的顺序接收并存储</li>
+<li>接收端接收到数据包后，发送确认信息给发送端，发送端接收确认数据以后，再继续发送下一个包，如果接收端收到的数据编号不是期望的编号，则要求发送端重新发送</li>
+</ol>
+<p>（其实就是自己实现滑动窗口 + 消息确认）</p>
+<h2 id="http-协议：各个版本的区别？"><a href="#http-协议：各个版本的区别？" class="headerlink" title="http 协议：各个版本的区别？"></a>http 协议：各个版本的区别？</h2><ol>
+<li>HTTP 0.9<br>HTTP 协议的第一个版本，只支持 GET 请求</li>
+<li>HTTP 1.0<ul>
+<li>请求与响应支持头域</li>
+<li>响应对象以一个响应状态行开始</li>
+<li>响应对象不只限于超文本</li>
+<li>开始支持客户端通过POST方法向Web服务器提交数据，支持GET、HEAD、POST方法</li>
+<li>（短连接）每一个请求建立一个TCP连接，请求完成后立马断开连接。这将会导致2个问题：连接无法复用，head of line blocking。连接无法复用会导致每次请求都经历三次握手和慢启动。三次握手在高延迟的场景下影响较明显，慢启动则对文件类请求影响较大。head of line blocking会导致带宽无法被充分利用，以及后续健康请求被阻塞。</li>
+</ul>
+</li>
+<li>HTTP 1.1<br>被广泛使用的协议版本，引入了很多关键性能优化。<ul>
+<li>Persistent Connection（keepalive 连接）：允许HTTP设备在事务处理结束之后将 TCP 连接保持在打开的状态，以便未来的 HTTP 请求重用现在的连接，直到客户端或服务器端决定将其关闭为止。在 HTTP1.0 中使用长连接需要添加请求头 Connection: Keep-Alive，而在 HTTP 1.1 所有的连接默认都是长连接，除非特殊声明不支持（ HTTP 请求报文首部加上 Connection: close ）。服务器端按照 FIFO 原则来处理不同的 Request。</li>
+<li>chunked编码传输：该编码将实体分块传送并逐块标明长度，直到长度为 0 块表示传输结束，这在实体长度未知时特别有用(比如由数据库动态产生的数据)</li>
+<li>字节范围请求：HTTP1.1 支持传送内容的一部分。比方说，当客户端已经有内容的一部分，为了节省带宽，可以只向服务器请求一部分。该功能通过在请求消息中引入了 range 头域来实现，它允许只请求资源的某个部分。在响应消息中 Content-Range 头域声明了返回的这部分对象的偏移值和长度。如果服务器相应地返回了对象所请求范围的内容，则响应码206（Partial Content）</li>
+<li>Pipelining（请求流水线）</li>
+<li>请求消息和响应消息都支持 Host 头域：在 HTTP1.0 中认为每台服务器都绑定一个唯一的 IP 地址，因此，请求消息中的 URL 并没有传递主机名（hostname）。但随着虚拟主机技术的发展，在一台物理服务器上可以存在多个虚拟主机（Multi-homed Web Servers），并且它们共享一个 IP 地址。因此，Host 头的引入就很有必要了。</li>
+<li>新增了一批 Request method：HTTP 1.1 增加了 OPTIONS、PUT、DELETE、TRACE、CONNECT 方法</li>
+<li>缓存处理：HTTP 1.1 在 1.0 的基础上加入了一些 cache 的新特性，引入了实体标签，一般被称为 e-tags，新增更为强大的 Cache-Control 头。</li>
+</ul>
+</li>
+<li>HTTP 2.0<ul>
+<li>多路复用（二进制分帧）。HTTP 2.0 最大的特点：不会改动 HTTP 的语义，HTTP 方法、状态码、URI 及首部字段，等等这些核心概念上一如往常，却能致力于突破上一代标准的性能限制，改进传输性能，实现低延迟和高吞吐量。而之所以叫 2.0，是在于新增的二进制分帧层。在二进制分帧层上， HTTP 2.0 会将所有传输的信息分割为更小的消息和帧，并对它们采用二进制格式的编码 ，其中 HTTP 1.x 的首部信息会被封装到 Headers 帧，而我们的request body 则封装到 Data 帧里面。</li>
+<li>HTTP 2.0 通信都在一个连接上完成，这个连接可以承载任意数量的双向数据流。相应地，每个数据流以消息的形式发送，而消息由一或多个帧组成，这些帧可以乱序发送，然后再根据每个帧首部的流标识符重新组装。</li>
+<li>头部压缩：当一个客户端向相同服务器请求许多资源时，像来自同一个网页的图像，将会有大量的请求看上去几乎同样的，这就需要压缩技术对付这种几乎相同的信息。</li>
+<li>随时复位：HTTP1.1 一个缺点是当 HTTP 信息有一定长度大小数据传输时，你不能方便地随时停止它，中断 TCP 连接的代价是昂贵的。使用 HTTP2 的 RST_STREAM 将能方便停止一个信息传输，启动新的信息，在不中断连接的情况下提高带宽利用效率。</li>
+<li>服务器端推流：Server Push。客户端请求一个资源 X，服务器端判断也许客户端还需要资源 Z，在无需事先询问客户端情况下将资源 Z 推送到客户端，客户端接受到后，可以缓存起来以备后用。</li>
+<li>优先权和依赖：每个流都有自己的优先级别，会表明哪个流是最重要的，客户端会指定哪个流是最重要的，有一些依赖参数，这样一个流可以依赖另外一个流。优先级别可以在运行时动态改变，当用户滚动页面时，可以告诉浏览器哪个图像是最重要的，你也可以在一组流中进行优先筛选，能够突然抓住重点流。</li>
+</ul>
+</li>
+</ol>
+<h2 id="Linux-常用网络命令的原理：ping、traceroute"><a href="#Linux-常用网络命令的原理：ping、traceroute" class="headerlink" title="Linux 常用网络命令的原理：ping、traceroute"></a>Linux 常用网络命令的原理：ping、traceroute</h2><p>ping 与 traceroute 都使用 ICMP 协议。</p>
+<p>traceroute 的原理是：首先发送一个 TTL 为 1 的 UDP 数据报，当经过路由器时，路由器将 TTL 减一，因为 TTL 此时为 0，因此路由器丢弃这个数据报，并返回路由不可达的 ICMP 给主机。主机接收到这个 ICMP 后再发送 TTL 为 2 的 UDP，以此类推。</p>
+<h2 id="DNS-的作用？什么时候使用-TCP-什么时候使用-UDP"><a href="#DNS-的作用？什么时候使用-TCP-什么时候使用-UDP" class="headerlink" title="DNS 的作用？什么时候使用 TCP?什么时候使用 UDP?"></a>DNS 的作用？什么时候使用 TCP?什么时候使用 UDP?</h2><ol>
+<li>单个 UDP 报文的最大长度为 512 字节，当单次查询的数据超过这个数值时需要使用 TCP。</li>
+<li>DNS 服务器需要同步其上级服务器的数据，此时使用 TCP。</li>
+<li>其余 DNS 查询都使用 UDP。</li>
+</ol>
+<h2 id="参考-1"><a href="#参考-1" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://www.zhihu.com/question/20210025" target="_blank" rel="noopener">怎么解决TCP网络传输“粘包”问题？ - 知乎</a></li>
+<li><a href="https://blog.csdn.net/tiandijun/article/details/41961785" target="_blank" rel="noopener">《TCP粘包问题分析和解决（全）》</a> - CSDN</li>
+<li><a href="https://zhuanlan.zhihu.com/p/37387316" target="_blank" rel="noopener">《HTTP协议几个版本的比较》</a> - 知乎专栏</li>
+</ul>
+<h1 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h1><p>数据库这方面是我比较薄弱的地方，所以这里更多的是引用其他的博客和内容。</p>
+<h2 id="MySQL-中-MyISAM-与-InnoDB-的区别？"><a href="#MySQL-中-MyISAM-与-InnoDB-的区别？" class="headerlink" title="MySQL 中 MyISAM 与 InnoDB 的区别？"></a>MySQL 中 MyISAM 与 InnoDB 的区别？</h2><ol>
+<li>InnoDB 支持事务，MyISAM 不支持，对于 InnoDB 每一条 SQL 语言都默认封装成事务，自动提交，这样会影响速度，所以最好把多条 SQL 语言放在 begin 和 commit 之间，组成一个事务</li>
+<li>InnoDB 支持外键，而 MyISAM 不支持。对一个包含外键的 InnoDB 表转为 MYISAM 会失败</li>
+<li>InnoDB 是聚集索引，数据文件是和索引绑在一起的，必须要有主键，通过主键索引效率很高。但是辅助索引需要两次查询，先查询到主键，然后再通过主键查询到数据。因此，主键不应该过大，因为主键太大，其他索引也都会很大。而MyISAM是非聚集索引，数据文件是分离的，索引保存的是数据文件的指针。主键索引和辅助索引是独立的</li>
+<li>InnoDB 不保存表的具体行数，执行 <code>select count(*) from table</code> 时需要全表扫描。而 MyISAM 用一个变量保存了整个表的行数，执行上述语句时只需要读出该变量即可，速度很快</li>
+<li>Innodb 不支持全文索引，而 MyISAM 支持全文索引，查询效率上 MyISAM 要高；</li>
+</ol>
+<p>如何选择：</p>
+<ol>
+<li>是否要支持事务，如果要请选择innodb，如果不需要可以考虑MyISAM</li>
+<li>如果表中绝大多数都只是读查询，可以考虑MyISAM，如果既有读写也挺频繁，请使用InnoD</li>
+<li>系统奔溃后，MyISAM恢复起来更困难，能否接受</li>
+<li>MySQL5.5版本开始Innodb已经成为Mysql的默认引擎(之前是MyISAM)，说明其优势是有目共睹的，如果你不知道用什么，那就用InnoDB，至少不会差</li>
+</ol>
+<p>— <a href="https://www.zhihu.com/question/20596402/answer/211492971" target="_blank" rel="noopener">Mysql 中 MyISAM 和 InnoDB 的区别有哪些？ - Oscarwin的回答 - 知乎</a></p>
+<h2 id="索引？适合创建索引的条件？不适合创建索引的条件？"><a href="#索引？适合创建索引的条件？不适合创建索引的条件？" class="headerlink" title="索引？适合创建索引的条件？不适合创建索引的条件？"></a>索引？适合创建索引的条件？不适合创建索引的条件？</h2><h3 id="哪些情况适合建索引？"><a href="#哪些情况适合建索引？" class="headerlink" title="哪些情况适合建索引？"></a>哪些情况适合建索引？</h3><ol>
+<li>主键自动建立唯一索引。</li>
+<li>频繁作为查询条件的字段应该创建索引。</li>
+<li>查询中与其他表关联的字段，外键关系建立索引。</li>
+<li>频繁更新的字段不适合创建索引，因为每次更新不单单是更新了记录还会更新索引文件。</li>
+<li>where 条件里用不到的字段不创建索引。</li>
+<li>单键/组合索引的选择问题，who？（在高并发下倾向创建组合索引）。</li>
+<li>查询中排序的字段，排序字段若通过索引去访问将大大提高排序速度。（索引干两件事：检索和排序）。</li>
+<li>查询中统计或者分组字段。</li>
+</ol>
+<h3 id="哪些情况不适合建索引？"><a href="#哪些情况不适合建索引？" class="headerlink" title="哪些情况不适合建索引？"></a>哪些情况不适合建索引？</h3><ol>
+<li>表记录太少。</li>
+<li>经常增删改的表的字段。</li>
+<li>数据重复且分布平均的表字段，因此应该只为最经常查询和最经常排序的数据列建立索引。如果某个数据列包含许多重复的内容，为它建立索引就没太大的实际效果。</li>
+</ol>
+<p>— <a href="https://www.jianshu.com/p/a44960298154" target="_blank" rel="noopener">索引五：哪些情况适合建索引？</a> - 简书</p>
+<h2 id="索引优化策略？五个优化级别"><a href="#索引优化策略？五个优化级别" class="headerlink" title="索引优化策略？五个优化级别"></a>索引优化策略？五个优化级别</h2><p><a href="https://www.jianshu.com/p/d7665192aaaf" target="_blank" rel="noopener">我必须得告诉大家的MySQL优化原理</a></p>
+<h2 id="存储过程？"><a href="#存储过程？" class="headerlink" title="存储过程？"></a>存储过程？</h2><p>这个题目…啥意思…</p>
+<p>直接放定义吧：<a href="https://zh.wikipedia.org/wiki/%E5%AD%98%E5%82%A8%E7%A8%8B%E5%BA%8F" target="_blank" rel="noopener">存储程序</a></p>
+<h2 id="触发器？"><a href="#触发器？" class="headerlink" title="触发器？"></a>触发器？</h2><p><a href="https://zh.wikipedia.org/wiki/%E8%A7%A6%E5%8F%91%E5%99%A8" target="_blank" rel="noopener">触发器</a></p>
+<h2 id="参考-2"><a href="#参考-2" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://www.zhihu.com/question/20596402/answer/211492971" target="_blank" rel="noopener">Mysql 中 MyISAM 和 InnoDB 的区别有哪些？ - Oscarwin的回答 - 知乎</a></li>
+<li><a href="https://www.jianshu.com/p/a44960298154" target="_blank" rel="noopener">索引五：哪些情况适合建索引？</a> - 简书</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/面经/" rel="tag"># 面经</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/22/面经答案整理三/" rel="next" title="面经答案整理三">
+                <i class="fa fa-chevron-left"></i> 面经答案整理三
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/24/C-C-中-static-与-const-的用法与区别/" rel="prev" title="C/C++ 中 static 与 const 的用法与区别">
+                C/C++ 中 static 与 const 的用法与区别 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+      <div id="gitalk-container"></div>
+      <link rel="stylesheet" href="https://unpkg.com/gitalk@1.4.1/dist/gitalk.css">
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/avatar.png"
+                alt="MeiK" />
+            
+              <p class="site-author-name" itemprop="name">MeiK</p>
+              <p class="site-description motion-element" itemprop="description">In solitude, where we are least alone.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/MeiK2333" target="_blank" title="GitHub"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://twitter.com/MeiK2333" target="_blank" title="Twitter"><i class="fa fa-fw fa-globe"></i>Twitter</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://www.zhihu.com/people/MeiK2333/activities" target="_blank" title="ZhiHu"><i class="fa fa-fw fa-globe"></i>ZhiHu</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:meik2333@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-globe"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#C"><span class="nav-number">1.</span> <span class="nav-text">C++</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#各种排序的时间复杂度，空间复杂度，是否稳定，时间复杂度是否与初始序列有关"><span class="nav-number">1.1.</span> <span class="nav-text">各种排序的时间复杂度，空间复杂度，是否稳定，时间复杂度是否与初始序列有关?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#指针和引用的区别？"><span class="nav-number">1.2.</span> <span class="nav-text">指针和引用的区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#悬空指针和野指针有什么区别？"><span class="nav-number">1.3.</span> <span class="nav-text">悬空指针和野指针有什么区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是内存泄漏？怎么产生的？如何检测？"><span class="nav-number">1.4.</span> <span class="nav-text">什么是内存泄漏？怎么产生的？如何检测？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#static-和-const-区别？"><span class="nav-number">1.5.</span> <span class="nav-text">static 和 const 区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#const-和-define-的区别？"><span class="nav-number">1.6.</span> <span class="nav-text">const 和 define 的区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#struct-和-class-的区别？"><span class="nav-number">1.7.</span> <span class="nav-text">struct 和 class 的区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sizeof-和-strlen-的区别？"><span class="nav-number">1.8.</span> <span class="nav-text">sizeof 和 strlen 的区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#32位，64位系统中，各种常用内置数据类型占用的字节数？"><span class="nav-number">1.9.</span> <span class="nav-text">32位，64位系统中，各种常用内置数据类型占用的字节数？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#virtual、inline、decltype、volatile、static、const-关键字的作用？使用场景？"><span class="nav-number">1.10.</span> <span class="nav-text">virtual、inline、decltype、volatile、static、const 关键字的作用？使用场景？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#virtual"><span class="nav-number">1.10.1.</span> <span class="nav-text">virtual</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#inline"><span class="nav-number">1.10.2.</span> <span class="nav-text">inline</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#decltype"><span class="nav-number">1.10.3.</span> <span class="nav-text">decltype</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#volatile"><span class="nav-number">1.10.4.</span> <span class="nav-text">volatile</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-中函数指针的作用？由哪些属性唯一决定一个函数指针？"><span class="nav-number">1.11.</span> <span class="nav-text">C++ 中函数指针的作用？由哪些属性唯一决定一个函数指针？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-中如何唯一确定一个重载函数？"><span class="nav-number">1.12.</span> <span class="nav-text">C++ 中如何唯一确定一个重载函数？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-多态的实现机制？虚函数表的内部实现机制？"><span class="nav-number">1.13.</span> <span class="nav-text">C++ 多态的实现机制？虚函数表的内部实现机制？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-中重载、覆盖、隐藏的区别？"><span class="nav-number">1.14.</span> <span class="nav-text">C++ 中重载、覆盖、隐藏的区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#深拷贝与浅拷贝的区别？"><span class="nav-number">1.15.</span> <span class="nav-text">深拷贝与浅拷贝的区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#派生类中构造函数、析构函数调用顺序？"><span class="nav-number">1.16.</span> <span class="nav-text">派生类中构造函数、析构函数调用顺序？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-类中数据成员初始化顺序？"><span class="nav-number">1.17.</span> <span class="nav-text">C++ 类中数据成员初始化顺序？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结构体内存对齐问题？结构体-类大小的计算？"><span class="nav-number">1.18.</span> <span class="nav-text">结构体内存对齐问题？结构体/类大小的计算？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#static-cast、dynamic-cast、const-cast、reinpreter-cast-的区别？"><span class="nav-number">1.19.</span> <span class="nav-text">static_cast、dynamic_cast、const_cast、reinpreter_cast 的区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shared-ptr、unique-ptr、weak-ptr-的区别？auto-ptr-与-shared-ptr-的区别？weak-ptr-主要是为了解决什么问题的？shared-ptr-的内部实现？"><span class="nav-number">1.20.</span> <span class="nav-text">shared_ptr、unique_ptr、weak_ptr 的区别？auto_ptr 与 shared_ptr 的区别？weak_ptr 主要是为了解决什么问题的？shared_ptr 的内部实现？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#auto-ptr-实现关键点"><span class="nav-number">1.20.1.</span> <span class="nav-text">auto_ptr 实现关键点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#new-delete-和-malloc-free-的区别？"><span class="nav-number">1.21.</span> <span class="nav-text">new/delete 和 malloc/free 的区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#new-operator、operator-new、placement-new-的区别？"><span class="nav-number">1.22.</span> <span class="nav-text">new operator、operator new、placement new 的区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单例模式？懒汉式？饿汉式？"><span class="nav-number">1.23.</span> <span class="nav-text">单例模式？懒汉式？饿汉式？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#单例模式的定义"><span class="nav-number">1.23.1.</span> <span class="nav-text">单例模式的定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#懒汉式"><span class="nav-number">1.23.2.</span> <span class="nav-text">懒汉式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#饿汉式"><span class="nav-number">1.23.3.</span> <span class="nav-text">饿汉式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">1.24.</span> <span class="nav-text">参考</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#计算机网络"><span class="nav-number">2.</span> <span class="nav-text">计算机网络</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#TCP粘包问题？如何解决？"><span class="nav-number">2.1.</span> <span class="nav-text">TCP粘包问题？如何解决？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何使用UDP建立可靠连接？"><span class="nav-number">2.2.</span> <span class="nav-text">如何使用UDP建立可靠连接？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#http-协议：各个版本的区别？"><span class="nav-number">2.3.</span> <span class="nav-text">http 协议：各个版本的区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-常用网络命令的原理：ping、traceroute"><span class="nav-number">2.4.</span> <span class="nav-text">Linux 常用网络命令的原理：ping、traceroute</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DNS-的作用？什么时候使用-TCP-什么时候使用-UDP"><span class="nav-number">2.5.</span> <span class="nav-text">DNS 的作用？什么时候使用 TCP?什么时候使用 UDP?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考-1"><span class="nav-number">2.6.</span> <span class="nav-text">参考</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据库"><span class="nav-number">3.</span> <span class="nav-text">数据库</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL-中-MyISAM-与-InnoDB-的区别？"><span class="nav-number">3.1.</span> <span class="nav-text">MySQL 中 MyISAM 与 InnoDB 的区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#索引？适合创建索引的条件？不适合创建索引的条件？"><span class="nav-number">3.2.</span> <span class="nav-text">索引？适合创建索引的条件？不适合创建索引的条件？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#哪些情况适合建索引？"><span class="nav-number">3.2.1.</span> <span class="nav-text">哪些情况适合建索引？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#哪些情况不适合建索引？"><span class="nav-number">3.2.2.</span> <span class="nav-text">哪些情况不适合建索引？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#索引优化策略？五个优化级别"><span class="nav-number">3.3.</span> <span class="nav-text">索引优化策略？五个优化级别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#存储过程？"><span class="nav-number">3.4.</span> <span class="nav-text">存储过程？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#触发器？"><span class="nav-number">3.5.</span> <span class="nav-text">触发器？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考-2"><span class="nav-number">3.6.</span> <span class="nav-text">参考</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">MeiK</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+    
+      <script src="https://unpkg.com/gitalk@1.4.1/dist/gitalk.min.js"></script>
+      <script type="text/javascript">
+        const gitalk = new Gitalk({
+          id: (decodeURI(location.pathname)).split("/")[4].substring(0, 49),
+          clientID: '4d2994f790117e7633bd',
+          clientSecret: '09947e1a30bd8f44fd4f648114b65fe5e6c5156a',
+          repo: 'MeiK2333.github.io',
+          owner: 'MeiK2333',
+          admin: 'MeiK2333'.split(','),
+          pagerDirection: 'first',
+          // facebook-like distraction free mode
+          distractionFreeMode: false
+        })
+        gitalk.render('gitalk-container')
+      </script>
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
