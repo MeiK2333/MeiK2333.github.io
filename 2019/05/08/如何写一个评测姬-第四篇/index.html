@@ -115,27 +115,25 @@
 
 
 
-  <meta name="description" content="let headers = [];     let current_header;     let current_qq = &apos;&apos;;     let cnt = 0;     function getHeaders(timestamp) {         if (cnt++ &amp;gt; 23) {             return;         }         let url">
-<meta name="keywords" content="QQ,爬虫">
+  <meta name="description" content="从零开始实现一个 OJ 评测姬。">
+<meta name="keywords" content="OnlineJudge,评测姬">
 <meta property="og:type" content="article">
-<meta property="og:title" content="QQ 头像黑历史">
-<meta property="og:url" content="https://meik2333.com/2018/09/04/QQ-头像黑历史/index.html">
+<meta property="og:title" content="如何写一个评测姬 - 第四篇">
+<meta property="og:url" content="https://meik2333.com/2019/05/08/如何写一个评测姬-第四篇/index.html">
 <meta property="og:site_name" content="MeiK&#39;s blog">
-<meta property="og:description" content="let headers = [];     let current_header;     let current_qq = &apos;&apos;;     let cnt = 0;     function getHeaders(timestamp) {         if (cnt++ &amp;gt; 23) {             return;         }         let url">
+<meta property="og:description" content="从零开始实现一个 OJ 评测姬。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://q1.qlogo.cn/qhis/RJZX4YLCqVWdUqoezfpMicV1tZz2AriaIHyFoGLEr6VVvDRibqHb7tuZ5jI54iaU7DQBsHCscYvGaP0/100">
-<meta property="og:updated_time" content="2019-04-27T06:46:50.169Z">
+<meta property="og:updated_time" content="2019-05-08T11:12:16.845Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="QQ 头像黑历史">
-<meta name="twitter:description" content="let headers = [];     let current_header;     let current_qq = &apos;&apos;;     let cnt = 0;     function getHeaders(timestamp) {         if (cnt++ &amp;gt; 23) {             return;         }         let url">
-<meta name="twitter:image" content="https://q1.qlogo.cn/qhis/RJZX4YLCqVWdUqoezfpMicV1tZz2AriaIHyFoGLEr6VVvDRibqHb7tuZ5jI54iaU7DQBsHCscYvGaP0/100">
+<meta name="twitter:title" content="如何写一个评测姬 - 第四篇">
+<meta name="twitter:description" content="从零开始实现一个 OJ 评测姬。">
 
 
 
 
 
 
-  <link rel="canonical" href="https://meik2333.com/2018/09/04/QQ-头像黑历史/"/>
+  <link rel="canonical" href="https://meik2333.com/2019/05/08/如何写一个评测姬-第四篇/"/>
 
 
 
@@ -145,7 +143,7 @@
   };
 </script>
 
-  <title>QQ 头像黑历史 | MeiK's blog</title>
+  <title>如何写一个评测姬 - 第四篇 | MeiK's blog</title>
   
 
 
@@ -303,7 +301,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://meik2333.com/2018/09/04/QQ-头像黑历史/">
+    <link itemprop="mainEntityOfPage" href="https://meik2333.com/2019/05/08/如何写一个评测姬-第四篇/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="MeiK">
@@ -320,7 +318,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">QQ 头像黑历史
+          <h1 class="post-title" itemprop="name headline">如何写一个评测姬 - 第四篇
               
             
           </h1>
@@ -345,7 +343,7 @@
                 
               
 
-              <time title="创建时间：2018-09-04 17:20:45" itemprop="dateCreated datePublished" datetime="2018-09-04T17:20:45+08:00">2018-09-04</time>
+              <time title="创建时间：2019-05-08 15:05:04" itemprop="dateCreated datePublished" datetime="2019-05-08T15:05:04+08:00">2019-05-08</time>
             
 
             
@@ -379,68 +377,42 @@
       
 
       
-        
-<img src="https://q1.qlogo.cn/qhis/RJZX4YLCqVWdUqoezfpMicV1tZz2AriaIHyFoGLEr6VVvDRibqHb7tuZ5jI54iaU7DQBsHCscYvGaP0/100" id="header-current">
-<script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
-<script>
-    let headers = [];
-    let current_header;
-    let current_qq = '';
-    let cnt = 0;
-    function getHeaders(timestamp) {
-        if (cnt++ > 23) {
-            return;
-        }
-        let url = 'https://ti.qq.com/mqqbase/cgi/history/face/list?timestamp=' + timestamp + '&num=24&need_cur=1&filter_type=0';
-        $.ajax({
-            url: url,
-            dataType: 'json',
-            xhrFields: {
-                withCredentials: true
-            },
-            type: "get",
-            success: function (data) {
-                current_header = data.data.cur_face.headurl + 640;
-                headers = headers.concat(data.data.head_info_list);
-                if (data.data.is_end === 0) {
-                    getHeaders(data.data.last_timestamp);
-                } else {
-                    setHeaders();
-                }
-            }
-        });
-    }
-    function setHeaders() {
-        if (current_header) {
-            $("#header-current").attr('src', "https" + current_header.substr(4));
-        }
-        if (headers) {
-            let html = '';
-            for (let i = 0; i < headers.length; i++) {
-                // 升级协议为 https
-                html += `<img src="https${headers[i].headurl.substr(4)}640" style="margin: auto;    margin-top: 50px;">`;
-            }
-            $("#header-main").html(html);
-
-            // 解析出 QQ 号
-            current_qq = headers[0].fileid.split('_')[0];
-            $("#qq-main").html(`（哦对了，你的 QQ 号应该是 <span style="color:red;">${current_qq}</span> 吧）`);
-        }
-    }
-    getHeaders(Math.floor(new Date().getTime() / 1000));
-</script>
-
+        <p>从零开始实现一个 OJ 评测姬。</p>
 <a id="more"></a>
-<p><del>需要在同一浏览器内登陆过 QQ 相关的网站（ QQ 空间、QQ 音乐等）</del></p>
-<p>现在是手机 QQ 浏览器可见了…</p>
-<p>越往下年代越久远，不用谢。</p>
-
-<div id="qq-main">
-</div>
-<div id="header-main" style="text-align: center;">
-如果你看到了这些内容，那么应该没有正常获取到你的数据。<br>
-你可以通过登陆 <a href="https://im.qq.com/" target="_blank" rel="noopener">QQ 官方网站</a>来尝试修复。
-</div>
+<p>本篇讲一下如何防止评测姬因用户程序的异常而崩溃。首先，我们来看看用户程序都会出现什么异常，然后再来考虑如何解决这些异常。</p>
+<h2 id="解决过多资源占用"><a href="#解决过多资源占用" class="headerlink" title="解决过多资源占用"></a>解决过多资源占用</h2><p>用户可能因为失误而提交了占用过多资源的代码，比如死循环、占用过多内存、输出过多等。为了解决这些问题，我们需要限制用户程序的时间、内存以及输出数据的大小。</p>
+<p>Linux 有系统函数可以解决这个问题：<a href="https://linux.die.net/man/3/setrlimit" target="_blank" rel="noopener"><code>setrlimit</code></a>。这个函数可以限制程序的 CPU 时间、内存占用、输出数据等，用法大致如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/resource.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rlimit</span> <span class="title">rl</span>;</span></span><br><span class="line">    rl.rlim_cur = rl.rlim_max = <span class="number">1</span>;</span><br><span class="line">    setrlimit(RLIMIT_CPU, &amp;rl);</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ gcc main.c</span><br><span class="line">$ time ./a.out </span><br><span class="line">[2]    3057 cpu <span class="built_in">limit</span> exceeded  ./a.out</span><br><span class="line">./a.out  0.98s user 0.02s system 96% cpu 1.034 total</span><br></pre></td></tr></table></figure>
+<p>可以看到，虽然我们在代码中写了个死循环，但是这个程序只运行一秒就结束了。<code>setrlimit</code> 可以对进程添加资源限制，并在超出限制时触发信号，父进程可以捕获这个信号。同时 <code>exec</code> 会继承这些限制，因此可以使用与流重定向类似的方法来添加资源限制。</p>
+<p>有关限制的实际代码，可以查看 <a href="https://github.com/MeiK2333/ZeroJudger/blob/master/limit/main.c" target="_blank" rel="noopener">https://github.com/MeiK2333/ZeroJudger/blob/master/limit/main.c</a>。</p>
+<h2 id="解决恶意攻击"><a href="#解决恶意攻击" class="headerlink" title="解决恶意攻击"></a>解决恶意攻击</h2><p>不同于用户不小心提交的占用资源过多的代码，有些同学会故意提交一些恶意攻击评测姬的代码，俗称“卡评测”。对于这些恶意攻击，我们也需要做好防备。</p>
+<p>简单起见，我们的评测姬不对恶意攻击做防范，仅对用户无意间造成的资源过度占用做限制。</p>
+<p>常用的恶意攻击的方式我之前写过博客，后来我注销了 CSDN 账号，博客也没了，这里就重新写一遍吧。</p>
+<h3 id="include-攻击"><a href="#include-攻击" class="headerlink" title="include 攻击"></a>include 攻击</h3><p>利用 OJ 会返回编译错误的特点，使用 C/C++ 语言使用 <code>#include</code> 来导入一个敏感的文件，然后通过编译错误的信息来获得其中敏感的数据。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">echo</span> <span class="string">'password'</span> &gt; password.txt</span><br><span class="line">$ <span class="built_in">echo</span> <span class="string">'#include &lt;password.txt&gt;'</span> &gt; main.c </span><br><span class="line">$ gcc main.c </span><br><span class="line">main.c:1:10: error: <span class="string">'password.txt'</span> file not found with &lt;angled&gt; include; use <span class="string">"quotes"</span> instead</span><br><span class="line"><span class="comment">#include &lt;password.txt&gt;</span></span><br><span class="line">         ^~~~~~~~~~~~~~</span><br><span class="line">         <span class="string">"password.txt"</span></span><br><span class="line">In file included from main.c:1:</span><br><span class="line">./password.txt:1:1: error: unknown <span class="built_in">type</span> name <span class="string">'password'</span></span><br><span class="line">password</span><br><span class="line">^</span><br><span class="line">main.c:1:24: error: expected identifier or <span class="string">'('</span></span><br><span class="line"><span class="comment">#include &lt;password.txt&gt;</span></span><br><span class="line">                       ^</span><br><span class="line">3 errors generated.</span><br></pre></td></tr></table></figure>
+<p>解决方案为配置好评测用户权限，使用低权限的用户进行评测，以防止此类攻击。同时可以考虑使用 Docker 等进行评测，Docker 环境内不放任何敏感的数据。</p>
+<h3 id="编译超时-amp-amp-编译产生巨大文件-amp-amp-编译产生巨量错误信息"><a href="#编译超时-amp-amp-编译产生巨大文件-amp-amp-编译产生巨量错误信息" class="headerlink" title="编译超时 &amp;&amp; 编译产生巨大文件 &amp;&amp; 编译产生巨量错误信息"></a>编译超时 &amp;&amp; 编译产生巨大文件 &amp;&amp; 编译产生巨量错误信息</h3><ul>
+<li><p>编译超时  </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;/dev/random&gt;或者#include &lt;/dev/tty&gt; //(Linux)</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;CON&gt; //(Windows)</span></span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>编译产生巨大文件  </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">main[<span class="number">-1u</span>]=&#123;<span class="number">1</span>&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>编译产生巨量错误信息</p>
+</li>
+</ul>
+<p>这几种攻击方式并不能让攻击者获得什么数据或权限，只是单纯的会卡住评测。但有人就是这么无聊的……</p>
+<p>解决方案也很简单，就是像限制用户程序资源占用一样限制编译时的资源占用。</p>
+<h3 id="shell-攻击-amp-amp-fork-炸弹-amp-amp-其他系统调用攻击-amp-amp-网络模块攻击"><a href="#shell-攻击-amp-amp-fork-炸弹-amp-amp-其他系统调用攻击-amp-amp-网络模块攻击" class="headerlink" title="shell 攻击 &amp;&amp; fork 炸弹 &amp;&amp; 其他系统调用攻击 &amp;&amp; 网络模块攻击"></a>shell 攻击 &amp;&amp; fork 炸弹 &amp;&amp; 其他系统调用攻击 &amp;&amp; 网络模块攻击</h3><p>shell 攻击：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">system(<span class="string">"reboot"</span>);</span><br></pre></td></tr></table></figure>
+<p><code>fork</code> 炸弹：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">    fork();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>网络模块攻击：如果评测姬没有限制联网的话，攻击的程序可以通过网络做到很多的攻击方式，程序可能会收集很多运行时评测姬和服务器的信息，然后提交到某处。</p>
+<p>这几种攻击方式，如果只是简单的禁用 <code>system</code> 和 <code>fork</code> 等这些函数是没有用的，因为 C/C++ 的宏可以轻易的绕过这些限制。可以考虑在系统调用的层面进行限制，大多开源的评测机都是通过限制系统调用来保证评测安全的。</p>
+<p>限制系统调用，可以使用 <code>ptrace</code> 来自行限制，也可以使用开源库 <a href="https://github.com/seccomp/libseccomp" target="_blank" rel="noopener">seccomp</a> 来进行限制。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本篇我们介绍了常见的攻击手段与防范手段，这样我们的评测姬就会有一定的安全性保障。下一篇我们将介绍一下如何获取用户程序运行占用的资源。</p>
 
       
     </div>
@@ -461,9 +433,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/QQ/" rel="tag"># QQ</a>
+            <a href="/tags/OnlineJudge/" rel="tag"># OnlineJudge</a>
           
-            <a href="/tags/爬虫/" rel="tag"># 爬虫</a>
+            <a href="/tags/评测姬/" rel="tag"># 评测姬</a>
           
         </div>
       
@@ -476,8 +448,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/08/29/SYN-Flood-攻击原理与-C-语言实现/" rel="next" title="SYN Flood 攻击原理与 C 语言实现">
-                <i class="fa fa-chevron-left"></i> SYN Flood 攻击原理与 C 语言实现
+              <a href="/2019/05/05/如何写一个评测姬-第三篇/" rel="next" title="如何写一个评测姬 - 第三篇">
+                <i class="fa fa-chevron-left"></i> 如何写一个评测姬 - 第三篇
               </a>
             
           </div>
@@ -485,10 +457,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/09/15/TCP-的滑动窗口/" rel="prev" title="TCP 的滑动窗口">
-                TCP 的滑动窗口 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -536,8 +504,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -693,6 +670,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#解决过多资源占用"><span class="nav-number">1.</span> <span class="nav-text">解决过多资源占用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决恶意攻击"><span class="nav-number">2.</span> <span class="nav-text">解决恶意攻击</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#include-攻击"><span class="nav-number">2.1.</span> <span class="nav-text">include 攻击</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译超时-amp-amp-编译产生巨大文件-amp-amp-编译产生巨量错误信息"><span class="nav-number">2.2.</span> <span class="nav-text">编译超时 &amp;&amp; 编译产生巨大文件 &amp;&amp; 编译产生巨量错误信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#shell-攻击-amp-amp-fork-炸弹-amp-amp-其他系统调用攻击-amp-amp-网络模块攻击"><span class="nav-number">2.3.</span> <span class="nav-text">shell 攻击 &amp;&amp; fork 炸弹 &amp;&amp; 其他系统调用攻击 &amp;&amp; 网络模块攻击</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
