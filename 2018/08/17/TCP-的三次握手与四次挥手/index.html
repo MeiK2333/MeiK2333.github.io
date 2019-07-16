@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/lurongkai/anti-baidu/js/anti-baidu-latest.min.js" charset="UTF-8"></script>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="//cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/favicon.ico?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="TCP 协议提供了可靠的传输，但是网络是不可靠的，TCP 也无法保证数据一定会被对方接收，这是不可能做到的。TCP 实际提供的是数据的可靠递送或故障的可靠通知。 建立一个 TCP 连接需要进行三次握手，而终止一个 TCP 连接需要进行四次挥手。这篇博客就介绍一下关于 TCP 的三次握手与四次挥手与其他一些信息吧。">
+<meta name="keywords" content="UNPv1,网络编程,TCP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TCP 的三次握手与四次挥手">
+<meta property="og:url" content="https://meik2333.com/2018/08/17/TCP-的三次握手与四次挥手/index.html">
+<meta property="og:site_name" content="MeiK&#39;s blog">
+<meta property="og:description" content="TCP 协议提供了可靠的传输，但是网络是不可靠的，TCP 也无法保证数据一定会被对方接收，这是不可能做到的。TCP 实际提供的是数据的可靠递送或故障的可靠通知。 建立一个 TCP 连接需要进行三次握手，而终止一个 TCP 连接需要进行四次挥手。这篇博客就介绍一下关于 TCP 的三次握手与四次挥手与其他一些信息吧。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://meik2333.com/2018/08/17/TCP-的三次握手与四次挥手/TCP三次握手.png">
+<meta property="og:image" content="https://meik2333.com/2018/08/17/TCP-的三次握手与四次挥手/TCP四次挥手.png">
+<meta property="og:updated_time" content="2019-07-16T11:18:13.293Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="TCP 的三次握手与四次挥手">
+<meta name="twitter:description" content="TCP 协议提供了可靠的传输，但是网络是不可靠的，TCP 也无法保证数据一定会被对方接收，这是不可能做到的。TCP 实际提供的是数据的可靠递送或故障的可靠通知。 建立一个 TCP 连接需要进行三次握手，而终止一个 TCP 连接需要进行四次挥手。这篇博客就介绍一下关于 TCP 的三次握手与四次挥手与其他一些信息吧。">
+<meta name="twitter:image" content="https://meik2333.com/2018/08/17/TCP-的三次握手与四次挥手/TCP三次握手.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://meik2333.com/2018/08/17/TCP-的三次握手与四次挥手/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>TCP 的三次握手与四次挥手 | MeiK's blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-107784973-4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-107784973-4');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">MeiK's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">In solitude, where we are least alone.</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://meik2333.com/2018/08/17/TCP-的三次握手与四次挥手/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="MeiK">
+      <meta itemprop="description" content="In solitude, where we are least alone.">
+      <meta itemprop="image" content="/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MeiK's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">TCP 的三次握手与四次挥手
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-08-17 20:48:23" itemprop="dateCreated datePublished" datetime="2018-08-17T20:48:23+08:00">2018-08-17</time>
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>TCP 协议提供了可靠的传输，但是网络是不可靠的，TCP 也无法保证数据一定会被对方接收，这是不可能做到的。TCP 实际提供的是数据的可靠递送或故障的可靠通知。</p>
+<p>建立一个 TCP 连接需要进行三次握手，而终止一个 TCP 连接需要进行四次挥手。这篇博客就介绍一下关于 TCP 的三次握手与四次挥手与其他一些信息吧。<br><a id="more"></a></p>
+<h2 id="三次握手"><a href="#三次握手" class="headerlink" title="三次握手"></a>三次握手</h2><p>建立一个 TCP 连接时会发生下列情形。</p>
+<ol>
+<li>服务器必须准备好接收外来的连接。称之为<strong>被动打开</strong>（passive open）。在 Linux 上，一般是通过调用 <code>socket</code>、<code>bind</code> 和 <code>listen</code> 这三个函数来完成的。可以参照 <a href="/2018/06/29/Tinyhttpd-源码及分析/">Tinyhttpd</a> 的实现。</li>
+<li>客户端通过调用 <code>connect</code> 函数发起<strong>主动打开</strong>（active open）。客户端将向服务器发送一个 SYN（同步）分节，它告诉服务器客户端将在（待建立的）连接中发送的数据的初始序列号。SYN 分节通常不携带数据，其 IP 数据报只含有一个 IP 首部、一个 TCP 首部以及可能有的 TCP 选项。</li>
+<li>服务器必须确认（ACK）客户端的 SYN，同时自己也要发送一个 SYN 分节，它含有服务器将在同一连接中发送的数据的初始序列号。服务器在单个分节中发送 SYN 和对客户 SYN 的 ACK（确认）。</li>
+<li>客户端必须确认（ACK）服务器的的 SYN。 </li>
+</ol>
+<p>因为这个过程中最少需要三个分组，因此称之为 TCP 的<strong>三路握手</strong>（three-way handshake）。虽然很多地方将其翻译为了三次握手，但其实际只有一次握手（不过分为了三步），如下图。</p>
+<p><img src="TCP三次握手.png" alt="TCP 的三次握手"></p>
+<p>图中客户端的初始序列号为 J，服务器的初始序列号为 K。ACK 中的确认号是发送这个 ACK 的一端所期待的下一个序列号（即接收到的 SYN + 1）。</p>
+<h3 id="建立连接涉及到的函数"><a href="#建立连接涉及到的函数" class="headerlink" title="建立连接涉及到的函数"></a>建立连接涉及到的函数</h3><ul>
+<li><code>socket</code>：创建一个套接字，用于建立 TCP 连接（客户端）或者监听端口（服务器）</li>
+<li><code>bind</code>：服务器使用，绑定套接字与端口</li>
+<li><code>listen</code>：服务器使用，开始监听端口</li>
+<li><code>connect</code>：客户端使用，尝试建立一个到指定服务器的连接</li>
+<li><code>accept</code>：服务器使用，接收连接并响应，可以获得一个三次握手完成后的连接</li>
+</ul>
+<h3 id="TCP-选项"><a href="#TCP-选项" class="headerlink" title="TCP 选项"></a>TCP 选项</h3><p>每一个 SYN 可以含有多个 TCP 选项。下面是常用的TCP 选项。</p>
+<ul>
+<li>MSS 选项。发送 SYN 的 TCP 一端使用本选项通告对端它的<strong>最大分节大小</strong>（maximum segment size），即 MSS。也就是它在本连接的每个 TCP 分节中愿意接受的最大数据量。发送端 TCP 使用接收端的 MSS 作为所发送分节的最大大小。</li>
+<li>窗口规模选项。TCP 首部表示窗口大小的字段占 16 位，因此最大只能表示 65535。为了适应当今普及的高速网络连接，这个字段指定了窗口大小需要左移的位数（0~14），可以提供最大接近 1GB（65535 * 2^14)的窗口大小。</li>
+<li>时间戳选项。用以防止重复的失而复得的分组对数据造成破坏。</li>
+</ul>
+<h3 id="为什么是三次握手而不是两次或者四次"><a href="#为什么是三次握手而不是两次或者四次" class="headerlink" title="为什么是三次握手而不是两次或者四次"></a>为什么是三次握手而不是两次或者四次</h3><p>关于这个问题，我在网上也看了不少回答。知乎上有<a href="https://www.zhihu.com/question/24853633" target="_blank" rel="noopener">一个问题</a>就是对这个的讨论，里面有很多答主回答的都很不错。</p>
+<p>我自己对这个问题的理解是这个样子的：三次握手中的第二次，在一个分节中同时递送了对客户端的确认（ACK）和自己的 SYN，而如果将这个分节拆开来看的话，就是客户端和服务器都分别发送了一个 SYN 分节和对其的 ACK。</p>
+<p>网络环境是不能确定可靠的，三次握手后，客户端仍然不知道服务器有没有接收到自己最后一个 ACK。但这两个 SYN 和 ACK 可以测试双方的发送与接收能力，即使有再多的握手次数也不过是重复罢了。而这四个分节少了一个就无法测试到所有情况了。因此三次握手（两个 SYN 与两个 ACK）是最为合理的方式。</p>
+<h2 id="四次挥手"><a href="#四次挥手" class="headerlink" title="四次挥手"></a>四次挥手</h2><p>在 Linux 上，终止一个 TCP 连接有四步。</p>
+<ol>
+<li>某个应用程序调用 <code>close</code>，我们称该端执行<strong>主动关闭</strong>（active close）。该端的 TCP 将会发送一个 FIN 分节，表示数据发送结束。</li>
+<li>接收到 FIN 分节的对端执行<strong>被动关闭</strong>（passive close）。这个 FIN 由 TCP 确认。它的接收也作为一个文件结束符（end-of-file）传递给接收端应用进程（放在已排队等候该应用进程接收的任何其他数据之后），因为 FIN 的接收意味着接收端应用进程在相应连接上再无额外数据可接收。</li>
+<li>一段时间后，接收到这个文件描述符的应用进程将调用 <code>close</code> 关闭它的套接字。这导致它的 TCP 也发送一个 FIN。</li>
+<li>接收这个最终 FIN 的原发送端 TCP（即执行主动关闭的那一端）确认这个 FIN。</li>
+</ol>
+<p><img src="TCP四次挥手.png" alt="TCP四次挥手"></p>
+<p>这个过程通常需要四个分节，在某些情况下步骤一的 FIN 会随着数据一起发送；另外，步骤二与步骤三的分节有可能被合并为一个分节。</p>
+<h3 id="为什么是四次挥手"><a href="#为什么是四次挥手" class="headerlink" title="为什么是四次挥手"></a>为什么是四次挥手</h3><p>挥手时双方需要明确的通知到对方连接已经结束了，因此双方各自发送一个结束的信号与对结束信号的确认。</p>
+<h3 id="TIME-WAIT-状态"><a href="#TIME-WAIT-状态" class="headerlink" title="TIME_WAIT 状态"></a>TIME_WAIT 状态</h3><p>在关闭一个 TCP 连接的过程中，执行主动关闭的一端需要维持一个长达 2MSL 的 TIME_WAIT 状态。</p>
+<p>MSL 全称为 maximum segment lifetime，即最长分节生命期。RFC 1122 [Braden 1989] 的建议值为 2 分钟，而源自 Berkeley 的实现传统上使用 30 秒这个值。虽然 IP 数据报在网络中存活的限制是跳限（hop limit）而非时间，但是一般认为，一个 IP 数据报在网络中不能存活超过 MSL。基于这个前提，设立了时长为 2MSL 的 TIME_WAIT 状态。</p>
+<p>TIME_WAIT 状态有两个存在的理由：</p>
+<ol>
+<li>可靠地实现 TCP 全双工连接的终止；</li>
+<li>允许老的重复分节在网络中消逝。</li>
+</ol>
+<p>假设在终止 TCP 连接时，最后一个 ACK 分节丢失了，那么被动关闭的一方（在图中为服务器）将重发第三步的 FIN N，如果客户端已经清理了 TCP 连接的信息，那么将无法重发最后的 ACK。因此主动关闭的一方需要保持 TIME_WAIT 状态。</p>
+<p>对于第二个理由，假设两台电脑在进行 TCP 连接的时候发生了路由异常，某个分组没有被及时送达。两台电脑通过重传恢复了连接，并正常终止了这个 TCP 连接。紧接着，在同样的 IP 和同样的端口，这两台电脑又开始了一次新的 TCP 连接，此时之前没有及时送达的分组姗姗来迟，就有可能被误认为是新的连接的分节。为了解决这个问题，同样需要保持 TIME_WAIT 状态。这也解答了 TIME_WAIT 状态为什么是 2MSL：因为在一个 IP 最长生存时间不会超过 MSL 的前提下， 2MSL 时间可以保证每个方向的分组都已经在网络中消逝了。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>UNPv1</li>
+<li><a href="https://www.zhihu.com/question/24853633" target="_blank" rel="noopener">TCP 为什么是三次握手，而不是两次或四次？</a> - 知乎问题</li>
+</ul>
+<h2 id="工具"><a href="#工具" class="headerlink" title="工具"></a>工具</h2><ul>
+<li><a href="https://www.draw.io/" target="_blank" rel="noopener">draw.io</a>，在线作图工具</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/UNPv1/" rel="tag"># UNPv1</a>
+          
+            <a href="/tags/网络编程/" rel="tag"># 网络编程</a>
+          
+            <a href="/tags/TCP/" rel="tag"># TCP</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/17/我为什么选择将博客托管到-GitHub-Pages-上/" rel="next" title="我为什么选择将博客托管到 GitHub Pages 上">
+                <i class="fa fa-chevron-left"></i> 我为什么选择将博客托管到 GitHub Pages 上
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/19/TCP-连接的流程与状态转换/" rel="prev" title="TCP 连接的流程与状态转换">
+                TCP 连接的流程与状态转换 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+      <div id="gitalk-container"></div>
+      <link rel="stylesheet" href="https://unpkg.com/gitalk@1.4.1/dist/gitalk.css">
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/avatar.png"
+                alt="MeiK" />
+            
+              <p class="site-author-name" itemprop="name">MeiK</p>
+              <p class="site-description motion-element" itemprop="description">In solitude, where we are least alone.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">54</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/MeiK2333" target="_blank" title="GitHub"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://twitter.com/MeiK2333" target="_blank" title="Twitter"><i class="fa fa-fw fa-globe"></i>Twitter</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:meik2333@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-globe"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#三次握手"><span class="nav-number">1.</span> <span class="nav-text">三次握手</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#建立连接涉及到的函数"><span class="nav-number">1.1.</span> <span class="nav-text">建立连接涉及到的函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TCP-选项"><span class="nav-number">1.2.</span> <span class="nav-text">TCP 选项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么是三次握手而不是两次或者四次"><span class="nav-number">1.3.</span> <span class="nav-text">为什么是三次握手而不是两次或者四次</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四次挥手"><span class="nav-number">2.</span> <span class="nav-text">四次挥手</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么是四次挥手"><span class="nav-number">2.1.</span> <span class="nav-text">为什么是四次挥手</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TIME-WAIT-状态"><span class="nav-number">2.2.</span> <span class="nav-text">TIME_WAIT 状态</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#工具"><span class="nav-number">4.</span> <span class="nav-text">工具</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">MeiK</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+    
+      <script src="https://unpkg.com/gitalk@1.4.1/dist/gitalk.min.js"></script>
+      <script type="text/javascript">
+        const gitalk = new Gitalk({
+          id: (decodeURI(location.pathname)).split("/")[4].substring(0, 49),
+          clientID: '4d2994f790117e7633bd',
+          clientSecret: '09947e1a30bd8f44fd4f648114b65fe5e6c5156a',
+          repo: 'MeiK2333.github.io',
+          owner: 'MeiK2333',
+          admin: 'MeiK2333'.split(','),
+          pagerDirection: 'first',
+          // facebook-like distraction free mode
+          distractionFreeMode: false
+        })
+        gitalk.render('gitalk-container')
+      </script>
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

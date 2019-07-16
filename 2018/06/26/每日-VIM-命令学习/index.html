@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/lurongkai/anti-baidu/js/anti-baidu-latest.min.js" charset="UTF-8"></script>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="//cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/favicon.ico?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="参考 简明 VIM 练级攻略 - 陈皓 史上最全的Vim命令 - 作者不详">
+<meta name="keywords" content="VIM,攻略">
+<meta property="og:type" content="article">
+<meta property="og:title" content="每日 VIM 命令学习">
+<meta property="og:url" content="https://meik2333.com/2018/06/26/每日-VIM-命令学习/index.html">
+<meta property="og:site_name" content="MeiK&#39;s blog">
+<meta property="og:description" content="参考 简明 VIM 练级攻略 - 陈皓 史上最全的Vim命令 - 作者不详">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-07-16T11:18:13.313Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="每日 VIM 命令学习">
+<meta name="twitter:description" content="参考 简明 VIM 练级攻略 - 陈皓 史上最全的Vim命令 - 作者不详">
+
+
+
+
+
+
+  <link rel="canonical" href="https://meik2333.com/2018/06/26/每日-VIM-命令学习/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>每日 VIM 命令学习 | MeiK's blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-107784973-4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-107784973-4');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">MeiK's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">In solitude, where we are least alone.</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://meik2333.com/2018/06/26/每日-VIM-命令学习/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="MeiK">
+      <meta itemprop="description" content="In solitude, where we are least alone.">
+      <meta itemprop="image" content="/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MeiK's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">每日 VIM 命令学习
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-06-26 20:55:35" itemprop="dateCreated datePublished" datetime="2018-06-26T20:55:35+08:00">2018-06-26</time>
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://coolshell.cn/articles/5426.html" target="_blank" rel="noopener">简明 VIM 练级攻略 - 陈皓</a></li>
+<li><a href="https://blog.csdn.net/scaleqiao/article/details/45153379" target="_blank" rel="noopener">史上最全的Vim命令 - 作者不详</a></li>
+</ul>
+<a id="more"></a>
+<h3 id="Insert-模式"><a href="#Insert-模式" class="headerlink" title="Insert 模式"></a>Insert 模式</h3><ul>
+<li><code>esc</code> ，退出 <code>Insert</code> 模式，进入 <code>Normal</code> 模式</li>
+</ul>
+<h3 id="Normal-模式"><a href="#Normal-模式" class="headerlink" title="Normal 模式"></a>Normal 模式</h3><ul>
+<li><code>i</code> ，进入<code>Insert</code> 模式</li>
+<li><code>x</code> ，删除当前光标所在位置的字符</li>
+<li><code>s</code> ，删除当前光标所在位置的字符并进入 <code>Insert</code> 模式</li>
+<li><code>w</code> ，保存，后面可以加文件名</li>
+<li><code>q</code> ，退出</li>
+<li><code>q!</code> ，强制退出，不保存修改内容</li>
+<li><code>:wq</code> ，保存 + 退出， <code>w</code> 后面可以加文件名</li>
+<li><code>dd</code> ，删除当前行，并把删除的行存入剪切板内</li>
+<li><code>p</code> ，粘贴剪切板</li>
+<li><code>h</code> ， ←</li>
+<li><code>j</code> ， ↓</li>
+<li><code>k</code>， ↑</li>
+<li><code>l</code> ， →</li>
+<li><code>:help &lt;command&gt;</code> ， 显示相关命令的帮助</li>
+</ul>
+<h3 id="各种插入模式"><a href="#各种插入模式" class="headerlink" title="各种插入模式"></a>各种插入模式</h3><h4 id="基本插入"><a href="#基本插入" class="headerlink" title="基本插入"></a>基本插入</h4><ul>
+<li><code>i</code> ，在当前光标前插入</li>
+<li><code>I</code> ，在当前行第一个非空白符前插入</li>
+<li><code>gI</code> ，在当前行的开头插入</li>
+<li><code>a</code> ，在当前光标后插入</li>
+<li><code>A</code> ，在当前行末尾插入</li>
+<li><code>o</code> ，在当前行后插入一个新行</li>
+<li><code>O</code> ，在当前行前插入一个新行</li>
+<li><code>:r !date</code> ，在光标处插入当前日期时间</li>
+<li><code>:r !&lt;command&gt;</code> 可以将 shell 命令的输出插入当前文档</li>
+</ul>
+<h4 id="改写插入"><a href="#改写插入" class="headerlink" title="改写插入"></a>改写插入</h4><ul>
+<li><code>cw</code> ，替换从光标所在位置后到一个单词结尾的字符</li>
+<li><code>c[n]w</code> ，替换光标所在位置后 n 个单词，与 <code>[n]cw</code> 作用相同</li>
+<li><code>cl</code> ，替换光标所在位置后的 1 个字符</li>
+<li><code>c[n]l</code> ，替换光标所在位置后 n 个字符，与 <code>[n]cl</code> 作用相同</li>
+<li><code>ch</code> ，替换光标所在位置前 1 个字符</li>
+<li><code>c[n]h</code> ，替换光标所在位置前 n 个字符，与 <code>[n]ch</code> 作用相同</li>
+<li><code>cc</code> ，替换光标所在行</li>
+<li><code>c[n]c</code> ，替换光标所在行及向下的共 n 行，与 <code>[n]cc</code> 作用相同</li>
+<li><code>s</code> ，替换光标所在位置的字符</li>
+<li><code>[n]s</code> ，替换光标所在位置及之后的共 n 个字符</li>
+<li><code>S</code> ，替换光标所在行</li>
+<li><code>[n]S</code> ，替换光标所在行及向下的共 n 行</li>
+</ul>
+<h3 id="移动光标"><a href="#移动光标" class="headerlink" title="移动光标"></a>移动光标</h3><h4 id="随机移动"><a href="#随机移动" class="headerlink" title="随机移动"></a>随机移动</h4><ul>
+<li><code>hjkl</code> ，←↓→↑</li>
+<li><code>gj</code> ，移动到一段内的下一行</li>
+<li><code>gk</code> ，移动到一段内的上一行</li>
+<li><code>w</code> ，后移一个单词，到下一个单词开头</li>
+<li><code>W</code> ，后移一个单词，到下一个单词开头，会忽略一些标点符号</li>
+<li><code>e</code> ，类似 <code>w</code> ，不过是停留在下一个单词结尾</li>
+<li><code>E</code> ，类似 <code>E</code> ，不过是停留在下一个单词结尾</li>
+<li><code>b</code> ，前移一个单词，停留在开头</li>
+<li><code>B</code> ，前移一个单词，停留在开头，忽略一些标点符号</li>
+<li><code>ge</code> ，前移一个单词，停留在结尾</li>
+<li><code>gE</code> ，前移一个单词，停留在结尾，忽略一些标点符号</li>
+<li><code>(</code> ，前移一句</li>
+<li><code>)</code> ，后移一句</li>
+<li><code>{</code> ，前移一段</li>
+<li><code>}</code> ，后移一段</li>
+<li><code>+</code> 或 <code>&lt;enter&gt;</code> ，将光标移动到下一行的第一个非空白字符处</li>
+<li><code>-</code> ，将光标移动到上一行的第一个非空白字符处</li>
+<li><code>f[c]</code> ，将光标移动到同一行的下一个 <code>c</code> 处</li>
+<li><code>F[c]</code> ，将光标移动到同一行的上一个 <code>c</code> 处</li>
+<li><code>t[c]</code> ，将光标移动到同一行的下一个 <code>c</code> 前</li>
+<li><code>T[c]</code> ，将光标移动到同一行的上一个 <code>c</code> 后</li>
+<li><code>;</code> ，配合 <code>fFtT</code> 使用，重复一次刚刚的操作</li>
+<li><code>,</code> ，配合 <code>fFtT</code> 使用，反向重复一次刚刚的操作</li>
+</ul>
+<h4 id="匹配移动"><a href="#匹配移动" class="headerlink" title="匹配移动"></a>匹配移动</h4><ul>
+<li><code>/&lt;pattern&gt;</code> ，搜索 <code>pattern</code> 的字符串，语法为正则表达式，可以按 <code>n</code> 切换到下一个匹配位置，按 <code>N</code> 切换到上一个匹配位置</li>
+<li><code>0</code> ，到该行开头</li>
+<li><code>^</code> ，到该行第一个非空白字符处</li>
+<li><code>$</code> ，到该行末尾</li>
+<li><code>g_</code> ，到该行最后一个非空白字符处</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/VIM/" rel="tag"># VIM</a>
+          
+            <a href="/tags/攻略/" rel="tag"># 攻略</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/31/Java-web-中几种编码错误的原因及解决方案/" rel="next" title="Java web 中几种编码错误的原因及解决方案">
+                <i class="fa fa-chevron-left"></i> Java web 中几种编码错误的原因及解决方案
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/29/Tinyhttpd-源码及分析/" rel="prev" title="Tinyhttpd 源码及分析">
+                Tinyhttpd 源码及分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+      <div id="gitalk-container"></div>
+      <link rel="stylesheet" href="https://unpkg.com/gitalk@1.4.1/dist/gitalk.css">
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/avatar.png"
+                alt="MeiK" />
+            
+              <p class="site-author-name" itemprop="name">MeiK</p>
+              <p class="site-description motion-element" itemprop="description">In solitude, where we are least alone.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">54</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/MeiK2333" target="_blank" title="GitHub"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://twitter.com/MeiK2333" target="_blank" title="Twitter"><i class="fa fa-fw fa-globe"></i>Twitter</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:meik2333@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-globe"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">1.</span> <span class="nav-text">参考</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Insert-模式"><span class="nav-number">1.1.</span> <span class="nav-text">Insert 模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Normal-模式"><span class="nav-number">1.2.</span> <span class="nav-text">Normal 模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#各种插入模式"><span class="nav-number">1.3.</span> <span class="nav-text">各种插入模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#基本插入"><span class="nav-number">1.3.1.</span> <span class="nav-text">基本插入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#改写插入"><span class="nav-number">1.3.2.</span> <span class="nav-text">改写插入</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#移动光标"><span class="nav-number">1.4.</span> <span class="nav-text">移动光标</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#随机移动"><span class="nav-number">1.4.1.</span> <span class="nav-text">随机移动</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#匹配移动"><span class="nav-number">1.4.2.</span> <span class="nav-text">匹配移动</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">MeiK</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+    
+      <script src="https://unpkg.com/gitalk@1.4.1/dist/gitalk.min.js"></script>
+      <script type="text/javascript">
+        const gitalk = new Gitalk({
+          id: (decodeURI(location.pathname)).split("/")[4].substring(0, 49),
+          clientID: '4d2994f790117e7633bd',
+          clientSecret: '09947e1a30bd8f44fd4f648114b65fe5e6c5156a',
+          repo: 'MeiK2333.github.io',
+          owner: 'MeiK2333',
+          admin: 'MeiK2333'.split(','),
+          pagerDirection: 'first',
+          // facebook-like distraction free mode
+          distractionFreeMode: false
+        })
+        gitalk.render('gitalk-container')
+      </script>
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
