@@ -124,7 +124,7 @@
 <meta property="og:description" content="本文介绍了我是如何找到一个 BUG 的。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://meik2333.com/2019/01/29/我是如何找到一个-BUG-的/1.png">
-<meta property="og:updated_time" content="2019-07-29T12:37:30.527Z">
+<meta property="og:updated_time" content="2019-08-01T07:21:00.846Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="我是如何找到一个 BUG 的">
 <meta name="twitter:description" content="本文介绍了我是如何找到一个 BUG 的。">
@@ -426,7 +426,7 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">resp.headers[<span class="string">'Set-Cookie'</span>] = <span class="string">'Hello=World; Expires=Thu,31 Jan 2019 05:56:00 GMT;'</span></span><br></pre></td></tr></table></figure>
 <p>我尝试用 cUrl 和 Requests 来解析这段数据，都可以正常的获得响应，只有 aiohttp 不可以。这时候我发现这段字符串的格式有点问题：</p>
 <p>这是 <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Date" target="_blank" rel="noopener">MDN</a> 中说明的 <code>Expires</code> 格式：<code>&lt;day-name&gt;, &lt;day&gt; &lt;month&gt; &lt;year&gt; &lt;hour&gt;:&lt;minute&gt;:&lt;second&gt; GMT</code>。</p>
-<p>按照 MDN 的格式，<code>The,</code> 后面和 <code>31</code> 前面少了一个空格，我添加了这个空格后， aiohttp 果然能够正常的解析这段字符串了。</p>
+<p>按照 MDN 的格式，<code>Thu,</code> 后面和 <code>31</code> 前面少了一个空格，我添加了这个空格后， aiohttp 果然能够正常的解析这段字符串了。</p>
 <p>看起来问题到此结束了： aiohttp 没有对不规范的 <code>Expires</code> 做解析。但经我测试，JavaScript、PHP 都可以正常解析没有空格的数据，同为 Python 库的 Requests 也可以。或许兼容这种写法才是正常的？</p>
 <h2 id="找到问题代码"><a href="#找到问题代码" class="headerlink" title="找到问题代码"></a>找到问题代码</h2><p>是什么导致了同为 Python 语言的两个库行为不同的？我继续追踪代码，找到了 aiohttp 为 <code>session</code> 设置 <code>cookie</code> 的地方（<a href="https://github.com/aio-libs/aiohttp/blob/master/aiohttp/cookiejar.py#L113" target="_blank" rel="noopener">cookiejar.py</a>）：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> name, cookie <span class="keyword">in</span> cookies:</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> isinstance(cookie, Morsel):</span><br><span class="line">        tmp = SimpleCookie()</span><br><span class="line">        tmp[name] = cookie  <span class="comment"># type: ignore</span></span><br><span class="line">        cookie = tmp[name]</span><br></pre></td></tr></table></figure>
