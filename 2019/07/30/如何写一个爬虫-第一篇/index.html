@@ -126,7 +126,7 @@
 <meta property="og:image" content="https://meik2333.com/2019/07/30/如何写一个爬虫-第一篇/WX20190731-184700.png">
 <meta property="og:image" content="https://meik2333.com/2019/07/30/如何写一个爬虫-第一篇/WX20190731-194635@2x.png">
 <meta property="og:image" content="https://meik2333.com/2019/07/30/如何写一个爬虫-第一篇/40D98F7E9BDEEC8BB55AADA12BB1EB98.gif">
-<meta property="og:updated_time" content="2019-07-31T13:03:20.163Z">
+<meta property="og:updated_time" content="2019-08-05T13:03:32.998Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="如何写一个爬虫 - 第一篇">
 <meta name="twitter:description" content="从零开始实现一个爬虫。">
@@ -387,8 +387,8 @@
 <p>To eat when you’re hungry, to sleep when you’re tired, to take a break when you’re bored, to work on projects that seem fun and interesting. —— <a href="http://www.aaronsw.com/weblog/productivity" target="_blank" rel="noopener">Aaron Swartz</a></p>
 </blockquote>
 <p>关于如何写爬虫，网上已经有很多资源了，随便搜索一下就可以获得很多教程。跟着那些教程，很快就可以达到爬取豆瓣、微博等网站的水平。利用无头浏览器等技术，可以轻松的爬取网上绝大部分可见的资源。</p>
-<p>然而，回想起大一刚开始学习爬虫时候的我，当时我还在使用 <code>Python2</code> ，时常因为错误的编码而陷入困境，在网上的各种博客里复制来的代码运行倒是能运行，但其实哪一句什么意思都不知道，踩了数不清的坑之后才勉强入门。但如果过去的我能够看到现在网上铺天盖地的爬虫教程，我踩的坑会因此而变少吗？</p>
-<p>对我来说，答案是否定的。区别可能是，以前我在 CSDN 上复制 <code>Python2</code> + <code>urllib</code> 的代码，现在我在知乎专栏复制 <code>Python3</code> + <code>requests</code> 的代码。</p>
+<p>然而，回想起大一刚开始学习爬虫时候的我，当时我还在使用 Python2 ，时常因为错误的编码而陷入困境，在网上的各种博客里复制来的代码运行倒是能运行，但其实哪一句什么意思都不知道，踩了数不清的坑之后才勉强入门。但如果过去的我能够看到现在网上铺天盖地的爬虫教程，我踩的坑会因此而变少吗？</p>
+<p>对我来说，答案是否定的。区别可能是，以前我在 CSDN 上复制 Python2 + <code>urllib</code> 的代码，现在我在知乎专栏复制 Python3 + <code>requests</code> 的代码。</p>
 <p>因此，我决定自己写博客来讲解如何写爬虫。考虑到现在我的博客日访问量还是个位数，因此我大概率是写给自己看的。当然这并没有什么关系，就当作是写给大一时候的我自己了。</p>
 <h2 id="所需基础"><a href="#所需基础" class="headerlink" title="所需基础"></a>所需基础</h2><p>如果可以的话，我肯定是想能让零基础的人也能学会，然而我的能力它不允许啊……</p>
 <p>因此，在学习之前，你需要以下前置技能：</p>
@@ -440,15 +440,15 @@
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 <span class="number">200</span> OK</span><br><span class="line"><span class="attribute">Date</span>: Sun, 10 Oct 2010 23:26:07 GMT</span><br><span class="line"><span class="attribute">Server</span>: Apache/2.2.8 (Ubuntu) mod_ssl/2.2.8 OpenSSL/0.9.8g</span><br><span class="line"><span class="attribute">Last-Modified</span>: Sun, 26 Sep 2010 22:04:35 GMT</span><br><span class="line"><span class="attribute">ETag</span>: "45b6-834-49130cc1182c0"</span><br><span class="line"><span class="attribute">Accept-Ranges</span>: bytes</span><br><span class="line"><span class="attribute">Content-Length</span>: 13</span><br><span class="line"><span class="attribute">Connection</span>: close</span><br><span class="line"><span class="attribute">Content-Type</span>: text/html</span><br><span class="line"></span><br><span class="line">Hello world!</span><br></pre></td></tr></table></figure>
 <h2 id="编码实现一个基本的请求"><a href="#编码实现一个基本的请求" class="headerlink" title="编码实现一个基本的请求"></a>编码实现一个基本的请求</h2><p>先来介绍一个网站： <a href="https://httpbin.org" target="_blank" rel="noopener">https://httpbin.org</a> ，这是一个用于测试请求的网站，是测试爬虫的最合适的工具之一。比如你访问 <a href="https://httpbin.org/get" target="_blank" rel="noopener">https://httpbin.org/get</a> ，它会把你请求的 <code>headers</code> 信息、 <code>url</code> 、参数等信息都返回给你。</p>
 <p><img src="WX20190731-184700.png" alt=""></p>
-<p>因为 <code>https</code> 需要处理证书加解密，我们现在还无法做到，因此我们使用这个网站的 <code>http</code> 版本 <a href="http://httpbin.org" target="_blank" rel="noopener">http://httpbin.org</a> ，使用 <code>Python</code> ，请求其 <code>/get</code> 接口。</p>
-<p>在 <code>Python</code> 中，创建一个 TCP 连接可以使用 <code>socket</code> 库，这是一个内置库，<a href="https://docs.python.org/3/library/socket.html" target="_blank" rel="noopener">这里</a>是它的文档。</p>
+<p>因为 https 需要处理证书加解密，我们现在还无法做到，因此我们使用这个网站的 http 版本 <a href="http://httpbin.org" target="_blank" rel="noopener">http://httpbin.org</a> ，使用 Python ，请求其 <code>/get</code> 接口。</p>
+<p>在 Python 中，创建一个 TCP 连接可以使用 socket 库，这是一个内置库，<a href="https://docs.python.org/3/library/socket.html" target="_blank" rel="noopener">这里</a>是它的文档。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"></span><br><span class="line">sock = socket.socket()</span><br><span class="line">sock.connect((<span class="string">"httpbin.org"</span>, <span class="number">80</span>))</span><br><span class="line"></span><br><span class="line">request = <span class="string">"GET /get HTTP/1.0\r\n"</span> + \</span><br><span class="line">          <span class="string">"Host: httpbin.org\r\n"</span> + \</span><br><span class="line">          <span class="string">"\r\n"</span></span><br><span class="line">sock.send(request.encode(<span class="string">"ascii"</span>))</span><br><span class="line"></span><br><span class="line">response = <span class="string">b""</span></span><br><span class="line">chunk = sock.recv(<span class="number">4096</span>)</span><br><span class="line"><span class="keyword">while</span> chunk:</span><br><span class="line">    response += chunk</span><br><span class="line">    chunk = sock.recv(<span class="number">4096</span>)</span><br><span class="line">sock.close()</span><br><span class="line"></span><br><span class="line">print(response.decode())</span><br></pre></td></tr></table></figure>
 <p>这段代码的意思是，我们构建了一段请求字符串如下：</p>
 <figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/get</span> HTTP/1.0</span><br><span class="line"><span class="attribute">Host</span>: httpbin.org</span><br></pre></td></tr></table></figure>
-<p>创建了一个与 httpbin.org 的 TCP 连接，并将请求字符串发送给网站服务器。创建了一个 <code>response</code> 的变量来存储服务器发给我们的数据。因为协议中规定了 HTTP 的编码为 <code>ascii</code> ，而 <code>Python3</code> 默认的编码为 <code>Unicode</code> ，因此在发送与接收时我们都需要进行转码。</p>
+<p>创建了一个与 httpbin.org 的 TCP 连接，并将请求字符串发送给网站服务器。创建了一个 <code>response</code> 的变量来存储服务器发给我们的数据。因为协议中规定了 HTTP 的编码为 ascii ，而 Python3 默认的编码为 Unicode ，因此在发送与接收时我们都需要进行转码。</p>
 <p>需要注意的是， <code>sock.recv(4096)</code> 返回的是读取到的服务器给我们发送的数据，如果数据还没有收到， <code>sock.recv</code> 并不会返回空，而是会一直阻塞在这里，等待数据到达。只有当连接已经断开或者连接出错的时候， <code>sock.recv</code> 才会返回一个空字符串。</p>
 <p>有的同学可能会发现，我们上面说我们的教程基于 <code>HTTP/1.1</code> ，这里发送的却是 <code>HTTP/1.0</code> 。这是因为，在 <code>HTTP/1.1</code> 中， HTTP header 中新增了字段 <code>Content-Length</code> ，服务器会在响应数据的 header 中添加这个字段，用于表示响应数据的长度，正常的浏览器应该识别这个字段，并在服务器传输了足够长度的数据后主动关闭连接。</p>
-<p>客户端主动关闭连接可以有效的减少服务器 <code>TIME_WAIT</code> 积压的问题，对这个问题有兴趣的同学可以看一下我的博客<a href="https://meik2333.com/2018/08/17/TCP-%E7%9A%84%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E4%B8%8E%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B/">《TCP 的三次握手与四次挥手》</a>和<a href="https://meik2333.com/2018/08/19/TCP-%E8%BF%9E%E6%8E%A5%E7%9A%84%E6%B5%81%E7%A8%8B%E4%B8%8E%E7%8A%B6%E6%80%81%E8%BD%AC%E6%8D%A2/">《TCP 连接的流程与状态转换》</a>。转回我们的教程，我们还不想在现在的代码中添加主动关闭的功能，因此我们直接发送 <code>HTTP/1.0</code> 的请求给服务器，来规避这个问题。</p>
+<p>客户端主动关闭连接可以有效的减少服务器 TIME_WAIT 积压的问题，对这个问题有兴趣的同学可以看一下我的博客<a href="https://meik2333.com/2018/08/17/TCP-%E7%9A%84%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E4%B8%8E%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B/">《TCP 的三次握手与四次挥手》</a>和<a href="https://meik2333.com/2018/08/19/TCP-%E8%BF%9E%E6%8E%A5%E7%9A%84%E6%B5%81%E7%A8%8B%E4%B8%8E%E7%8A%B6%E6%80%81%E8%BD%AC%E6%8D%A2/">《TCP 连接的流程与状态转换》</a>。转回我们的教程，我们还不想在现在的代码中添加主动关闭的功能，因此我们直接发送 <code>HTTP/1.0</code> 的请求给服务器，来规避这个问题。</p>
 <p>保存代码到本地并执行，我们可以直观的看到其效果：</p>
 <p><img src="WX20190731-194635@2x.png" alt=""></p>
 <h2 id="封装成函数"><a href="#封装成函数" class="headerlink" title="封装成函数"></a>封装成函数</h2><p>我们的爬虫当然是不会只访问 httpbin.org 的，我们需要把通用的代码封装起来，供后续调用。</p>
@@ -464,7 +464,7 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> .fetch <span class="keyword">import</span> fetch</span><br></pre></td></tr></table></figure>
 <p><strong><code>test_fetch.py</code></strong></p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> unittest</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> ZeroCrawler <span class="keyword">import</span> fetch</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TestFetch</span><span class="params">(unittest.TestCase)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">test_fetch</span><span class="params">(self)</span>:</span></span><br><span class="line">        resp = fetch(<span class="string">"http://httpbin.org/get"</span>)</span><br><span class="line">        self.assertTrue(resp.startswith(<span class="string">"HTTP/1.1 200 OK"</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    unittest.main()</span><br></pre></td></tr></table></figure>
-<p>我们添加了 <code>tests</code> 来测试我们的代码，以保证我们代码的可靠与稳定。现在我们的框架已经有了基本的雏形，在下一章里，我们将会把 <code>ZeroCrawler</code> 改造成一个可以安装使用的库。</p>
+<p>我们添加了 tests 来测试我们的代码，以保证我们代码的可靠与稳定。现在我们的框架已经有了基本的雏形，在下一章里，我们将会把 ZeroCrawler 改造成一个可以安装使用的库。</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这一篇里，我们大概了解了一下爬虫的原理，并且写代码实现了一个最基础的爬虫框架。</p>
 <p>本章的所有源代码可以在 GitHub ：<a href="https://github.com/MeiK2333/ZeroCrawler/tree/092d5109e1493d9d820db1f852922f377e0f20c1" target="_blank" rel="noopener">ZeroCrawler Version 0.0.1</a> 中找到。如果有意见或者建议，可以通过评论或者 <a href="https://github.com/MeiK2333/ZeroCrawler/issues" target="_blank" rel="noopener">GitHub Issues</a> 来告诉我。我们下期再见。</p>
 <p><img src="40D98F7E9BDEEC8BB55AADA12BB1EB98.gif" alt=""></p>
@@ -512,6 +512,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/08/05/如何写一个爬虫-第二篇/" rel="prev" title="如何写一个爬虫 - 第二篇">
+                如何写一个爬虫 - 第二篇 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
