@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/lurongkai/anti-baidu/js/anti-baidu-latest.min.js" charset="UTF-8"></script>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="//cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/favicon.ico?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="从零开始实现一个 OJ 评测姬。">
+<meta name="keywords" content="OnlineJudge,评测姬">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何写一个评测姬 - 第四篇">
+<meta property="og:url" content="https://meik2333.com/2019/05/08/如何写一个评测姬-第四篇/index.html">
+<meta property="og:site_name" content="MeiK&#39;s blog">
+<meta property="og:description" content="从零开始实现一个 OJ 评测姬。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-08-16T03:57:06.877Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="如何写一个评测姬 - 第四篇">
+<meta name="twitter:description" content="从零开始实现一个 OJ 评测姬。">
+
+
+
+
+
+
+  <link rel="canonical" href="https://meik2333.com/2019/05/08/如何写一个评测姬-第四篇/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>如何写一个评测姬 - 第四篇 | MeiK's blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-107784973-4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-107784973-4');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">MeiK's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">In solitude, where we are least alone.</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://meik2333.com/2019/05/08/如何写一个评测姬-第四篇/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="MeiK">
+      <meta itemprop="description" content="In solitude, where we are least alone.">
+      <meta itemprop="image" content="/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MeiK's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">如何写一个评测姬 - 第四篇
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-05-08 15:05:04" itemprop="dateCreated datePublished" datetime="2019-05-08T15:05:04+08:00">2019-05-08</time>
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>从零开始实现一个 OJ 评测姬。</p>
+<a id="more"></a>
+<p>本篇讲一下如何防止评测姬因用户程序的异常而崩溃。首先，我们来看看用户程序都会出现什么异常，然后再来考虑如何解决这些异常。</p>
+<h2 id="解决过多资源占用"><a href="#解决过多资源占用" class="headerlink" title="解决过多资源占用"></a>解决过多资源占用</h2><p>用户可能因为失误而提交了占用过多资源的代码，比如死循环、占用过多内存、输出过多等。为了解决这些问题，我们需要限制用户程序的时间、内存以及输出数据的大小。</p>
+<p>Linux 有系统函数可以解决这个问题：<a href="https://linux.die.net/man/3/setrlimit" target="_blank" rel="noopener"><code>setrlimit</code></a>。这个函数可以限制程序的 CPU 时间、内存占用、输出数据等，用法大致如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/resource.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rlimit</span> <span class="title">rl</span>;</span></span><br><span class="line">    rl.rlim_cur = rl.rlim_max = <span class="number">1</span>;</span><br><span class="line">    setrlimit(RLIMIT_CPU, &amp;rl);</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ gcc main.c</span><br><span class="line">$ time ./a.out </span><br><span class="line">[2]    3057 cpu <span class="built_in">limit</span> exceeded  ./a.out</span><br><span class="line">./a.out  0.98s user 0.02s system 96% cpu 1.034 total</span><br></pre></td></tr></table></figure>
+<p>可以看到，虽然我们在代码中写了个死循环，但是这个程序只运行一秒就结束了。<code>setrlimit</code> 可以对进程添加资源限制，并在超出限制时触发信号，父进程可以捕获这个信号。同时 <code>exec</code> 会继承这些限制，因此可以使用与流重定向类似的方法来添加资源限制。</p>
+<p>有关限制的实际代码，可以查看 <a href="https://github.com/MeiK2333/ZeroJudger/blob/master/limit/main.c" target="_blank" rel="noopener">https://github.com/MeiK2333/ZeroJudger/blob/master/limit/main.c</a>。</p>
+<h2 id="解决恶意攻击"><a href="#解决恶意攻击" class="headerlink" title="解决恶意攻击"></a>解决恶意攻击</h2><p>不同于用户不小心提交的占用资源过多的代码，有些同学会故意提交一些恶意攻击评测姬的代码，俗称“卡评测”。对于这些恶意攻击，我们也需要做好防备。</p>
+<p>简单起见，我们的评测姬不对恶意攻击做防范，仅对用户无意间造成的资源过度占用做限制。</p>
+<p>常用的恶意攻击的方式我之前写过博客，后来我注销了 CSDN 账号，博客也没了，这里就重新写一遍吧。</p>
+<h3 id="include-攻击"><a href="#include-攻击" class="headerlink" title="include 攻击"></a>include 攻击</h3><p>利用 OJ 会返回编译错误的特点，使用 C/C++ 语言使用 <code>#include</code> 来导入一个敏感的文件，然后通过编译错误的信息来获得其中敏感的数据。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">echo</span> <span class="string">'password'</span> &gt; password.txt</span><br><span class="line">$ <span class="built_in">echo</span> <span class="string">'#include &lt;password.txt&gt;'</span> &gt; main.c </span><br><span class="line">$ gcc main.c </span><br><span class="line">main.c:1:10: error: <span class="string">'password.txt'</span> file not found with &lt;angled&gt; include; use <span class="string">"quotes"</span> instead</span><br><span class="line"><span class="comment">#include &lt;password.txt&gt;</span></span><br><span class="line">         ^~~~~~~~~~~~~~</span><br><span class="line">         <span class="string">"password.txt"</span></span><br><span class="line">In file included from main.c:1:</span><br><span class="line">./password.txt:1:1: error: unknown <span class="built_in">type</span> name <span class="string">'password'</span></span><br><span class="line">password</span><br><span class="line">^</span><br><span class="line">main.c:1:24: error: expected identifier or <span class="string">'('</span></span><br><span class="line"><span class="comment">#include &lt;password.txt&gt;</span></span><br><span class="line">                       ^</span><br><span class="line">3 errors generated.</span><br></pre></td></tr></table></figure>
+<p>解决方案为配置好评测用户权限，使用低权限的用户进行评测，以防止此类攻击。同时可以考虑使用 Docker 等进行评测，Docker 环境内不放任何敏感的数据。</p>
+<h3 id="编译超时-amp-amp-编译产生巨大文件-amp-amp-编译产生巨量错误信息"><a href="#编译超时-amp-amp-编译产生巨大文件-amp-amp-编译产生巨量错误信息" class="headerlink" title="编译超时 &amp;&amp; 编译产生巨大文件 &amp;&amp; 编译产生巨量错误信息"></a>编译超时 &amp;&amp; 编译产生巨大文件 &amp;&amp; 编译产生巨量错误信息</h3><ul>
+<li><p>编译超时  </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;/dev/random&gt;或者#include &lt;/dev/tty&gt; //(Linux)</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;CON&gt; //(Windows)</span></span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>编译产生巨大文件  </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">main[<span class="number">-1u</span>]=&#123;<span class="number">1</span>&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>编译产生巨量错误信息</p>
+</li>
+</ul>
+<p>这几种攻击方式并不能让攻击者获得什么数据或权限，只是单纯的会卡住评测。但有人就是这么无聊的……</p>
+<p>解决方案也很简单，就是像限制用户程序资源占用一样限制编译时的资源占用。</p>
+<h3 id="shell-攻击-amp-amp-fork-炸弹-amp-amp-其他系统调用攻击-amp-amp-网络模块攻击"><a href="#shell-攻击-amp-amp-fork-炸弹-amp-amp-其他系统调用攻击-amp-amp-网络模块攻击" class="headerlink" title="shell 攻击 &amp;&amp; fork 炸弹 &amp;&amp; 其他系统调用攻击 &amp;&amp; 网络模块攻击"></a>shell 攻击 &amp;&amp; fork 炸弹 &amp;&amp; 其他系统调用攻击 &amp;&amp; 网络模块攻击</h3><p>shell 攻击：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">system(<span class="string">"reboot"</span>);</span><br></pre></td></tr></table></figure>
+<p><code>fork</code> 炸弹：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">    fork();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>网络模块攻击：如果评测姬没有限制联网的话，攻击的程序可以通过网络做到很多的攻击方式，程序可能会收集很多运行时评测姬和服务器的信息，然后提交到某处。</p>
+<p>这几种攻击方式，如果只是简单的禁用 <code>system</code> 和 <code>fork</code> 等这些函数是没有用的，因为 C/C++ 的宏可以轻易的绕过这些限制。可以考虑在系统调用的层面进行限制，大多开源的评测机都是通过限制系统调用来保证评测安全的。</p>
+<p>限制系统调用，可以使用 <code>ptrace</code> 来自行限制，也可以使用开源库 <a href="https://github.com/seccomp/libseccomp" target="_blank" rel="noopener">seccomp</a> 来进行限制。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本篇我们介绍了常见的攻击手段与防范手段，这样我们的评测姬就会有一定的安全性保障。下一篇我们将介绍一下如何获取用户程序运行占用的资源。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/OnlineJudge/" rel="tag"># OnlineJudge</a>
+          
+            <a href="/tags/评测姬/" rel="tag"># 评测姬</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/05/如何写一个评测姬-第三篇/" rel="next" title="如何写一个评测姬 - 第三篇">
+                <i class="fa fa-chevron-left"></i> 如何写一个评测姬 - 第三篇
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/07/08/如何写一个评测姬-第五篇/" rel="prev" title="如何写一个评测姬 - 第五篇">
+                如何写一个评测姬 - 第五篇 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+      <div id="gitalk-container"></div>
+      <link rel="stylesheet" href="https://unpkg.com/gitalk@1.4.1/dist/gitalk.css">
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/avatar.png"
+                alt="MeiK" />
+            
+              <p class="site-author-name" itemprop="name">MeiK</p>
+              <p class="site-description motion-element" itemprop="description">In solitude, where we are least alone.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/MeiK2333" target="_blank" title="GitHub"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://twitter.com/MeiK2333" target="_blank" title="Twitter"><i class="fa fa-fw fa-globe"></i>Twitter</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:meik2333@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-globe"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#解决过多资源占用"><span class="nav-number">1.</span> <span class="nav-text">解决过多资源占用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决恶意攻击"><span class="nav-number">2.</span> <span class="nav-text">解决恶意攻击</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#include-攻击"><span class="nav-number">2.1.</span> <span class="nav-text">include 攻击</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译超时-amp-amp-编译产生巨大文件-amp-amp-编译产生巨量错误信息"><span class="nav-number">2.2.</span> <span class="nav-text">编译超时 &amp;&amp; 编译产生巨大文件 &amp;&amp; 编译产生巨量错误信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#shell-攻击-amp-amp-fork-炸弹-amp-amp-其他系统调用攻击-amp-amp-网络模块攻击"><span class="nav-number">2.3.</span> <span class="nav-text">shell 攻击 &amp;&amp; fork 炸弹 &amp;&amp; 其他系统调用攻击 &amp;&amp; 网络模块攻击</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">MeiK</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+    
+      <script src="https://unpkg.com/gitalk@1.4.1/dist/gitalk.min.js"></script>
+      <script type="text/javascript">
+        const gitalk = new Gitalk({
+          id: (decodeURI(location.pathname)).split("/")[4].substring(0, 49),
+          clientID: '4d2994f790117e7633bd',
+          clientSecret: '09947e1a30bd8f44fd4f648114b65fe5e6c5156a',
+          repo: 'MeiK2333.github.io',
+          owner: 'MeiK2333',
+          admin: 'MeiK2333'.split(','),
+          pagerDirection: 'first',
+          // facebook-like distraction free mode
+          distractionFreeMode: false
+        })
+        gitalk.render('gitalk-container')
+      </script>
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
