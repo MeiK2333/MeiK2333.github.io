@@ -122,7 +122,7 @@
 <meta property="og:site_name" content="MeiK 的博客">
 <meta property="og:description" content="记录我过去一周看到的值得分享的东西，每周四发布。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-09-01T03:02:25.497Z">
+<meta property="og:updated_time" content="2019-09-02T06:07:30.758Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="每周分享第 18 期">
 <meta name="twitter:description" content="记录我过去一周看到的值得分享的东西，每周四发布。">
@@ -391,9 +391,9 @@
 <p>但我们仍可以用 C API 的方式来修改这个属性：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> ctypes</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>PyCell_Set = ctypes.pythonapi.PyCell_Set</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>PyCell_Set.argtypes = (ctypes.py_object, ctypes.py_object)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>PyCell_Set.restype = ctypes.c_int</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>ctypes.pythonapi.PyCell_Set(f.__closure__[<span class="number">0</span>], <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(f(<span class="number">1</span>))</span><br><span class="line"><span class="number">3</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(f(<span class="number">2</span>))</span><br><span class="line"><span class="number">4</span></span><br></pre></td></tr></table></figure>
 <h2 id="视频分享"><a href="#视频分享" class="headerlink" title="视频分享"></a>视频分享</h2><p>一时鸽一时爽，一直鸽一直爽。</p>
-<h3 id="96猫-『嘘の火花』"><a href="#96猫-『嘘の火花』" class="headerlink" title="96猫 『嘘の火花』"></a>96猫 『嘘の火花』</h3><video src="http://cdn.meik2333.com/week18/96猫 『嘘の火花』.mp4" controls="controls" width="100%"><br>Your browser does not support the audio tag.<br></video>
+<h3 id="96猫-『嘘の火花』"><a href="#96猫-『嘘の火花』" class="headerlink" title="96猫 『嘘の火花』"></a>96猫 『嘘の火花』</h3><video src="96猫『嘘の火花』.mp4" controls="controls" width="100%"><br>Your browser does not support the audio tag.<br></video>
 
-<h3 id="喵"><a href="#喵" class="headerlink" title="喵"></a>喵</h3><video src="http://cdn.meik2333.com/week18/56a7ca01cb631f498d147f5ea6290a84.mp4" controls="controls" width="100%"><br>Your browser does not support the audio tag.<br></video>
+<h3 id="喵"><a href="#喵" class="headerlink" title="喵"></a>喵</h3><video src="56a7ca01cb631f498d147f5ea6290a84.mp4" controls="controls" width="100%"><br>Your browser does not support the audio tag.<br></video>
 
       
     </div>
@@ -539,7 +539,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">28</span>
+                    <span class="site-state-item-count">27</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
