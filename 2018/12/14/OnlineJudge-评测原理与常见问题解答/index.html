@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/lurongkai/anti-baidu/js/anti-baidu-latest.min.js" charset="UTF-8"></script>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="//cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/favicon.ico?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="总会有人在群里问：“这个程序在我本地是正确的，但是提交到 OJ 上错误了”或者“本地 AC 但是提交 WA”。今天我来给大家讲解一下 OJ 的评测原理，以及对一些出现频率较高的问题进行解答。 建议在看本文之前先看一下这篇经典的文章：《提问的智慧》。">
+<meta name="keywords" content="OnlineJudge">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OnlineJudge 评测原理与常见问题解答">
+<meta property="og:url" content="https://meik2333.com/2018/12/14/OnlineJudge-评测原理与常见问题解答/index.html">
+<meta property="og:site_name" content="MeiK&#39;s blog">
+<meta property="og:description" content="总会有人在群里问：“这个程序在我本地是正确的，但是提交到 OJ 上错误了”或者“本地 AC 但是提交 WA”。今天我来给大家讲解一下 OJ 的评测原理，以及对一些出现频率较高的问题进行解答。 建议在看本文之前先看一下这篇经典的文章：《提问的智慧》。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://meik2333.com/2018/12/14/OnlineJudge-评测原理与常见问题解答/oj.png">
+<meta property="og:image" content="https://meik2333.com/2018/12/14/OnlineJudge-评测原理与常见问题解答/ojgg.png">
+<meta property="og:image" content="https://meik2333.com/2018/12/14/OnlineJudge-评测原理与常见问题解答/yougg.png">
+<meta property="og:updated_time" content="2019-09-19T12:56:27.787Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="OnlineJudge 评测原理与常见问题解答">
+<meta name="twitter:description" content="总会有人在群里问：“这个程序在我本地是正确的，但是提交到 OJ 上错误了”或者“本地 AC 但是提交 WA”。今天我来给大家讲解一下 OJ 的评测原理，以及对一些出现频率较高的问题进行解答。 建议在看本文之前先看一下这篇经典的文章：《提问的智慧》。">
+<meta name="twitter:image" content="https://meik2333.com/2018/12/14/OnlineJudge-评测原理与常见问题解答/oj.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://meik2333.com/2018/12/14/OnlineJudge-评测原理与常见问题解答/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>OnlineJudge 评测原理与常见问题解答 | MeiK's blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-107784973-4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-107784973-4');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">MeiK's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">In solitude, where we are least alone.</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://meik2333.com/2018/12/14/OnlineJudge-评测原理与常见问题解答/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="MeiK">
+      <meta itemprop="description" content="In solitude, where we are least alone.">
+      <meta itemprop="image" content="/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MeiK's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">OnlineJudge 评测原理与常见问题解答
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-14 11:26:14" itemprop="dateCreated datePublished" datetime="2018-12-14T11:26:14+08:00">2018-12-14</time>
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>总会有人在群里问：“这个程序在我本地是正确的，但是提交到 OJ 上错误了”或者“本地 AC 但是提交 WA”。今天我来给大家讲解一下 OJ 的评测原理，以及对一些出现频率较高的问题进行解答。</p>
+<p>建议在看本文之前先看一下这篇经典的文章：<a href="/2018/02/24/（转）提问的智慧/">《提问的智慧》</a>。</p>
+<a id="more"></a>
+<h2 id="OnlineJudge-的评测原理"><a href="#OnlineJudge-的评测原理" class="headerlink" title="OnlineJudge 的评测原理"></a>OnlineJudge 的评测原理</h2><p>OJ 评测一个用户代码大概分为以下几步：</p>
+<ol>
+<li>编译代码</li>
+<li>重定向输入输出，运行用户程序</li>
+<li>对比用户程序输出和标准答案</li>
+</ol>
+<h3 id="资源限制"><a href="#资源限制" class="headerlink" title="资源限制"></a>资源限制</h3><p>如果用户不小心提交了死循环的话，我们肯定不能一直等着它结束，因此要使用某种方式来限制用户程序占用的资源。</p>
+<p>需要限制的主要是：占用时间、占用内存、输出文件大小等。</p>
+<h3 id="权限限制"><a href="#权限限制" class="headerlink" title="权限限制"></a>权限限制</h3><p>在服务器上运行用户提交的代码是很危险的，如果用户提交的一个 <code>system(&#39;rm -rf /&#39;)</code> 被执行了，那就瞬间爆炸了。或者通过 <code>#include</code> 来引用一些密码文件，然后在编译信息中有服务器密码等信息，也会导致相当危险的情况。</p>
+<p>因此对用户提交的程序的运行权限要做严格的控制，常用的手段有创建专门用于评测的用户、使用 Docker 进行限制、限制 <code>syscall</code> 等。</p>
+<h3 id="输入输出"><a href="#输入输出" class="headerlink" title="输入输出"></a>输入输出</h3><p>有些 OJ 要求用户手动打开文件读取，并将输出写入文件。但大部分 OJ （包括 SDUTOJ）的做法都是通过重定向输入输出流，来让程序可以从 <code>stdin</code> 读、输出到 <code>stdout</code>，这样用户就不需要使用文件读写等操作了。</p>
+<h3 id="对比答案"><a href="#对比答案" class="headerlink" title="对比答案"></a>对比答案</h3><p>这里就要祭出我当年画的 OJ 评测流程图了。</p>
+<p><img src="oj.png" alt="">（虽然有 csdn 的水印，但是是我自己画的图）</p>
+<h3 id="完整实现"><a href="#完整实现" class="headerlink" title="完整实现"></a>完整实现</h3><p><a href="https://github.com/MeiK2333/JudgeLight" target="_blank" rel="noopener">这里</a>是一个 OJ 评测姬核心的完整实现，关键注释齐全，可以用作参考。</p>
+<h2 id="常见问题解答"><a href="#常见问题解答" class="headerlink" title="常见问题解答"></a>常见问题解答</h2><p>首先，所有的问题其实都是：</p>
+<p><img src="ojgg.png" alt=""></p>
+<p>用户是不可能出问题的，所有的问题都是 OJ 的问题。下面的问题解答针对的是某个不知名的平行世界，在那个世界里：</p>
+<p><img src="yougg.png" alt=""></p>
+<h3 id="为什么我本地-AC，提交却-WA-了"><a href="#为什么我本地-AC，提交却-WA-了" class="headerlink" title="为什么我本地 AC，提交却 WA 了"></a>为什么我本地 AC，提交却 WA 了</h3><p>首先要明确，没有本地 AC 这种操作。如果你本地就能 AC，那么何必将代码提交到 OJ 上呢。</p>
+<p>如果你说的是你的代码在你本地通过了测试数据的考验，但是提交到 OJ 却出错了：这是非常正常的。OJ 上给定的测试数据仅仅是其中一组数据，实际评测时会参照的可并不只有这一组数据。</p>
+<p>当你发现本地通过测试而提交 WA 时，你应该做的是检查你的代码在不同的边缘数据时的表现，而不是去群里抱怨你“本地 AC”。</p>
+<p>当然，有时候确实是题目或者数据出了问题，不过这个时候 OJ 和评测姬也是不背锅的。请找到对应题目的出题人，然后狠狠地把错误拍他脸上。</p>
+<h3 id="为什么我本地-AC，提交却-CE-了"><a href="#为什么我本地-AC，提交却-CE-了" class="headerlink" title="为什么我本地 AC，提交却 CE 了"></a>为什么我本地 AC，提交却 CE 了</h3><p>OJ 评测姬的系统环境是 Linux，因此如果你使用了某些平台专属的操作（比如 <code>#include &lt;Windows.h&gt;</code>）的话就会 GG。</p>
+<p>当然， 80% 的可能是你的代码写的有问题，你本地能运行只是你的编译器帮你做了一点优化。</p>
+<p>这里列举一些常见的错误：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span> </span>&#123;&#125;  <span class="comment">// 错误！main 的返回值必须为 int</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="number">1</span>; &#125;  <span class="comment">// 非零返回值的 main 函数可能让你的程序直接判错</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"%lf\n"</span>, ans);  <span class="comment">// 输出的时候没有 %lf 这种操作，请使用 %f</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> cnt; <span class="built_in">cout</span> &lt;&lt; cnt &lt;&lt; <span class="built_in">endl</span>;  <span class="comment">// 未初始化的变量的值是未定义的，也就是说，它可能是任何值</span></span><br></pre></td></tr></table></figure>
+<h3 id="为什么我的提交-SE-了"><a href="#为什么我的提交-SE-了" class="headerlink" title="为什么我的提交 SE 了"></a>为什么我的提交 SE 了</h3><p>SE（System Error）顾名思义是系统错误，这个错误一般和你的代码没啥关系。但是如果你发现你的某个代码只要提交就稳定 SE 的话，那么你最好检查一下你的代码里有没有非法字符。</p>
+<h3 id="为什么我本地-WA，提交却-AC-了"><a href="#为什么我本地-WA，提交却-AC-了" class="headerlink" title="为什么我本地 WA，提交却 AC 了"></a>为什么我本地 WA，提交却 AC 了</h3><p>如果你的代码中有 UB（undefined behavior，未定义行为）的话，那么你提交的程序可能返回任意结果。</p>
+<p>常见的 UB：变量未初始化、访问越界数组、<code>func(a++, b++, a--)</code> 、除零、函数未写返回值等操作。</p>
+<h3 id="道理我都懂但是我要怎么减少这些错误"><a href="#道理我都懂但是我要怎么减少这些错误" class="headerlink" title="道理我都懂但是我要怎么减少这些错误"></a>道理我都懂但是我要怎么减少这些错误</h3><p>一句话：不要 xjb 乱写，加上看看课本，就能在绝大部分情况下避免这些神奇错误。</p>
+<p>我在初学阶段，总是先看一遍书再敲代码，在运行之前就已经知道其运行过程与结果了。这并不是多么难的东西，你要知道，大部分情况下，你翻一下课本，能比去群里跪求大佬收获更多。</p>
+<p>另外，如果你使用和 OJ 相近的环境，可以在一定程度上减少这些错误。关于如何配置环境，可以看我写的<a href="https://github.com/sdutacm/cpp-style-guide" target="_blank" rel="noopener">《<br>C/C++ 代码风格指导》</a>，里面有配置环境的方法与一些敲代码的指导。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/OnlineJudge/" rel="tag"># OnlineJudge</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/19/Windows-To-Go-安装与-WSL-的使用/" rel="next" title="Windows To Go 安装与 WSL 的使用">
+                <i class="fa fa-chevron-left"></i> Windows To Go 安装与 WSL 的使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/31/2018-年度总结/" rel="prev" title="2018 年度总结">
+                2018 年度总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+      <div id="gitalk-container"></div>
+      <link rel="stylesheet" href="https://unpkg.com/gitalk@1.4.1/dist/gitalk.css">
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/avatar.png"
+                alt="MeiK" />
+            
+              <p class="site-author-name" itemprop="name">MeiK</p>
+              <p class="site-description motion-element" itemprop="description">In solitude, where we are least alone.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">53</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/MeiK2333" target="_blank" title="GitHub"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://twitter.com/MeiK2333" target="_blank" title="Twitter"><i class="fa fa-fw fa-globe"></i>Twitter</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:meik2333@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-globe"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#OnlineJudge-的评测原理"><span class="nav-number">1.</span> <span class="nav-text">OnlineJudge 的评测原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#资源限制"><span class="nav-number">1.1.</span> <span class="nav-text">资源限制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#权限限制"><span class="nav-number">1.2.</span> <span class="nav-text">权限限制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#输入输出"><span class="nav-number">1.3.</span> <span class="nav-text">输入输出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对比答案"><span class="nav-number">1.4.</span> <span class="nav-text">对比答案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#完整实现"><span class="nav-number">1.5.</span> <span class="nav-text">完整实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见问题解答"><span class="nav-number">2.</span> <span class="nav-text">常见问题解答</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么我本地-AC，提交却-WA-了"><span class="nav-number">2.1.</span> <span class="nav-text">为什么我本地 AC，提交却 WA 了</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么我本地-AC，提交却-CE-了"><span class="nav-number">2.2.</span> <span class="nav-text">为什么我本地 AC，提交却 CE 了</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么我的提交-SE-了"><span class="nav-number">2.3.</span> <span class="nav-text">为什么我的提交 SE 了</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么我本地-WA，提交却-AC-了"><span class="nav-number">2.4.</span> <span class="nav-text">为什么我本地 WA，提交却 AC 了</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#道理我都懂但是我要怎么减少这些错误"><span class="nav-number">2.5.</span> <span class="nav-text">道理我都懂但是我要怎么减少这些错误</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">MeiK</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+    
+      <script src="https://unpkg.com/gitalk@1.4.1/dist/gitalk.min.js"></script>
+      <script type="text/javascript">
+        const gitalk = new Gitalk({
+          id: (decodeURI(location.pathname)).split("/")[4].substring(0, 49),
+          clientID: '4d2994f790117e7633bd',
+          clientSecret: '09947e1a30bd8f44fd4f648114b65fe5e6c5156a',
+          repo: 'MeiK2333.github.io',
+          owner: 'MeiK2333',
+          admin: 'MeiK2333'.split(','),
+          pagerDirection: 'first',
+          // facebook-like distraction free mode
+          distractionFreeMode: false
+        })
+        gitalk.render('gitalk-container')
+      </script>
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

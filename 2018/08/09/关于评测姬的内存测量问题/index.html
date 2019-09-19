@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/lurongkai/anti-baidu/js/anti-baidu-latest.min.js" charset="UTF-8"></script>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="//cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/favicon.ico?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="SDUT OJ 的评测姬有时候会造成异常 MLE 的问题, 比如 字典树 题目, 或者是 装备合成(第八届校赛题目, 有一位同学在比赛中疯狂提交 20+ 发 MLE) . 然后, 有人会发现, 使用静态变量(栈区/静态区)的代码居然可以通过, 而使用同样多内存的动态分配(堆区)的代码却无论如何都是 MLE, 这难道是玄学问题咩? 本期的走进科学, 我们就来探究 SDUT OJ 评测姬的各种神奇之处">
+<meta name="keywords" content="攻略,评测姬">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于评测姬的内存测量问题">
+<meta property="og:url" content="https://meik2333.com/2018/08/09/关于评测姬的内存测量问题/index.html">
+<meta property="og:site_name" content="MeiK&#39;s blog">
+<meta property="og:description" content="SDUT OJ 的评测姬有时候会造成异常 MLE 的问题, 比如 字典树 题目, 或者是 装备合成(第八届校赛题目, 有一位同学在比赛中疯狂提交 20+ 发 MLE) . 然后, 有人会发现, 使用静态变量(栈区/静态区)的代码居然可以通过, 而使用同样多内存的动态分配(堆区)的代码却无论如何都是 MLE, 这难道是玄学问题咩? 本期的走进科学, 我们就来探究 SDUT OJ 评测姬的各种神奇之处">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-09-19T12:56:27.811Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="关于评测姬的内存测量问题">
+<meta name="twitter:description" content="SDUT OJ 的评测姬有时候会造成异常 MLE 的问题, 比如 字典树 题目, 或者是 装备合成(第八届校赛题目, 有一位同学在比赛中疯狂提交 20+ 发 MLE) . 然后, 有人会发现, 使用静态变量(栈区/静态区)的代码居然可以通过, 而使用同样多内存的动态分配(堆区)的代码却无论如何都是 MLE, 这难道是玄学问题咩? 本期的走进科学, 我们就来探究 SDUT OJ 评测姬的各种神奇之处">
+
+
+
+
+
+
+  <link rel="canonical" href="https://meik2333.com/2018/08/09/关于评测姬的内存测量问题/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>关于评测姬的内存测量问题 | MeiK's blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-107784973-4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-107784973-4');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">MeiK's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">In solitude, where we are least alone.</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://meik2333.com/2018/08/09/关于评测姬的内存测量问题/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="MeiK">
+      <meta itemprop="description" content="In solitude, where we are least alone.">
+      <meta itemprop="image" content="/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MeiK's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">关于评测姬的内存测量问题
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-08-09 22:00:39" itemprop="dateCreated datePublished" datetime="2018-08-09T22:00:39+08:00">2018-08-09</time>
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>SDUT OJ 的评测姬有时候会造成异常 MLE 的问题, 比如 <a href="https://acm.sdut.edu.cn/onlinejudge2/index.php/Home/Index/problemdetail/pid/2828.html" target="_blank" rel="noopener">字典树</a> 题目, 或者是 <a href="https://acm.sdut.edu.cn/onlinejudge2/index.php/Home/Index/problemdetail/pid/3545.html" target="_blank" rel="noopener">装备合成</a>(第八届校赛题目, 有一位同学在比赛中疯狂提交 20+ 发 MLE) .</p>
+<p>然后, 有人会发现, 使用静态变量(栈区/静态区)的代码居然可以通过, 而使用同样多内存的动态分配(堆区)的代码却无论如何都是 MLE, 这难道是玄学问题咩?</p>
+<p>本期的走进科学, 我们就来探究 SDUT OJ 评测姬的各种神奇之处.</p>
+<a id="more"></a>
+<h2 id="同样的代码在不同平台的表现"><a href="#同样的代码在不同平台的表现" class="headerlink" title="同样的代码在不同平台的表现"></a>同样的代码在不同平台的表现</h2><p>我们选用同样的代码, 在几个知名度较高的 OJ 平台上使用同样的编译器测试一下</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> a, b;</span><br><span class="line">    <span class="built_in">cin</span> &gt;&gt; a &gt;&gt; b;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; a + b &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>选用的题目是 A + B Problem, 在选中的 OJ 上都是 1000 题目.</p>
+<h3 id="POJ"><a href="#POJ" class="headerlink" title="POJ"></a>POJ</h3><table>
+<thead>
+<tr>
+<th>Run ID</th>
+<th>User</th>
+<th>Problem</th>
+<th>Result</th>
+<th>Memory</th>
+<th>Time</th>
+<th>Language</th>
+<th>Code Length</th>
+<th>Submit Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>19043427</td>
+<td>MeiK</td>
+<td>1000</td>
+<td>Accepted</td>
+<td>720K</td>
+<td>0MS</td>
+<td>G++</td>
+<td>132B</td>
+<td>2018-08-09  20:32:31</td>
+</tr>
+</tbody>
+</table>
+<p>(因为贴图太麻烦了, 这里直接贴个表格)</p>
+<h3 id="HDU-OJ"><a href="#HDU-OJ" class="headerlink" title="HDU OJ"></a>HDU OJ</h3><table>
+<thead>
+<tr>
+<th>Run ID</th>
+<th>Submit Time</th>
+<th>Judge Status</th>
+<th>Pro.ID</th>
+<th>Exe.Time</th>
+<th>Exe.Memory</th>
+<th>Code Len.</th>
+<th>Language</th>
+<th>Author</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>25796944</td>
+<td>2018-08-09 20:41:07</td>
+<td>Accepted</td>
+<td>1000</td>
+<td>0MS</td>
+<td>1796K</td>
+<td>149 B</td>
+<td>G++</td>
+<td>MeiK</td>
+</tr>
+</tbody>
+</table>
+<p>HDU OJ 上这个题目是多组输入的, 因此代码中处理了多组输入, 代码长度略长</p>
+<h3 id="SDUT-OJ"><a href="#SDUT-OJ" class="headerlink" title="SDUT OJ"></a>SDUT OJ</h3><table>
+<thead>
+<tr>
+<th>RunID</th>
+<th>Nick Name</th>
+<th>Problem</th>
+<th>Result</th>
+<th>Time</th>
+<th>Memory</th>
+<th>Language</th>
+<th>Code Len</th>
+<th>Submission Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4518622</td>
+<td>MeiK</td>
+<td>1000</td>
+<td>Accepted</td>
+<td>0 ms</td>
+<td>240 KiB</td>
+<td>g++</td>
+<td>142 B</td>
+<td>2018-08-09 20:31:5</td>
+</tr>
+</tbody>
+</table>
+<p>看出什么问题了没有? 虽然同样是 G++ 编译器, 但是在 SDUT OJ 上运行所使用的内存, 只有 POJ 的 1/3 , 只有 HDU OJ 的近 1/8 !</p>
+<p>是因为 SDUT OJ 的评测姬有什么神奇的优化技术吗? 这里还是先讲解一下评测姬(Linux 平台下)是怎么获得程序运行的时间和内存的吧.</p>
+<h2 id="评测姬原理"><a href="#评测姬原理" class="headerlink" title="评测姬原理"></a>评测姬原理</h2><h3 id="时间"><a href="#时间" class="headerlink" title="时间"></a>时间</h3><p>获得时间的方法各个 OJ 基本都没有区别, Linux 下有 <code>wait</code> 系列函数, 可以通过这个函数收集某个进程运行所占用的资源, 其中就有 CPU 时间.</p>
+<p>CPU 时间是指进程实际占用 CPU 的时间, 系统中断和 I/O 阻塞的时间不计入其中, 同样的, 如果是多线程的程序的话, 那么最终统计到的也是所有线程的用时之和. 这个时间的值和墙上时钟没有什么必然的联系, 墙上时钟运行了 10S 的程序也有可能只占用了 1S 的 CPU 时间, 多线程的程序也有可能在 1S 内占用 3S CPU 时间. Linux 下有 <code>time</code> 命令, 可以轻松的计算某个程序的运行用时.</p>
+<h3 id="内存"><a href="#内存" class="headerlink" title="内存"></a>内存</h3><p>和运行时间比起来, 获得运行占用内存是个相当不容易的事情. <code>wait</code> 函数虽然也可以获得程序占用内存, 但是有个弊端, 就是会将 <code>exec</code> 之前的内存也统计进来, 如果用户提交程序的内存占用还没有 <code>exec</code> 之前的内存大的话, 用户就会获得一个偏大的内存占用. (使用 <code>fork</code> 和 <code>exec</code>  几乎是 Linux 系统下执行新的程序的唯一方法, 所有基于 Linux 的评测姬都要通过这个方法来执行用户提交的代码)</p>
+<p>那么有什么办法可以解决这个问题呢? HUST 开源的评测姬是这样做的: 评测姬监测用户程序, 用户程序每次执行系统调用的时候, 评测姬去 <code>/proc/${pid}/status</code> 中读取程序当前所占用的内存, 然后取一个最大值作为最终的内存占用. </p>
+<p>这样的好处是不会再把其他的内存给统计进去, 缺点就是: 每次用户程序执行系统调用都要中断用户程序, 导致整体运行时间变长, 并且由于过多的来回切换, CPU 时间也相应的变长了. 经统计, HUST 的评测姬比基于 <code>wait</code> 获得内存的评测姬评测出来的程序用时要大 30% 左右.</p>
+<p>那还有没有其他的方法了? 我暂时是不知道还有什么能<strong>比较准确</strong>的测量程序运行占用内存的方法了. 我所知的大部分 OJ 都采用了 <code>wait</code> 的方法来获得内存占用, 但也有一些 OJ , 两种方法都没有使用, 比如 SDUTOJ …</p>
+<h2 id="问题出现的原因"><a href="#问题出现的原因" class="headerlink" title="问题出现的原因"></a>问题出现的原因</h2><p>时间回到 2017 年, 大概是四五月份(也许吧), 当时评测姬被发现了一个 BUG: 任何一个程序运行超过 2S 就会超时, 当时学长们都去实习了, 我就借此机会研究了评测姬的源码. 经过一个多星期的研究, 我终于找出了 BUG 出现的原因, 可同时我也发现了一个神奇的操作 — SDUT OJ 的评测姬, 是根据缺页中断次数判断使用内存的!</p>
+<p>学过操作系统的同学们应该都知道, 缺页中断发生在系统缺页的时候, 也就是要访问的页还不在主存中, 这时候需要系统将数据置换到主存中才可以访问. 缺页中断的次数和程序实际使用的内存并没有必然的联系, 但是, SDUTOJ 的评测姬居然是用缺页中断的次数乘以每页内存的大小来计算内存使用的! </p>
+<p>在程序中用全局变量中申请的内存位于 <em>全局/静态区</em> , 这部分会在程序开始执行的时候与程序正文段一起被装载到内存中. 而使用 <code>new</code> 或者 <code>malloc</code> 申请的内存位于堆区, 在每次调用的时候都会实时申请. 这中间具体的分配过程与缺页情况我并不是很清楚, 但是, 在 SDUTOJ 评测姬的这种计算方式下, 使用同样多的内存, 如果使用全局变量的程序被计算出 1000KIB 内存占用, 那么使用 <code>new</code> 的程序将会被计算出 150000KIB 甚至更多. 没错, 是一千和十五万的、 超过 100 倍的差距.</p>
+<h2 id="为何我没有修复这个问题"><a href="#为何我没有修复这个问题" class="headerlink" title="为何我没有修复这个问题"></a>为何我没有修复这个问题</h2><p>我当时注意到这个问题的时候, 想过要修复它. 但是考虑到了以下几点:</p>
+<ul>
+<li>OJ 中有大量限制内存严格的题目, 比如有个题目通过内存限制只能使用某种数据结构(几百 KIB 的内存限制). 而如果修复了这个问题的话, 那么这些题目将都无法通过, 因为任何一个提交的内存占用都将超过 1000KIB.</li>
+<li>当时我并不知道这个问题会导致什么样的后果, 我认为即使和其他 OJ 不同, 但只要能拿到一个相对正确的值即可. 比如两个代码, 在 POJ 上占用 2000KIB 和 4000KIB, 而在 SDUTOJ 上分别占用 300KIB 和 600KIB, 那么也是可以接受的.</li>
+<li>还有一点, 就是我当时确实认为这个是学长或者原作者有意为之(原版 SDUTOJ 基于 Lo_runner, 我不知道是 Lo_runner 就做了这个设定, 还是学长在修改的时候做的). 当年写评测姬的学长已经联系不到了, 而这个评测姬已经<em>稳定</em>运行了很多年, 出于一些稳定性的原因, 我也不能去修复它.</li>
+</ul>
+<h2 id="现在的解决方案"><a href="#现在的解决方案" class="headerlink" title="现在的解决方案"></a>现在的解决方案</h2><p>如果我现在修复了这个问题, 那么后续也会有大量的问题. 之前的题目是基于错误的内存测量方式而给定的内存限制, 这些题目全部需要进行修改, 是一个不小的工程.</p>
+<p>当然我们也并不会回避问题, 我们将在商讨后给定一个解决方案, 在修复这个 BUG 之前, 如果碰到了这种问题的话, 权宜之计就是申请全局变量来自己维持一个内存池, 这样就可以在内存方面通过限制.</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/攻略/" rel="tag"># 攻略</a>
+          
+            <a href="/tags/评测姬/" rel="tag"># 评测姬</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/22/curl-学习/" rel="next" title="curl 学习">
+                <i class="fa fa-chevron-left"></i> curl 学习
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/16/关于-mmap-映射的内存的释放问题/" rel="prev" title="关于 mmap 映射的内存的释放问题">
+                关于 mmap 映射的内存的释放问题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+      <div id="gitalk-container"></div>
+      <link rel="stylesheet" href="https://unpkg.com/gitalk@1.4.1/dist/gitalk.css">
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/avatar.png"
+                alt="MeiK" />
+            
+              <p class="site-author-name" itemprop="name">MeiK</p>
+              <p class="site-description motion-element" itemprop="description">In solitude, where we are least alone.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">53</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/MeiK2333" target="_blank" title="GitHub"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://twitter.com/MeiK2333" target="_blank" title="Twitter"><i class="fa fa-fw fa-globe"></i>Twitter</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:meik2333@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-globe"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#同样的代码在不同平台的表现"><span class="nav-number">1.</span> <span class="nav-text">同样的代码在不同平台的表现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#POJ"><span class="nav-number">1.1.</span> <span class="nav-text">POJ</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HDU-OJ"><span class="nav-number">1.2.</span> <span class="nav-text">HDU OJ</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SDUT-OJ"><span class="nav-number">1.3.</span> <span class="nav-text">SDUT OJ</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#评测姬原理"><span class="nav-number">2.</span> <span class="nav-text">评测姬原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#时间"><span class="nav-number">2.1.</span> <span class="nav-text">时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存"><span class="nav-number">2.2.</span> <span class="nav-text">内存</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题出现的原因"><span class="nav-number">3.</span> <span class="nav-text">问题出现的原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为何我没有修复这个问题"><span class="nav-number">4.</span> <span class="nav-text">为何我没有修复这个问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#现在的解决方案"><span class="nav-number">5.</span> <span class="nav-text">现在的解决方案</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">MeiK</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+    
+      <script src="https://unpkg.com/gitalk@1.4.1/dist/gitalk.min.js"></script>
+      <script type="text/javascript">
+        const gitalk = new Gitalk({
+          id: (decodeURI(location.pathname)).split("/")[4].substring(0, 49),
+          clientID: '4d2994f790117e7633bd',
+          clientSecret: '09947e1a30bd8f44fd4f648114b65fe5e6c5156a',
+          repo: 'MeiK2333.github.io',
+          owner: 'MeiK2333',
+          admin: 'MeiK2333'.split(','),
+          pagerDirection: 'first',
+          // facebook-like distraction free mode
+          distractionFreeMode: false
+        })
+        gitalk.render('gitalk-container')
+      </script>
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

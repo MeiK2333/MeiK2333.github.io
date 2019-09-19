@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/lurongkai/anti-baidu/js/anti-baidu-latest.min.js" charset="UTF-8"></script>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+  <link href="//cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/favicon.ico?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="转自牛客网《C++后台腾讯WXG实习面经》，同样按我自己的理解进行了作答。">
+<meta name="keywords" content="C++,面经">
+<meta property="og:type" content="article">
+<meta property="og:title" content="面经答案整理二">
+<meta property="og:url" content="https://meik2333.com/2018/09/21/面经答案整理二/index.html">
+<meta property="og:site_name" content="MeiK&#39;s blog">
+<meta property="og:description" content="转自牛客网《C++后台腾讯WXG实习面经》，同样按我自己的理解进行了作答。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-09-19T12:56:27.841Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="面经答案整理二">
+<meta name="twitter:description" content="转自牛客网《C++后台腾讯WXG实习面经》，同样按我自己的理解进行了作答。">
+
+
+
+
+
+
+  <link rel="canonical" href="https://meik2333.com/2018/09/21/面经答案整理二/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>面经答案整理二 | MeiK's blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-107784973-4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-107784973-4');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">MeiK's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">In solitude, where we are least alone.</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://meik2333.com/2018/09/21/面经答案整理二/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="MeiK">
+      <meta itemprop="description" content="In solitude, where we are least alone.">
+      <meta itemprop="image" content="/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MeiK's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">面经答案整理二
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-09-21 23:53:18" itemprop="dateCreated datePublished" datetime="2018-09-21T23:53:18+08:00">2018-09-21</time>
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>转自牛客网<a href="https://www.nowcoder.com/discuss/77507" target="_blank" rel="noopener">《C++后台腾讯WXG实习面经》</a>，同样按我自己的理解进行了作答。</p>
+<a id="more"></a>
+<h2 id="一颗二叉搜索树，找出树中的第-k-大节点"><a href="#一颗二叉搜索树，找出树中的第-k-大节点" class="headerlink" title="一颗二叉搜索树，找出树中的第 k 大节点"></a>一颗二叉搜索树，找出树中的第 k 大节点</h2><p>对于二叉搜索树来说，其中序遍历将按大小顺序依次输出其每个节点。因此只需要中序遍历，然后输出第 k 个即可。</p>
+<p>关于具体实现，可以递归，也可以用栈来存储中间节点。</p>
+<h2 id="fork-的过程"><a href="#fork-的过程" class="headerlink" title="fork 的过程"></a>fork 的过程</h2><p>首先父进程调用 <code>fork()</code>，内核根据父进程的信息复制出一个子进程，子进程与父进程的 PCB 相同，用户态代码和数据也相同，因此此时子进程与父进程看起来状态相同。</p>
+<p>然后根据内核调度方式的不同，两个进程先后返回。对于父进程来说，这个函数返回创建的子进程的 PID。而在子进程中，这个函数返回 0。因此可以用返回值来判断当前是父进程还是子进程。（如果 <code>fork</code> 执行出现错误，则返回一个负值）</p>
+<p>另外，因为 Linux 中执行一个新的进程需要 <code>fork</code> + <code>exec</code>，这种组合也被大量使用。如果在 <code>fork</code> 后紧接着执行 <code>exec</code>，那么子进程由父进程复制来的数据几乎毫无作用。对此内核进行了优化：如果在 <code>fork</code> 之后没有对数据进行过修改，直接进行 <code>exec</code> 的话，则不会复制一份数据给子进程，也就是 Copy-on-write。</p>
+<h2 id="fork、vfork-以及-clone-的区别"><a href="#fork、vfork-以及-clone-的区别" class="headerlink" title="fork、vfork 以及 clone 的区别"></a>fork、vfork 以及 clone 的区别</h2><p>这三个函数最终调用的都是 <code>do_fork()</code></p>
+<h3 id="fork-与-vfork"><a href="#fork-与-vfork" class="headerlink" title="fork 与 vfork"></a>fork 与 vfork</h3><p><code>fork</code> 与 <code>vfork</code> 都是创建一个新的进程，主要区别有以下几点：</p>
+<ul>
+<li><code>fork</code> 子进程拷贝父进程的数据段、代码段；<code>vfork</code> 子进程与父进程共享数据段。</li>
+<li><code>fork</code> 父子进程的执行次序不确定；<code>vfork</code> 保证子进程先运行。</li>
+</ul>
+<p>因为 <code>vfork</code> 父子进程共享数据段，而且保证子进程先执行，如果子进程中进行了 <code>return</code>，则会扰乱父进程的栈空间，而如果子进程中修改了其他如全局变量的数据，也很可能导致父进程崩溃。</p>
+<p>在 <code>fork</code> 提供 Copy-on-write 之前，<code>vfork</code> 是更好的创建新进程的方法，因为它不需要复制父进程的数据。但是现在基本已经没有继续使用 <code>vfork</code> 的必要了。</p>
+<h3 id="clone"><a href="#clone" class="headerlink" title="clone"></a>clone</h3><p><code>clone</code> 的功能很强大，可以通过指定参数让它达到 <code>fork</code> 或者 <code>vfork</code> 的效果，这里不过多说明，有兴趣可以自行搜索。</p>
+<h2 id="僵尸进程"><a href="#僵尸进程" class="headerlink" title="僵尸进程"></a>僵尸进程</h2><h3 id="什么是僵尸进程"><a href="#什么是僵尸进程" class="headerlink" title="什么是僵尸进程"></a>什么是僵尸进程</h3><p>在 Linux 中，每个进程退出后都有一些资源尚未释放，这是为了让这些进程的退出的信息可以被获取。</p>
+<p>但是，这些资源如果迟迟不被释放的话，就会占用系统资源，变成僵尸进程。</p>
+<h3 id="如何避免僵尸进程"><a href="#如何避免僵尸进程" class="headerlink" title="如何避免僵尸进程"></a>如何避免僵尸进程</h3><p>当某个进程还在运行的时候，它的父进程退出了，那这个进程就会变成孤儿进程，然后被 init 进程收养。当这个进程退出之后，init 进程会通过 <code>wait</code> 来释放它遗留的资源。</p>
+<p>因此，可以通过 <code>fork</code> 两次的方式，将要执行的进程变为孙子进程，然后其父进程退出，那么要执行的进程就会变成孤儿进程，由 init 进程来处理它的善后工作。</p>
+<p>如果想要自行处理的话，对于某个进程，其子进程退出的时候会给它发送 <code>SIGCHLD</code> 信号，这个进程可以监听这个信号，为这个信号安装处理函数，在函数里通过 <code>wait</code> 释放子进程的资源。</p>
+<h2 id="从汇编层去解释一下引用"><a href="#从汇编层去解释一下引用" class="headerlink" title="从汇编层去解释一下引用"></a>从汇编层去解释一下引用</h2><p>汇编我一窍不通…这个问题先 pass，日后学了再回来补充。</p>
+<h2 id="惊群效应"><a href="#惊群效应" class="headerlink" title="惊群效应"></a>惊群效应</h2><h3 id="什么是惊群效应"><a href="#什么是惊群效应" class="headerlink" title="什么是惊群效应"></a>什么是惊群效应</h3><p>多个进程或线程正在阻塞等待同一个事件时，如果被等待的这个事件发生，那么这些进程（线程）会被全部唤醒。如果这些进程（线程）是为了处理这个事件被唤醒的话，那么最后一般只会有一个进程（线程）得到这个事件，其他的进程（线程）将会重新进入休眠状态。</p>
+<p>就像是用一粒米来喂一群鸽子，整群鸽子都被惊动跑来争夺这一粒米，最终却只会有一只鸽子获得这粒米。如果发生了惊群效应，那么就会白白浪费了很多的系统资源。</p>
+<h3 id="如何解决惊群问题"><a href="#如何解决惊群问题" class="headerlink" title="如何解决惊群问题"></a>如何解决惊群问题</h3><p>一个典型的惊群问题，一个 web 服务器的多个进程等待 accept 同一个 sockfd，当一个客户端的连接请求到来时，所有的进程都会被唤醒，除了一个能够抢夺到连接之外，其他的都会失败。（较新的 Linux 内核已经解决了这个问题，在这个场景下，会优先指定一个进程来获得连接）</p>
+<p>如果我们想要自行解决这个惊群问题的话，可以自己设定一个锁，多个进程同时尝试请求这个锁，只有请求到锁的进程可以休眠等待连接（<code>accept</code>），其他的进程要等待这个进程释放掉锁后重新抢夺锁。</p>
+<p>另一个场景是使用 <code>epoll_wait</code> 时，这个问题已经被解决了。可以通过添加 <code>EPOLLEXCLUSIVE</code> 标志来指定在事件发生时只唤醒一个进程。</p>
+<h2 id="中断的作用"><a href="#中断的作用" class="headerlink" title="中断的作用"></a>中断的作用</h2><p>原作者对此有很深的理解，可以在原文中查看。</p>
+<p>对我来说，我认知的中断的作用主要就是让单个处理核心能够并行处理多个任务，不会因为单个任务的阻塞影响后续所有任务。</p>
+<h2 id="tcp-的连接关闭"><a href="#tcp-的连接关闭" class="headerlink" title="tcp 的连接关闭"></a>tcp 的连接关闭</h2><p>高频问题，我之前写过相关的博客。</p>
+<ul>
+<li><a href="/2018/08/17/TCP-的三次握手与四次挥手/">《TCP 的三次握手与四次挥手》</a></li>
+<li><a href="/2018/08/19/TCP-连接的流程与状态转换/">《TCP 连接的流程与状态转换》</a></li>
+</ul>
+<h2 id="TIME-WAIT-的作用"><a href="#TIME-WAIT-的作用" class="headerlink" title="TIME_WAIT 的作用"></a>TIME_WAIT 的作用</h2><p>依然是我之前的博客<a href="/2018/08/17/TCP-的三次握手与四次挥手/#TIME-WAIT-状态">《TCP 的三次握手与四次挥手》</a></p>
+<p>关于 TIME_WAIT 过多时的解决方案，有几种解决方案：</p>
+<ul>
+<li>TIME_WAIT 重用</li>
+<li>编译内核，缩短 TIME_WAIT 的时间</li>
+<li>结束连接时发送 RST 而不是 FIN，以越过 TIME_WAIT</li>
+</ul>
+<p>但是这几种方案都违反了设立 TIME_WAIT 的初衷。</p>
+<p>其实在我看来，如果是 web 服务器的话，那么升级到较新的协议是有用的。比如 http 0.9 是由服务器关闭连接，那么将由服务器处理这个 TIME_WAIT。而 1.0 以后，服务器可以发送 <code>Content-Length</code> 字段，由客户端关闭连接，因此将改由客户端处理关闭连接。还有 http 1.1 中的 <code>keepalive</code>，可以使多个 http 请求复用同一个连接，也可以有效的缓解这个问题。</p>
+<h2 id="如果网络延迟很高，但是又没有发生丢包，利用tcp会使吞吐量下降，该如何解决呢"><a href="#如果网络延迟很高，但是又没有发生丢包，利用tcp会使吞吐量下降，该如何解决呢" class="headerlink" title="如果网络延迟很高，但是又没有发生丢包，利用tcp会使吞吐量下降，该如何解决呢"></a>如果网络延迟很高，但是又没有发生丢包，利用tcp会使吞吐量下降，该如何解决呢</h2><h3 id="TCP-的滑动窗口"><a href="#TCP-的滑动窗口" class="headerlink" title="TCP 的滑动窗口"></a>TCP 的滑动窗口</h3><p>参照<a href="/2018/09/15/TCP-的滑动窗口/">《TCP 的滑动窗口》</a></p>
+<h3 id="TCP-的拥塞控制"><a href="#TCP-的拥塞控制" class="headerlink" title="TCP 的拥塞控制"></a>TCP 的拥塞控制</h3><p>参照<a href="/2018/09/16/TCP-的拥塞控制/">《TCP 的拥塞控制》</a></p>
+<h3 id="如果网络延迟很高，但是又没有发生丢包，利用tcp会使吞吐量下降，该如何解决呢-1"><a href="#如果网络延迟很高，但是又没有发生丢包，利用tcp会使吞吐量下降，该如何解决呢-1" class="headerlink" title="如果网络延迟很高，但是又没有发生丢包，利用tcp会使吞吐量下降，该如何解决呢"></a>如果网络延迟很高，但是又没有发生丢包，利用tcp会使吞吐量下降，该如何解决呢</h3><p>这个问题见仁见智吧，原作者的回答：从应用层封装udp协议或者使用raw socket直接封装ip数据报</p>
+<p>我认为也可以采用其他拥塞控制算法，比如 BBR 等。</p>
+<h2 id="DDos-攻击原理"><a href="#DDos-攻击原理" class="headerlink" title="DDos 攻击原理"></a>DDos 攻击原理</h2><p>分布式拒绝服务(DDoS: Distributed Denial of Service) 有很多类型，其中最常用的可能就是 SYN Flood 攻击了。</p>
+<p>正巧关于这种攻击方式我之前也有过一些测试，这里就直接放博客<a href="/2018/08/29/SYN-Flood-攻击原理与-C-语言实现/">《SYN Flood 攻击原理与 C 语言实现》</a>。</p>
+<h2 id="数据库引擎"><a href="#数据库引擎" class="headerlink" title="数据库引擎"></a>数据库引擎</h2><p>这里的篇幅肯定是不够的…自行搜索吧。</p>
+<h2 id="数据库三范式"><a href="#数据库三范式" class="headerlink" title="数据库三范式"></a>数据库三范式</h2><ol>
+<li>数据库表中不能出现重复记录，每个字段是原子性的不能再分</li>
+<li>第二范式是建立在第一范式基础上的，另外要求所有非主键字段完全依赖主键，不能产生部分依赖</li>
+<li>建立在第二范式基础上的，非主键字段不能传递依赖于主键字段（不要产生传递依赖）</li>
+</ol>
+<h2 id="网络层、数据链路层、传输层的设备有哪些"><a href="#网络层、数据链路层、传输层的设备有哪些" class="headerlink" title="网络层、数据链路层、传输层的设备有哪些"></a>网络层、数据链路层、传输层的设备有哪些</h2><p>OSI 七层模型从下到上：</p>
+<ol>
+<li>物理层：网线、集线器等</li>
+<li>数据链路层：网卡、网桥、二层交换机等</li>
+<li>网络层：路由器、多层交换机、防火墙等</li>
+<li>传输层：没有硬件设备，TCP 与 UDP 等都是这层的协议</li>
+<li>会话层：没有硬件设备与具体协议</li>
+<li>表示层：没有硬件设备与具体协议</li>
+<li>应用层：没有硬件设备，HTTP、FTP、DNS 等等协议都属于这一层</li>
+</ol>
+<h2 id="网络层、传输层协议有哪些"><a href="#网络层、传输层协议有哪些" class="headerlink" title="网络层、传输层协议有哪些"></a>网络层、传输层协议有哪些</h2><ol>
+<li>物理层：ISO2110、IEEE802、IEEE802.2</li>
+<li>数据链路层：SLIP、CSLIP、PPP、ARP、RARP、MTU</li>
+<li>网络层：IP、ICMP、RIP、OSPF、BGP、IGMP</li>
+<li>传输层：TCP、UDP</li>
+<li>会话层：没有具体协议</li>
+<li>表示层：没有具体协议</li>
+<li>应用层：TFTP、HTTP、SNMP、FTP、SMTP、DNS、Telnet</li>
+</ol>
+<h2 id="网络层、数据链路层、传输层使用的寻址地址分别是什么"><a href="#网络层、数据链路层、传输层使用的寻址地址分别是什么" class="headerlink" title="网络层、数据链路层、传输层使用的寻址地址分别是什么"></a>网络层、数据链路层、传输层使用的寻址地址分别是什么</h2><p>数据链路层使用 mac 寻址，网络层使用 IP，传输层使用 IP + port。</p>
+<h2 id="内存分配原理"><a href="#内存分配原理" class="headerlink" title="内存分配原理"></a>内存分配原理</h2><p>这个问题 CSAPP 中有详细的解答，我将在看过这本书后回来解答这个问题（也许吧）。</p>
+<h2 id="AVL-树、B＋树、红黑树"><a href="#AVL-树、B＋树、红黑树" class="headerlink" title="AVL 树、B＋树、红黑树"></a>AVL 树、B＋树、红黑树</h2><p>B+ 树上篇博客有过提及，是一种每层节点要多于两个的排序树，可以以较少的层数存储更多的数据。一般来说可以作为数据库的索引，因为它能够更好的利用磁盘的性质。</p>
+<p>AVL 树是自平衡二叉树，红黑树也是大致平衡的二叉树，两者的区别在于 AVL 是严格平衡的，因此在插入一个节点时平均需要更多的旋转次数，但是可以保证 O(log(n)) 的查询复杂度；而红黑树只保证最长的一条路不会比最短的一条长一倍，因此插入时需要的旋转次数少于 AVL 树，但是查询复杂度会略高一点。</p>
+<p>AVL 树与红黑树在极端数据的情况下也能保证不错的复杂度，而普通的排序二叉树在插入有序数据的情况下，查找速度可能会劣化为 O(n)。</p>
+<h2 id="poll-和-epoll-的区别"><a href="#poll-和-epoll-的区别" class="headerlink" title="poll 和 epoll 的区别"></a>poll 和 epoll 的区别</h2><p>一般都是把 select、poll 和 epoll 放在一起比较。</p>
+<p>select 和 poll 很接近，首先将一组要监听的描述符与事件加入监听列表中，当这一组描述符中有任何一个读写事件就绪的时候，就会返回。然后用户需要遍历整组描述符，找到真正就绪的那一个，然后对其进行处理。</p>
+<p>epoll 是对 select 和 poll 的改进，它不像 select 一样只能监听 1024 个描述符，它所支持的 FD 上限是最大可以打开文件的数目。</p>
+<p>epoll 也不像 select 和 poll 一样，需要遍历整组描述符，epoll 只会返回已就绪的描述符，可以通过返回的 <code>events</code> 判断是什么类型的就绪（可读、可写、关闭或错误等）。</p>
+<h2 id="epoll-中-ET-模式与-LT-模式的区别"><a href="#epoll-中-ET-模式与-LT-模式的区别" class="headerlink" title="epoll 中 ET 模式与 LT 模式的区别"></a>epoll 中 ET 模式与 LT 模式的区别</h2><p>ET：边缘触发，当有事件发生时，只会通知一次。比如通过 <code>epoll_wait</code> 返回了一个就绪的描述符，没有处理完其事件，那么此时再次调用 <code>epoll_wait</code>，将不能再获得这个描述符。<br>LT：水平触发，当有事件发生时，会持续通知。如果某个返回的描述符事件还没有被处理完，那么下一次调用 <code>epoll_wait</code> 时，这个描述符依旧会被返回。</p>
+<hr>
+<p>其他还有一些题目，但那些是原作者专精的方向，与我学习的方向不太相同，因此这里也不对其进行整理了。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>说实话，我和大佬们差距还是很大的。这篇面经是原作者在大三的下学期写的，我现在大四上学期了，水平还差得远呢…</p>
+<p>之前我的学习都太过肤浅了，很多问题，别说原理了，我连过程都不知道。还是要静下心来踏实学习才是啊。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://book.douban.com/subject/25900403/" target="_blank" rel="noopener">《UNIX环境高级编程（第3版）》</a> - 人民邮电出版社</li>
+<li><a href="https://blog.csdn.net/dlutbrucezhang/article/details/8692227" target="_blank" rel="noopener">《Linux C编程–fork()详解》</a> - CSDN</li>
+<li><a href="https://blog.csdn.net/gatieme/article/details/51417488" target="_blank" rel="noopener">《Linux中fork，vfork和clone详解（区别与联系）》</a> - CSDN</li>
+<li><a href="https://www.jianshu.com/p/21c3e5b99f4a" target="_blank" rel="noopener">《nginx如何解决惊群效应》</a> - 简书</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+            <a href="/tags/面经/" rel="tag"># 面经</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/16/面经答案整理一/" rel="next" title="面经答案整理一">
+                <i class="fa fa-chevron-left"></i> 面经答案整理一
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/22/面经答案整理三/" rel="prev" title="面经答案整理三">
+                面经答案整理三 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+      <div id="gitalk-container"></div>
+      <link rel="stylesheet" href="https://unpkg.com/gitalk@1.4.1/dist/gitalk.css">
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/avatar.png"
+                alt="MeiK" />
+            
+              <p class="site-author-name" itemprop="name">MeiK</p>
+              <p class="site-description motion-element" itemprop="description">In solitude, where we are least alone.</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">53</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/MeiK2333" target="_blank" title="GitHub"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://twitter.com/MeiK2333" target="_blank" title="Twitter"><i class="fa fa-fw fa-globe"></i>Twitter</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:meik2333@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-globe"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一颗二叉搜索树，找出树中的第-k-大节点"><span class="nav-number">1.</span> <span class="nav-text">一颗二叉搜索树，找出树中的第 k 大节点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fork-的过程"><span class="nav-number">2.</span> <span class="nav-text">fork 的过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fork、vfork-以及-clone-的区别"><span class="nav-number">3.</span> <span class="nav-text">fork、vfork 以及 clone 的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#fork-与-vfork"><span class="nav-number">3.1.</span> <span class="nav-text">fork 与 vfork</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#clone"><span class="nav-number">3.2.</span> <span class="nav-text">clone</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#僵尸进程"><span class="nav-number">4.</span> <span class="nav-text">僵尸进程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是僵尸进程"><span class="nav-number">4.1.</span> <span class="nav-text">什么是僵尸进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何避免僵尸进程"><span class="nav-number">4.2.</span> <span class="nav-text">如何避免僵尸进程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从汇编层去解释一下引用"><span class="nav-number">5.</span> <span class="nav-text">从汇编层去解释一下引用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#惊群效应"><span class="nav-number">6.</span> <span class="nav-text">惊群效应</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是惊群效应"><span class="nav-number">6.1.</span> <span class="nav-text">什么是惊群效应</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何解决惊群问题"><span class="nav-number">6.2.</span> <span class="nav-text">如何解决惊群问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#中断的作用"><span class="nav-number">7.</span> <span class="nav-text">中断的作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tcp-的连接关闭"><span class="nav-number">8.</span> <span class="nav-text">tcp 的连接关闭</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TIME-WAIT-的作用"><span class="nav-number">9.</span> <span class="nav-text">TIME_WAIT 的作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如果网络延迟很高，但是又没有发生丢包，利用tcp会使吞吐量下降，该如何解决呢"><span class="nav-number">10.</span> <span class="nav-text">如果网络延迟很高，但是又没有发生丢包，利用tcp会使吞吐量下降，该如何解决呢</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TCP-的滑动窗口"><span class="nav-number">10.1.</span> <span class="nav-text">TCP 的滑动窗口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TCP-的拥塞控制"><span class="nav-number">10.2.</span> <span class="nav-text">TCP 的拥塞控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如果网络延迟很高，但是又没有发生丢包，利用tcp会使吞吐量下降，该如何解决呢-1"><span class="nav-number">10.3.</span> <span class="nav-text">如果网络延迟很高，但是又没有发生丢包，利用tcp会使吞吐量下降，该如何解决呢</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DDos-攻击原理"><span class="nav-number">11.</span> <span class="nav-text">DDos 攻击原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库引擎"><span class="nav-number">12.</span> <span class="nav-text">数据库引擎</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库三范式"><span class="nav-number">13.</span> <span class="nav-text">数据库三范式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网络层、数据链路层、传输层的设备有哪些"><span class="nav-number">14.</span> <span class="nav-text">网络层、数据链路层、传输层的设备有哪些</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网络层、传输层协议有哪些"><span class="nav-number">15.</span> <span class="nav-text">网络层、传输层协议有哪些</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网络层、数据链路层、传输层使用的寻址地址分别是什么"><span class="nav-number">16.</span> <span class="nav-text">网络层、数据链路层、传输层使用的寻址地址分别是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内存分配原理"><span class="nav-number">17.</span> <span class="nav-text">内存分配原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AVL-树、B＋树、红黑树"><span class="nav-number">18.</span> <span class="nav-text">AVL 树、B＋树、红黑树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#poll-和-epoll-的区别"><span class="nav-number">19.</span> <span class="nav-text">poll 和 epoll 的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#epoll-中-ET-模式与-LT-模式的区别"><span class="nav-number">20.</span> <span class="nav-text">epoll 中 ET 模式与 LT 模式的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">21.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">22.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">MeiK</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+    
+      <script src="https://unpkg.com/gitalk@1.4.1/dist/gitalk.min.js"></script>
+      <script type="text/javascript">
+        const gitalk = new Gitalk({
+          id: (decodeURI(location.pathname)).split("/")[4].substring(0, 49),
+          clientID: '4d2994f790117e7633bd',
+          clientSecret: '09947e1a30bd8f44fd4f648114b65fe5e6c5156a',
+          repo: 'MeiK2333.github.io',
+          owner: 'MeiK2333',
+          admin: 'MeiK2333'.split(','),
+          pagerDirection: 'first',
+          // facebook-like distraction free mode
+          distractionFreeMode: false
+        })
+        gitalk.render('gitalk-container')
+      </script>
+    
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
