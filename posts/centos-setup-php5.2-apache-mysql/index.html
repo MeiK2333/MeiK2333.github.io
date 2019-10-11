@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>MeiK&#39;s blog  | CentOS 配置 PHP5.2 &#43; Apache &#43; MySQL</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="generator" content="Hugo 0.58.3" />
+    
+    
+      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+    
+
+    
+    
+      <link href="/dist/css/app.d98f2eb6bcd1eaedb7edf166bd16af26.css" rel="stylesheet">
+    
+
+    
+
+    
+      
+    
+
+    
+    
+    <meta property="og:title" content="CentOS 配置 PHP5.2 &#43; Apache &#43; MySQL" />
+<meta property="og:description" content="原材料
+
+
+Ubuntu16.04 服务器
+Docker
+CentOS:6 镜像
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://meik2333.com/posts/centos-setup-php5.2-apache-mysql/" />
+<meta property="article:published_time" content="2018-03-23T16:10:22+00:00" />
+<meta property="article:modified_time" content="2018-03-23T16:10:22+00:00" />
+<meta itemprop="name" content="CentOS 配置 PHP5.2 &#43; Apache &#43; MySQL">
+<meta itemprop="description" content="原材料
+
+
+Ubuntu16.04 服务器
+Docker
+CentOS:6 镜像
+">
+
+
+<meta itemprop="datePublished" content="2018-03-23T16:10:22&#43;00:00" />
+<meta itemprop="dateModified" content="2018-03-23T16:10:22&#43;00:00" />
+<meta itemprop="wordCount" content="333">
+
+
+
+<meta itemprop="keywords" content="Docker,网站运维," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="CentOS 配置 PHP5.2 &#43; Apache &#43; MySQL"/>
+<meta name="twitter:description" content="原材料
+
+
+Ubuntu16.04 服务器
+Docker
+CentOS:6 镜像
+"/>
+
+  </head>
+
+  <body class="ma0 avenir bg-near-white">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l justify-between items-center center">
+    <a href="https://meik2333.com" class="f3 fw2 hover-white no-underline white-90 dib">
+      MeiK&#39;s blog
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  <article class="flex-l flex-wrap justify-between mw8 center ph3">
+
+    <header class="mt4 w-100">
+      <p class="f6 b helvetica tracked">
+          
+        POSTS
+      </p>
+      <h1 class="f1 athelas mb1">CentOS 配置 PHP5.2 &#43; Apache &#43; MySQL</h1>
+      
+      
+      <time class="f6 mv4 dib tracked" datetime="2018-03-23T16:10:22Z">March 23, 2018</time>
+      
+      
+    </header>
+
+    <section class="nested-copy-line-height lh-copy serif f4 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><h2 id="原材料">原材料</h2>
+
+<ul>
+<li>Ubuntu16.04 服务器</li>
+<li>Docker</li>
+<li>CentOS:6 镜像</li>
+</ul>
+
+<h2 id="没什么卵用的介绍">没什么卵用的介绍</h2>
+
+<p>有个同学的需求，需要在一个 ubuntu16.04 服务器上部署一个 PHP 的网站，当我轻车熟路一顿 apt 之后……</p>
+
+<p><img src="/images/centos-php5.2-apache-mysql/fatalerror.png" alt="fatalerror.png" /></p>
+
+<p>代码中充满了 PHP5.2 版本才有的操作，包括且不限于 session_register、preg_match、ereg、mysql_connect 系列函数，我大概看了一下代码就放弃了帮他升级的想法 —— 升级到新版 PHP 的工作量不亚于写一个新的……</p>
+
+<p>好吧，看来代码是不能动了，那就装一个 PHP5.2 吧。</p>
+
+<p>经过一番搜索和考虑，我决定把 PHP5.2 装在 Docker 中，以 Docker 的形式来运行网站服务。一来是服务器上之前有什么东西我不知道，服务器上已经有 PHP7 了，我不想因为环境的修改导致其他的问题；二来就是，通过搜索，我发现，ubuntu16.04 上安装 PHP5.2 还没有先例……据某个网友说，ubuntu16.04 的系统无法兼容 PHP5 的 libphp5.so ，会导致 Apache 无法解析 PHP 文件。</p>
+
+<h2 id="安装-docker-镜像">安装 Docker 镜像</h2>
+
+<p>直接 pull 一个 CentOS:6 的镜像即可，我使用了国内源的加速。</p>
+
+<pre><code class="language-shell">docker pull registry.docker-cn.com/library/centos:6
+docker run -it -p 80:80 centos:6
+</code></pre>
+
+<h2 id="安装-mysql">安装 MySQL</h2>
+
+<p>项目对 MySQL 的版本没有什么要求，因此直接 yum 安装即可。</p>
+
+<pre><code class="language-shell">yum install mysql mysql-server
+</code></pre>
+
+<h2 id="安装-apache">安装 Apache</h2>
+
+<p>Apache 的版本同样没有什么要求，直接 yum 安装。</p>
+
+<pre><code class="language-shell">yum install httpd
+</code></pre>
+
+<h2 id="安装-php5-2">安装 PHP5.2</h2>
+
+<h3 id="准备工作">准备工作</h3>
+
+<p>因为 yum 源里的 PHP 版本高于 5.2 ，因此需要手动下载编译 PHP 。</p>
+
+<p>首先需要下载安装 PHP 必需的一些依赖。</p>
+
+<pre><code class="language-shell">yum groupinstall &quot;Development tools&quot;
+useradd opt -d /opt/sbin
+yum install wget
+yum install epel-release
+yum install gcc make httpd-devel libxml2-devel bzip2-devel openssl-devel curl-devel gd-devel libc-client-devel libmcrypt-devel libmhash-devel mysql55-devel aspell-devel libxslt-devel mysql-devel    
+ln -s /usr/lib64/libjpeg.so /usr/lib/libjpeg.so
+ln -s /usr/lib64/libpng.so /usr/lib/libpng.so
+ln -s /usr/lib64/libXpm.so /usr/lib/libXpm.so
+ln -s /usr/lib64/libc-client.so /usr/lib/libc-client.so
+ln -s /usr/lib64/krb5 /usr/lib/krb5
+ln -s /usr/lib64/libgssapi_krb5.so /usr/lib/libgssapi_krb5.so
+ln -s /usr/lib64/libgssrpc.so /usr/lib/libgssrpc.so
+ln -s /usr/lib64/libk5crypto.so /usr/lib/libk5crypto.so
+ln -s /usr/lib64/libkadm5clnt.so /usr/lib/libkadm5clnt.so
+ln -s /usr/lib64/libkadm5clnt_mit.so /usr/lib/libkadm5clnt_mit.so
+ln -s /usr/lib64/libkadm5srv.so /usr/lib/libkadm5srv.so
+ln -s /usr/lib64/libkadm5srv_mit.so /usr/lib/libkadm5srv_mit.so
+ln -s /usr/lib64/libkdb5.so /usr/lib/libkdb5.so
+ln -s /usr/lib64/libkrb5.so /usr/lib/libkrb5.so
+ln -s /usr/lib64/libkrb5support.so /usr/lib/libkrb5support.so
+ln -s /usr/lib64/mysql /usr/lib/mysql
+usermod -aG wheel opt
+echo &quot;%wheel ALL=(ALL) NOPASSWD: ALL&quot; &gt;&gt; /etc/sudoers
+</code></pre>
+
+<h3 id="安装">安装</h3>
+
+<pre><code class="language-shell">wget http://museum.php.net/php5/php-5.2.17.tar.gz
+tar xzf php-5.2.17.tar.gz
+cd php-5.2.17
+
+./configure --prefix=/opt/sbin/php --with-apxs2=/usr/sbin/apxs --with-config-file-path=/opt/sbin/etc/  --disable-posix   --enable-bcmath   --enable-calendar   --enable-exif   --enable-fastcgi   --enable-ftp   --enable-gd-native-ttf   --enable-libxml   --enable-magic-quotes   --enable-mbstring   --enable-pdo   --enable-soap   --enable-sockets   --enable-wddx   --enable-zip  --with-bz2   --with-curl   --with-curlwrappers   --with-freetype-dir   --with-gd   --with-gettext   --with-imap   --with-imap-ssl  --with-jpeg-dir  --with-kerberos   --with-libxml-dir  --with-libxml-dir   --with-mcrypt   --with-mhash   --with-mime-magic   --with-mysql  --with-mysqli   --with-openssl --with-openssl-dir --with-pcre-regex  --with-pdo-mysql   --with-pdo-sqlite   --with-pic   --with-png-dir   --with-pspell   --with-sqlite   --with-ttf   --with-xmlrpc   --with-xpm-dir  --with-xsl --with-zlib   --with-zlib-dir
+
+cd php-5.2.17
+sudo make install
+libtool --finish /opt/sbin/php-5.2.17/libs
+/opt/sbin/php/bin/php --version
+
+    PHP 5.2.17 (cli) (built: Dec 28 2015 13:24:10)
+    Copyright (c) 1997-2010 The PHP Group
+    Zend Engine v2.2.0, Copyright (c) 1998-2010 Zend Technologies
+</code></pre>
+
+<h2 id="配置-apache-解析-php">配置 Apache 解析 PHP</h2>
+
+<p>将下面的代码添加到 <code>/etc/httpd/conf/httpd.conf</code> 中：</p>
+
+<pre><code>AddType application/x-httpd-php .php
+
+LoadModule php5_module modules/libphp5.so
+&lt;IfModule mod_php5.c&gt;
+
+    AddType application/x-httpd-php .php
+    AddType application/x-httpd-php-source .phps
+&lt;/IfModule&gt;
+</code></pre>
+
+<p>重启 Apache 和 MySQL</p>
+
+<pre><code class="language-shell">/etc/init.d/mysqld restart
+/etc/init.d/httpd restart
+</code></pre>
+
+<p>此时访问服务器 IP ，已经在正常解析了。</p>
+
+<h2 id="总结">总结</h2>
+
+<ul>
+<li>万恶的上古代码</li>
+<li>Docker 还是美滋滋啊</li>
+</ul><ul class="pa0">
+  
+   <li class="list">
+     <a href="/tags/docker" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">Docker</a>
+   </li>
+  
+   <li class="list">
+     <a href="/tags/%E7%BD%91%E7%AB%99%E8%BF%90%E7%BB%B4" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">网站运维</a>
+   </li>
+  
+</ul>
+<div class="mt6">
+      
+      
+      </div>
+    </section>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+  <div class="bg-light-gray pa3 nested-list-reset nested-copy-line-height nested-links">
+    <p class="f5 b mb3">Related</p>
+    <ul class="pa0 list">
+	   
+	     <li  class="mb2">
+          <a href="/posts/use-lets-encrypt/">CentOS 7 &#43; Nginx 配置 HTTPS （使用 Let&#39;s Encrypt ）</a>
+        </li>
+	    
+    </ul>
+</div>
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="https://meik2333.com" >
+    &copy; 2019 MeiK&#39;s blog
+  </a>
+    <div>
+
+
+
+
+
+
+
+
+
+
+</div>
+  </div>
+</footer>
+
+    
+
+  <script src="/dist/js/app.3fc0f988d21662902933.js"></script>
+
+
+  </body>
+</html>

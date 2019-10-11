@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>MeiK&#39;s blog  | Tinyhttpd 源码及分析</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="generator" content="Hugo 0.58.3" />
+    
+    
+      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+    
+
+    
+    
+      <link href="/dist/css/app.d98f2eb6bcd1eaedb7edf166bd16af26.css" rel="stylesheet">
+    
+
+    
+
+    
+      
+    
+
+    
+    
+    <meta property="og:title" content="Tinyhttpd 源码及分析" />
+<meta property="og:description" content="Tinyhttpd 是J. David Blackstone在1999年写的一个不到 500 行的超轻量型 Http Server，分析这个项目可以帮助我们理解服务器软件的本质。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://meik2333.com/posts/tinyhttpd-source-and-analysis/" />
+<meta property="article:published_time" content="2018-06-29T17:16:20+00:00" />
+<meta property="article:modified_time" content="2018-06-29T17:16:20+00:00" />
+<meta itemprop="name" content="Tinyhttpd 源码及分析">
+<meta itemprop="description" content="Tinyhttpd 是J. David Blackstone在1999年写的一个不到 500 行的超轻量型 Http Server，分析这个项目可以帮助我们理解服务器软件的本质。">
+
+
+<meta itemprop="datePublished" content="2018-06-29T17:16:20&#43;00:00" />
+<meta itemprop="dateModified" content="2018-06-29T17:16:20&#43;00:00" />
+<meta itemprop="wordCount" content="2086">
+
+
+
+<meta itemprop="keywords" content="Tinyhttpd,C 语言,网络编程," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Tinyhttpd 源码及分析"/>
+<meta name="twitter:description" content="Tinyhttpd 是J. David Blackstone在1999年写的一个不到 500 行的超轻量型 Http Server，分析这个项目可以帮助我们理解服务器软件的本质。"/>
+
+  </head>
+
+  <body class="ma0 avenir bg-near-white">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l justify-between items-center center">
+    <a href="https://meik2333.com" class="f3 fw2 hover-white no-underline white-90 dib">
+      MeiK&#39;s blog
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  <article class="flex-l flex-wrap justify-between mw8 center ph3">
+
+    <header class="mt4 w-100">
+      <p class="f6 b helvetica tracked">
+          
+        POSTS
+      </p>
+      <h1 class="f1 athelas mb1">Tinyhttpd 源码及分析</h1>
+      
+      
+      <time class="f6 mv4 dib tracked" datetime="2018-06-29T17:16:20Z">June 29, 2018</time>
+      
+      
+    </header>
+
+    <section class="nested-copy-line-height lh-copy serif f4 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><p>Tinyhttpd 是J. David Blackstone在1999年写的一个不到 500 行的超轻量型 Http Server，分析这个项目可以帮助我们理解服务器软件的本质。</p>
+
+<h2 id="源码">源码</h2>
+
+<pre><code class="language-C">/* J. David's webserver */
+/* This is a simple webserver.
+ * Created November 1999 by J. David Blackstone.
+ * CSE 4344 (Network concepts), Prof. Zeigler
+ * University of Texas at Arlington
+ */
+/* This program compiles for Sparc Solaris 2.6.
+ * To compile for Linux:
+ *  1) Comment out the #include &lt;pthread.h&gt; line.
+ *  2) Comment out the line that defines the variable newthread.
+ *  3) Comment out the two lines that run pthread_create().
+ *  4) Uncomment the line that runs accept_request().
+ *  5) Remove -lsocket from the Makefile.
+ */
+/**
+ * 较新版本的 Linux 已经内置了对线程的支持，只需要在编译时添加 -lpthread
+ * 参数即可 调整 Makefile 的编译选项，使 $(LIBS) 在第 4 行的最后即可
+ */
+#include &lt;arpa/inet.h&gt;
+#include &lt;ctype.h&gt;
+#include &lt;netinet/in.h&gt;
+#include &lt;pthread.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;strings.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;sys/stat.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;sys/wait.h&gt;
+#include &lt;unistd.h&gt;
+
+#define ISspace(x) isspace((int)(x))
+
+#define SERVER_STRING &quot;Server: jdbhttpd/0.1.0\r\n&quot;
+#define STDIN 0
+#define STDOUT 1
+#define STDERR 2
+
+#define u_short unsigned short int
+
+void accept_request(void *);
+void bad_request(int);
+void cat(int, FILE *);
+void cannot_execute(int);
+void error_die(const char *);
+void execute_cgi(int, const char *, const char *, const char *);
+int get_line(int, char *, int);
+void headers(int, const char *);
+void not_found(int);
+void serve_file(int, const char *);
+int startup(u_short *);
+void unimplemented(int);
+
+/**********************************************************************/
+/* A request has caused a call to accept() on the server port to
+ * return.  Process the request appropriately.
+ * Parameters: the socket connected to the client */
+/**********************************************************************/
+void accept_request(void *arg) {
+  int client = (intptr_t)arg;
+  char buf[1024];
+  size_t numchars;
+  char method[255];
+  char url[255];
+  char path[512];
+  size_t i, j;
+  struct stat st;
+  int cgi = 0; /* becomes true if server decides this is a CGI
+                * program */
+  char *query_string = NULL;
+
+  /* 读取第一行，格式类似 &quot;GET / HTTP/1.1&quot; */
+  numchars = get_line(client, buf, sizeof(buf));
+  i = 0;
+  j = 0;
+  /* 首先解析 method (GET / POST) */
+  while (!ISspace(buf[i]) &amp;&amp; (i &lt; sizeof(method) - 1)) {
+    method[i] = buf[i];
+    i++;
+  }
+  j = i;
+  method[i] = '\0';
+
+  /* 不能处理 GET 和 POST 之外的请求类型 */
+  if (strcasecmp(method, &quot;GET&quot;) &amp;&amp; strcasecmp(method, &quot;POST&quot;)) {
+    /* 直接返回 501 Method Not Implemented */
+    unimplemented(client);
+    return;
+  }
+
+  /* 若为 POST 请求类型，则认为送给 cgi 程序处理 */
+  if (strcasecmp(method, &quot;POST&quot;) == 0) {
+    cgi = 1;
+  }
+
+  i = 0;
+  while (ISspace(buf[j]) &amp;&amp; (j &lt; numchars)) {
+    j++;
+  }
+  while (!ISspace(buf[j]) &amp;&amp; (i &lt; sizeof(url) - 1) &amp;&amp; (j &lt; numchars)) {
+    url[i] = buf[j];
+    i++;
+    j++;
+  }
+  url[i] = '\0';
+
+  if (strcasecmp(method, &quot;GET&quot;) == 0) {
+    query_string = url;
+    while ((*query_string != '?') &amp;&amp; (*query_string != '\0')) {
+      query_string++;
+    }
+    if (*query_string == '?') {
+      cgi = 1;
+      *query_string = '\0';
+      query_string++;
+    }
+  }
+
+  sprintf(path, &quot;htdocs%s&quot;, url);
+  if (path[strlen(path) - 1] == '/') {
+    strcat(path, &quot;index.html&quot;);
+  }
+  /* 判断请求的文件是否存在 */
+  if (stat(path, &amp;st) == -1) {
+    /* read &amp; discard headers */
+    while ((numchars &gt; 0) &amp;&amp; strcmp(&quot;\n&quot;, buf)) {
+      numchars = get_line(client, buf, sizeof(buf));
+    }
+    not_found(client);
+  } else {
+    /* 如果为一个目录，则自动寻找 index.html */
+    if ((st.st_mode &amp; S_IFMT) == S_IFDIR) {
+      strcat(path, &quot;/index.html&quot;);
+    }
+    if ((st.st_mode &amp; S_IXUSR) || (st.st_mode &amp; S_IXGRP) ||
+        (st.st_mode &amp; S_IXOTH)) {
+      cgi = 1;
+    }
+    if (!cgi) {
+      serve_file(client, path);
+    } else {
+      execute_cgi(client, path, method, query_string);
+    }
+  }
+
+  close(client);
+}
+
+/**********************************************************************/
+/* Inform the client that a request it has made has a problem.
+ * Parameters: client socket */
+/**********************************************************************/
+void bad_request(int client) {
+  char buf[1024];
+
+  sprintf(buf, &quot;HTTP/1.0 400 BAD REQUEST\r\n&quot;);
+  send(client, buf, sizeof(buf), 0);
+  sprintf(buf, &quot;Content-type: text/html\r\n&quot;);
+  send(client, buf, sizeof(buf), 0);
+  sprintf(buf, &quot;\r\n&quot;);
+  send(client, buf, sizeof(buf), 0);
+  sprintf(buf, &quot;&lt;P&gt;Your browser sent a bad request, &quot;);
+  send(client, buf, sizeof(buf), 0);
+  sprintf(buf, &quot;such as a POST without a Content-Length.\r\n&quot;);
+  send(client, buf, sizeof(buf), 0);
+}
+
+/**********************************************************************/
+/* Put the entire contents of a file out on a socket.  This function
+ * is named after the UNIX &quot;cat&quot; command, because it might have been
+ * easier just to do something like pipe, fork, and exec(&quot;cat&quot;).
+ * Parameters: the client socket descriptor
+ *             FILE pointer for the file to cat */
+/**********************************************************************/
+void cat(int client, FILE *resource) {
+  char buf[1024];
+
+  fgets(buf, sizeof(buf), resource);
+  while (!feof(resource)) {
+    send(client, buf, strlen(buf), 0);
+    fgets(buf, sizeof(buf), resource);
+  }
+}
+
+/**********************************************************************/
+/* Inform the client that a CGI script could not be executed.
+ * Parameter: the client socket descriptor. */
+/**********************************************************************/
+void cannot_execute(int client) {
+  char buf[1024];
+
+  sprintf(buf, &quot;HTTP/1.0 500 Internal Server Error\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+  sprintf(buf, &quot;Content-type: text/html\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+  sprintf(buf, &quot;\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+  sprintf(buf, &quot;&lt;P&gt;Error prohibited CGI execution.\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+}
+
+/**********************************************************************/
+/* Print out an error message with perror() (for system errors; based
+ * on value of errno, which indicates system call errors) and exit the
+ * program indicating an error. */
+/**********************************************************************/
+void error_die(const char *sc) {
+  perror(sc);
+  exit(1);
+}
+
+/**********************************************************************/
+/* Execute a CGI script.  Will need to set environment variables as
+ * appropriate.
+ * Parameters: client socket descriptor
+ *             path to the CGI script */
+/**********************************************************************/
+void execute_cgi(int client, const char *path, const char *method,
+                 const char *query_string) {
+  char buf[1024];
+  int cgi_output[2];
+  int cgi_input[2];
+  pid_t pid;
+  int status;
+  int i;
+  char c;
+  int numchars = 1;
+  int content_length = -1;
+
+  buf[0] = 'A';
+  buf[1] = '\0';
+  if (strcasecmp(method, &quot;GET&quot;) == 0) {
+    /* read &amp; discard headers */
+    while ((numchars &gt; 0) &amp;&amp; strcmp(&quot;\n&quot;, buf)) {
+      numchars = get_line(client, buf, sizeof(buf));
+    }
+  } else if (strcasecmp(method, &quot;POST&quot;) == 0) { /* POST */
+    numchars = get_line(client, buf, sizeof(buf));
+    while ((numchars &gt; 0) &amp;&amp; strcmp(&quot;\n&quot;, buf)) {
+      buf[15] = '\0';
+      if (strcasecmp(buf, &quot;Content-Length:&quot;) == 0) {
+        content_length = atoi(&amp;(buf[16]));
+      }
+      numchars = get_line(client, buf, sizeof(buf));
+    }
+    if (content_length == -1) {
+      bad_request(client);
+      return;
+    }
+  } else { /*HEAD or other*/
+  }
+
+  if (pipe(cgi_output) &lt; 0) {
+    cannot_execute(client);
+    return;
+  }
+  if (pipe(cgi_input) &lt; 0) {
+    cannot_execute(client);
+    return;
+  }
+
+  if ((pid = fork()) &lt; 0) {
+    cannot_execute(client);
+    return;
+  }
+  sprintf(buf, &quot;HTTP/1.0 200 OK\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+  /* child: CGI script */
+  /**
+   * 子进程去执行 cgi 程序
+   * 父子进程通过 pipe 管道通信
+   * */
+  if (pid == 0) {
+    char meth_env[255];
+    char query_env[255];
+    char length_env[255];
+
+    dup2(cgi_output[1], STDOUT);
+    dup2(cgi_input[0], STDIN);
+    close(cgi_output[0]);
+    close(cgi_input[1]);
+    sprintf(meth_env, &quot;REQUEST_METHOD=%s&quot;, method);
+    putenv(meth_env);
+    if (strcasecmp(method, &quot;GET&quot;) == 0) {
+      sprintf(query_env, &quot;QUERY_STRING=%s&quot;, query_string);
+      putenv(query_env);
+    } else { /* POST */
+      sprintf(length_env, &quot;CONTENT_LENGTH=%d&quot;, content_length);
+      putenv(length_env);
+    }
+    execl(path, NULL);
+    exit(0);
+  } else { /* parent */
+    close(cgi_output[1]);
+    close(cgi_input[0]);
+    if (strcasecmp(method, &quot;POST&quot;) == 0) {
+      for (i = 0; i &lt; content_length; i++) {
+        recv(client, &amp;c, 1, 0);
+        write(cgi_input[1], &amp;c, 1);
+      }
+    }
+    /* 将 cgi 程序的输出返回到网页 */
+    while (read(cgi_output[0], &amp;c, 1) &gt; 0) {
+      send(client, &amp;c, 1, 0);
+    }
+
+    close(cgi_output[0]);
+    close(cgi_input[1]);
+    waitpid(pid, &amp;status, 0);
+  }
+}
+
+/**********************************************************************/
+/* Get a line from a socket, whether the line ends in a newline,
+ * carriage return, or a CRLF combination.  Terminates the string read
+ * with a null character.  If no newline indicator is found before the
+ * end of the buffer, the string is terminated with a null.  If any of
+ * the above three line terminators is read, the last character of the
+ * string will be a linefeed and the string will be terminated with a
+ * null character.
+ * Parameters: the socket descriptor
+ *             the buffer to save the data in
+ *             the size of the buffer
+ * Returns: the number of bytes stored (excluding null) */
+/**********************************************************************/
+int get_line(int sock, char *buf, int size) {
+  int i = 0;
+  char c = '\0';
+  int n;
+
+  while ((i &lt; size - 1) &amp;&amp; (c != '\n')) {
+    n = recv(sock, &amp;c, 1, 0);
+    /* DEBUG printf(&quot;%02X\n&quot;, c); */
+    if (n &gt; 0) {
+      if (c == '\r') {
+        n = recv(sock, &amp;c, 1, MSG_PEEK);
+        /* DEBUG printf(&quot;%02X\n&quot;, c); */
+        if ((n &gt; 0) &amp;&amp; (c == '\n')) {
+          recv(sock, &amp;c, 1, 0);
+        } else {
+          c = '\n';
+        }
+      }
+      buf[i] = c;
+      i++;
+    } else {
+      c = '\n';
+    }
+  }
+  buf[i] = '\0';
+
+  return (i);
+}
+
+/**********************************************************************/
+/* Return the informational HTTP headers about a file. */
+/* Parameters: the socket to print the headers on
+ *             the name of the file */
+/**********************************************************************/
+void headers(int client, const char *filename) {
+  char buf[1024];
+  (void)filename; /* could use filename to determine file type */
+
+  strcpy(buf, &quot;HTTP/1.0 200 OK\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+  strcpy(buf, SERVER_STRING);
+  send(client, buf, strlen(buf), 0);
+  sprintf(buf, &quot;Content-Type: text/html\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+  strcpy(buf, &quot;\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+}
+
+/**********************************************************************/
+/* Give a client a 404 not found status message. */
+/**********************************************************************/
+void not_found(int client) {
+  char buf[1024];
+
+  sprintf(buf, &quot;HTTP/1.0 404 NOT FOUND\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+  sprintf(buf, SERVER_STRING);
+  send(client, buf, strlen(buf), 0);
+  sprintf(buf, &quot;Content-Type: text/html\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+  sprintf(buf, &quot;\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+  sprintf(buf, &quot;&lt;HTML&gt;&lt;TITLE&gt;Not Found&lt;/TITLE&gt;\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+  sprintf(buf, &quot;&lt;BODY&gt;&lt;P&gt;The server could not fulfill\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+  sprintf(buf, &quot;your request because the resource specified\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+  sprintf(buf, &quot;is unavailable or nonexistent.\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+  sprintf(buf, &quot;&lt;/BODY&gt;&lt;/HTML&gt;\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+}
+
+/**********************************************************************/
+/* Send a regular file to the client.  Use headers, and report
+ * errors to client if they occur.
+ * Parameters: a pointer to a file structure produced from the socket
+ *              file descriptor
+ *             the name of the file to serve */
+/**********************************************************************/
+void serve_file(int client, const char *filename) {
+  FILE *resource = NULL;
+  int numchars = 1;
+  char buf[1024];
+
+  buf[0] = 'A';
+  buf[1] = '\0';
+  /* read &amp; discard headers */
+  while ((numchars &gt; 0) &amp;&amp; strcmp(&quot;\n&quot;, buf)) {
+    numchars = get_line(client, buf, sizeof(buf));
+  }
+
+  resource = fopen(filename, &quot;r&quot;);
+  if (resource == NULL) {
+    not_found(client);
+  } else {
+    headers(client, filename);
+    cat(client, resource);
+  }
+  fclose(resource);
+}
+
+/**********************************************************************/
+/* This function starts the process of listening for web connections
+ * on a specified port.  If the port is 0, then dynamically allocate a
+ * port and modify the original port variable to reflect the actual
+ * port.
+ * Parameters: pointer to variable containing the port to connect on
+ * Returns: the socket */
+/**********************************************************************/
+int startup(u_short *port) {
+  int httpd = 0;
+  int on = 1;
+  struct sockaddr_in name;
+
+  /**
+   * socker 创建套接字连接
+   * PF_INET \ AF_INET IPv4 因特网域
+   * SOCK_STREAM 有序的、可靠的、双向的、面向连接的字节流
+   * */
+  httpd = socket(PF_INET, SOCK_STREAM, 0);
+  if (httpd == -1) {
+    error_die(&quot;socket&quot;);
+  }
+
+  memset(&amp;name, 0, sizeof(name));
+  name.sin_family = AF_INET;
+  /* htons: Host to Network Short */
+  name.sin_port = htons(*port);
+  /* htonl: Host to Network Long */
+  name.sin_addr.s_addr = htonl(INADDR_ANY);
+  if ((setsockopt(httpd, SOL_SOCKET, SO_REUSEADDR, &amp;on, sizeof(on))) &lt; 0) {
+    error_die(&quot;setsockopt failed&quot;);
+  }
+  /* 如果没有指定端口，则系统会自动指定一个 */
+  if (bind(httpd, (struct sockaddr *)&amp;name, sizeof(name)) &lt; 0) {
+    error_die(&quot;bind&quot;);
+  }
+  /* 如果没有指定端口，则将系统指定的端口赋值给端口参数 */
+  if (*port == 0) {
+    socklen_t namelen = sizeof(name);
+    if (getsockname(httpd, (struct sockaddr *)&amp;name, &amp;namelen) == -1) {
+      error_die(&quot;getsockname&quot;);
+    }
+    *port = ntohs(name.sin_port);
+  }
+  /* listen 的第二个参数指定了可以排队的请求的个数，多余的会被拒绝 */
+  if (listen(httpd, 5) &lt; 0) {
+    error_die(&quot;listen&quot;);
+  }
+  return (httpd);
+}
+
+/**********************************************************************/
+/* Inform the client that the requested web method has not been
+ * implemented.
+ * Parameter: the client socket */
+/**********************************************************************/
+void unimplemented(int client) {
+  char buf[1024];
+
+  sprintf(buf, &quot;HTTP/1.0 501 Method Not Implemented\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+  sprintf(buf, SERVER_STRING);
+  send(client, buf, strlen(buf), 0);
+  sprintf(buf, &quot;Content-Type: text/html\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+  sprintf(buf, &quot;\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+  sprintf(buf, &quot;&lt;HTML&gt;&lt;HEAD&gt;&lt;TITLE&gt;Method Not Implemented\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+  sprintf(buf, &quot;&lt;/TITLE&gt;&lt;/HEAD&gt;\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+  sprintf(buf, &quot;&lt;BODY&gt;&lt;P&gt;HTTP request method not supported.\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+  sprintf(buf, &quot;&lt;/BODY&gt;&lt;/HTML&gt;\r\n&quot;);
+  send(client, buf, strlen(buf), 0);
+}
+
+/**********************************************************************/
+
+int main(void) {
+  int server_sock = -1;
+  u_short port = 0;
+  int client_sock = -1;
+  struct sockaddr_in client_name;
+  socklen_t client_name_len = sizeof(client_name);
+  pthread_t newthread;
+
+  server_sock = startup(&amp;port);
+  printf(&quot;httpd running on port %d\n&quot;, port);
+
+  while (1) {
+    /* accept 函数获得连接请求并建立连接，返回套接字描述符 */
+    client_sock =
+        accept(server_sock, (struct sockaddr *)&amp;client_name, &amp;client_name_len);
+    if (client_sock == -1) {
+      error_die(&quot;accept&quot;);
+    }
+
+    /* 创建新线程处理此次请求 */
+    if (pthread_create(&amp;newthread, NULL, (void *)accept_request,
+                       (void *)(intptr_t)client_sock) != 0) {
+      perror(&quot;pthread_create&quot;);
+    }
+  }
+
+  close(server_sock);
+
+  return (0);
+}
+
+</code></pre>
+
+<h2 id="分析">分析</h2>
+
+<h3 id="main">main</h3>
+
+<p>调用 <code>startup</code> 函数初始化连接， <code>while(1)</code> 接收请求，将接收到的信号多线程分发给 <code>accept_request</code> 函数处理。</p>
+
+<h3 id="startup">startup</h3>
+
+<p>创建套接字连接，绑定端口，返回 <code>socket</code> 连接的描述符。</p>
+
+<h3 id="accept-request">accept_request</h3>
+
+<p>解析 <code>client</code> 发送的数据，从中提取出 <code>method</code> 、 <code>url</code> 等信息，根据 <code>url</code> 确定对应的文件 <code>path</code> ，根据 <code>method</code> 的具体属性决定后续处理方式。</p>
+
+<ul>
+<li>如果 <code>method</code> 为 <code>GET</code> ，则尝试从 <code>url</code> 中解析 <code>query</code> 参数。
+
+<ul>
+<li>如果没有 <code>query</code> 参数，则判断请求的路径对应的文件属性</li>
+<li>如果对应的文件有 <code>x</code> 属性（即可执行属性），则作为 CGI 文件处理</li>
+<li>否则作为静态页面，直接返回文件内容（此处对不同的文件类型没有区分，全部是作为 <code>document</code> 返回的，因此并不能正确的返回非文本的静态资源）。</li>
+<li>如果有 <code>query</code> 参数，则作为 CGI 程序处理。（其实这样并不完全合理，因为带有 <code>query</code> 参数也有可能是请求静态资源，比如 JavaScript 脚本文件的版本控制）</li>
+</ul></li>
+<li>如果 <code>method</code> 为 <code>POST</code> ，则作为 CGI 程序处理</li>
+<li>其他类型的 <code>method</code> ，返回 <code>501 Method Not Implemented</code></li>
+</ul>
+
+<p>静态页面请求交由 <code>serve_file</code> 函数处理， CGI 程序交由 <code>execute_cgi</code> 函数处理。</p>
+
+<h3 id="serve-file">serve_file</h3>
+
+<p>读取文件内容， <code>send</code> 返回给请求的服务端。</p>
+
+<p>此处可以优化一下，根据不同的文件类型返回不同的 <code>Content-Type</code> 信息，这样就不仅仅可以处理文本类型的静态文件了。</p>
+
+<h3 id="execute-cgi">execute_cgi</h3>
+
+<p><code>fork</code> 创建子进程， <code>pipe</code> 创建父进程与子进程的管道，重定向子进程的标准输入输出。</p>
+
+<ul>
+<li>对于 <code>GET</code> 请求，将 <code>GET</code> 请求的 Query String 存入 <code>env</code> 的 <code>QUERY_STRING</code> 字段，然后 <code>exec</code> 执行 CGI 程序</li>
+<li>对于 <code>POST</code> 请求，将 <code>POST</code> 请求的 <code>Content-Length</code> 存入 <code>env</code> 的 <code>CONTENT_LENGTH</code> 字段， <code>exec</code> 执行 CGI 程序，然后父进程将 <code>POST</code> 的数据由标准输入传递给 CGI 程序</li>
+</ul>
+
+<p>父进程将 CGI 程序的输出 <code>send</code> 给 <code>client</code> ，浏览器将返回数据渲染出来。</p>
+
+<p>此函数没有处理 <code>POST</code> 请求的 Query String ，但很多 <code>POST</code> 请求也是同时带有 Query String 参数的。</p>
+
+<h2 id="总结">总结</h2>
+
+<p>Tinyhttpd 作为一个超轻量级的 HTTP Server ，其功能并不十分完善，但其体现出了一个 HTTP Server 的整体流程与设计思路，非常值得阅读学习。</p><ul class="pa0">
+  
+   <li class="list">
+     <a href="/tags/tinyhttpd" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">Tinyhttpd</a>
+   </li>
+  
+   <li class="list">
+     <a href="/tags/c-%E8%AF%AD%E8%A8%80" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">C 语言</a>
+   </li>
+  
+   <li class="list">
+     <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">网络编程</a>
+   </li>
+  
+</ul>
+<div class="mt6">
+      
+      
+      </div>
+    </section>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+  <div class="bg-light-gray pa3 nested-list-reset nested-copy-line-height nested-links">
+    <p class="f5 b mb3">Related</p>
+    <ul class="pa0 list">
+	   
+	     <li  class="mb2">
+          <a href="/posts/apue-exercise-4.6/">《APUE》习题 4.6</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/use-scanf-in-c/">C 语言中 scanf 函数的使用</a>
+        </li>
+	    
+    </ul>
+</div>
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="https://meik2333.com" >
+    &copy; 2019 MeiK&#39;s blog
+  </a>
+    <div>
+
+
+
+
+
+
+
+
+
+
+</div>
+  </div>
+</footer>
+
+    
+
+  <script src="/dist/js/app.3fc0f988d21662902933.js"></script>
+
+
+  </body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>MeiK&#39;s blog  | 如何写一个评测姬 - 第四篇</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="generator" content="Hugo 0.58.3" />
+    
+    
+      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+    
+
+    
+    
+      <link href="/dist/css/app.d98f2eb6bcd1eaedb7edf166bd16af26.css" rel="stylesheet">
+    
+
+    
+
+    
+      
+    
+
+    
+    
+    <meta property="og:title" content="如何写一个评测姬 - 第四篇" />
+<meta property="og:description" content="从零开始实现一个 OJ 评测姬。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://meik2333.com/posts/judger4/" />
+<meta property="article:published_time" content="2019-05-08T15:05:04+00:00" />
+<meta property="article:modified_time" content="2019-05-08T15:05:04+00:00" />
+<meta itemprop="name" content="如何写一个评测姬 - 第四篇">
+<meta itemprop="description" content="从零开始实现一个 OJ 评测姬。">
+
+
+<meta itemprop="datePublished" content="2019-05-08T15:05:04&#43;00:00" />
+<meta itemprop="dateModified" content="2019-05-08T15:05:04&#43;00:00" />
+<meta itemprop="wordCount" content="184">
+
+
+
+<meta itemprop="keywords" content="OnlineJudge,评测姬," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="如何写一个评测姬 - 第四篇"/>
+<meta name="twitter:description" content="从零开始实现一个 OJ 评测姬。"/>
+
+  </head>
+
+  <body class="ma0 avenir bg-near-white">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l justify-between items-center center">
+    <a href="https://meik2333.com" class="f3 fw2 hover-white no-underline white-90 dib">
+      MeiK&#39;s blog
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  <article class="flex-l flex-wrap justify-between mw8 center ph3">
+
+    <header class="mt4 w-100">
+      <p class="f6 b helvetica tracked">
+          
+        POSTS
+      </p>
+      <h1 class="f1 athelas mb1">如何写一个评测姬 - 第四篇</h1>
+      
+      
+      <time class="f6 mv4 dib tracked" datetime="2019-05-08T15:05:04Z">May 8, 2019</time>
+      
+      
+    </header>
+
+    <section class="nested-copy-line-height lh-copy serif f4 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><p>从零开始实现一个 OJ 评测姬。</p>
+
+<p>本篇讲一下如何防止评测姬因用户程序的异常而崩溃。首先，我们来看看用户程序都会出现什么异常，然后再来考虑如何解决这些异常。</p>
+
+<h2 id="解决过多资源占用">解决过多资源占用</h2>
+
+<p>用户可能因为失误而提交了占用过多资源的代码，比如死循环、占用过多内存、输出过多等。为了解决这些问题，我们需要限制用户程序的时间、内存以及输出数据的大小。</p>
+
+<p>Linux 有系统函数可以解决这个问题：<a href="https://linux.die.net/man/3/setrlimit"><code>setrlimit</code></a>。这个函数可以限制程序的 CPU 时间、内存占用、输出数据等，用法大致如下：</p>
+
+<pre><code class="language-c">#include &lt;sys/resource.h&gt;
+int main() {
+    struct rlimit rl;
+    rl.rlim_cur = rl.rlim_max = 1;
+    setrlimit(RLIMIT_CPU, &amp;rl);
+    while (1) {
+    }
+}
+</code></pre>
+
+<p>执行：</p>
+
+<pre><code class="language-bash">$ gcc main.c
+$ time ./a.out 
+[2]    3057 cpu limit exceeded  ./a.out
+./a.out  0.98s user 0.02s system 96% cpu 1.034 total
+</code></pre>
+
+<p>可以看到，虽然我们在代码中写了个死循环，但是这个程序只运行一秒就结束了。<code>setrlimit</code> 可以对进程添加资源限制，并在超出限制时触发信号，父进程可以捕获这个信号。同时 <code>exec</code> 会继承这些限制，因此可以使用与流重定向类似的方法来添加资源限制。</p>
+
+<p>有关限制的实际代码，可以查看 <a href="https://github.com/MeiK2333/ZeroJudger/blob/master/limit/main.c">https://github.com/MeiK2333/ZeroJudger/blob/master/limit/main.c</a>。</p>
+
+<h2 id="解决恶意攻击">解决恶意攻击</h2>
+
+<p>不同于用户不小心提交的占用资源过多的代码，有些同学会故意提交一些恶意攻击评测姬的代码，俗称“卡评测”。对于这些恶意攻击，我们也需要做好防备。</p>
+
+<p>简单起见，我们的评测姬不对恶意攻击做防范，仅对用户无意间造成的资源过度占用做限制。</p>
+
+<p>常用的恶意攻击的方式我之前写过博客，后来我注销了 CSDN 账号，博客也没了，这里就重新写一遍吧。</p>
+
+<h3 id="include-攻击">include 攻击</h3>
+
+<p>利用 OJ 会返回编译错误的特点，使用 C/C++ 语言使用 <code>#include</code> 来导入一个敏感的文件，然后通过编译错误的信息来获得其中敏感的数据。</p>
+
+<pre><code class="language-bash">$ echo 'password' &gt; password.txt
+$ echo '#include &lt;password.txt&gt;' &gt; main.c 
+$ gcc main.c 
+main.c:1:10: error: 'password.txt' file not found with &lt;angled&gt; include; use &quot;quotes&quot; instead
+#include &lt;password.txt&gt;
+         ^~~~~~~~~~~~~~
+         &quot;password.txt&quot;
+In file included from main.c:1:
+./password.txt:1:1: error: unknown type name 'password'
+password
+^
+main.c:1:24: error: expected identifier or '('
+#include &lt;password.txt&gt;
+                       ^
+3 errors generated.
+</code></pre>
+
+<p>解决方案为配置好评测用户权限，使用低权限的用户进行评测，以防止此类攻击。同时可以考虑使用 Docker 等进行评测，Docker 环境内不放任何敏感的数据。</p>
+
+<h3 id="编译超时-编译产生巨大文件-编译产生巨量错误信息">编译超时 &amp;&amp; 编译产生巨大文件 &amp;&amp; 编译产生巨量错误信息</h3>
+
+<ul>
+<li><p>编译超时</p>
+
+<pre><code class="language-c">#include &lt;/dev/random&gt;或者#include &lt;/dev/tty&gt; //(Linux)
+#include &lt;CON&gt; //(Windows)
+</code></pre></li>
+
+<li><p>编译产生巨大文件</p>
+
+<pre><code class="language-c">main[-1u]={1};
+</code></pre></li>
+
+<li><p>编译产生巨量错误信息</p></li>
+</ul>
+
+<p>这几种攻击方式并不能让攻击者获得什么数据或权限，只是单纯的会卡住评测。但有人就是这么无聊的……</p>
+
+<p>解决方案也很简单，就是像限制用户程序资源占用一样限制编译时的资源占用。</p>
+
+<h3 id="shell-攻击-fork-炸弹-其他系统调用攻击-网络模块攻击">shell 攻击 &amp;&amp; fork 炸弹 &amp;&amp; 其他系统调用攻击 &amp;&amp; 网络模块攻击</h3>
+
+<p>shell 攻击：</p>
+
+<pre><code class="language-c">system(&quot;reboot&quot;);
+</code></pre>
+
+<p><code>fork</code> 炸弹：</p>
+
+<pre><code class="language-c">while (1) {
+    fork();
+}
+</code></pre>
+
+<p>网络模块攻击：如果评测姬没有限制联网的话，攻击的程序可以通过网络做到很多的攻击方式，程序可能会收集很多运行时评测姬和服务器的信息，然后提交到某处。</p>
+
+<p>这几种攻击方式，如果只是简单的禁用 <code>system</code> 和 <code>fork</code> 等这些函数是没有用的，因为 C/C++ 的宏可以轻易的绕过这些限制。可以考虑在系统调用的层面进行限制，大多开源的评测机都是通过限制系统调用来保证评测安全的。</p>
+
+<p>限制系统调用，可以使用 <code>ptrace</code> 来自行限制，也可以使用开源库 <a href="https://github.com/seccomp/libseccomp">seccomp</a> 来进行限制。</p>
+
+<h2 id="总结">总结</h2>
+
+<p>本篇我们介绍了常见的攻击手段与防范手段，这样我们的评测姬就会有一定的安全性保障。下一篇我们将介绍一下如何获取用户程序运行占用的资源。</p><ul class="pa0">
+  
+   <li class="list">
+     <a href="/tags/onlinejudge" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">OnlineJudge</a>
+   </li>
+  
+   <li class="list">
+     <a href="/tags/%E8%AF%84%E6%B5%8B%E5%A7%AC" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">评测姬</a>
+   </li>
+  
+</ul>
+<div class="mt6">
+      
+      
+      </div>
+    </section>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+  <div class="bg-light-gray pa3 nested-list-reset nested-copy-line-height nested-links">
+    <p class="f5 b mb3">Related</p>
+    <ul class="pa0 list">
+	   
+	     <li  class="mb2">
+          <a href="/posts/judger3/">如何写一个评测姬 - 第三篇</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/judger2/">如何写一个评测姬 - 第二篇</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/judger1/">如何写一个评测姬 - 第一篇</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/online-judge-faq/">OnlineJudge 评测原理与常见问题解答</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/online-judge-get-memory-usage/">关于评测姬的内存测量问题</a>
+        </li>
+	    
+    </ul>
+</div>
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="https://meik2333.com" >
+    &copy; 2019 MeiK&#39;s blog
+  </a>
+    <div>
+
+
+
+
+
+
+
+
+
+
+</div>
+  </div>
+</footer>
+
+    
+
+  <script src="/dist/js/app.3fc0f988d21662902933.js"></script>
+
+
+  </body>
+</html>

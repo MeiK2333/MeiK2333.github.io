@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>MeiK&#39;s blog  | C/C&#43;&#43; 中 static 与 const 的用法与区别</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="generator" content="Hugo 0.58.3" />
+    
+    
+      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+    
+
+    
+    
+      <link href="/dist/css/app.d98f2eb6bcd1eaedb7edf166bd16af26.css" rel="stylesheet">
+    
+
+    
+
+    
+      
+    
+
+    
+    
+    <meta property="og:title" content="C/C&#43;&#43; 中 static 与 const 的用法与区别" />
+<meta property="og:description" content="const 关键词指定对象或变量不可修改，static 关键词指定对象或变量为静态的。两者可以分别使用也可以结合使用，这篇博客就来探讨一些这两个关键词的用法。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://meik2333.com/posts/static-vs-const/" />
+<meta property="article:published_time" content="2018-09-24T17:15:59+00:00" />
+<meta property="article:modified_time" content="2018-09-24T17:15:59+00:00" />
+<meta itemprop="name" content="C/C&#43;&#43; 中 static 与 const 的用法与区别">
+<meta itemprop="description" content="const 关键词指定对象或变量不可修改，static 关键词指定对象或变量为静态的。两者可以分别使用也可以结合使用，这篇博客就来探讨一些这两个关键词的用法。">
+
+
+<meta itemprop="datePublished" content="2018-09-24T17:15:59&#43;00:00" />
+<meta itemprop="dateModified" content="2018-09-24T17:15:59&#43;00:00" />
+<meta itemprop="wordCount" content="421">
+
+
+
+<meta itemprop="keywords" content="C 语言,C&#43;&#43;," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="C/C&#43;&#43; 中 static 与 const 的用法与区别"/>
+<meta name="twitter:description" content="const 关键词指定对象或变量不可修改，static 关键词指定对象或变量为静态的。两者可以分别使用也可以结合使用，这篇博客就来探讨一些这两个关键词的用法。"/>
+
+  </head>
+
+  <body class="ma0 avenir bg-near-white">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l justify-between items-center center">
+    <a href="https://meik2333.com" class="f3 fw2 hover-white no-underline white-90 dib">
+      MeiK&#39;s blog
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  <article class="flex-l flex-wrap justify-between mw8 center ph3">
+
+    <header class="mt4 w-100">
+      <p class="f6 b helvetica tracked">
+          
+        POSTS
+      </p>
+      <h1 class="f1 athelas mb1">C/C&#43;&#43; 中 static 与 const 的用法与区别</h1>
+      
+      
+      <time class="f6 mv4 dib tracked" datetime="2018-09-24T17:15:59Z">September 24, 2018</time>
+      
+      
+    </header>
+
+    <section class="nested-copy-line-height lh-copy serif f4 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><p>const 关键词指定对象或变量不可修改，static 关键词指定对象或变量为静态的。两者可以分别使用也可以结合使用，这篇博客就来探讨一些这两个关键词的用法。</p>
+
+<h2 id="const-的用法">const 的用法</h2>
+
+<p>const 关键字指定变量的值是常量，并通知编译器防止程序员修改它。比起 <code>#define</code> 来说，const 有类型检查。</p>
+
+<p>在 C语言中，const 修饰的常量值默认为外部链接，因此它们只能出现在源文件中。 在 C++ 中，常量值默认为内部链接，这使它们可以出现在头文件中。</p>
+
+<h3 id="修饰变量与函数">修饰变量与函数</h3>
+
+<p>当修饰变量时，这个变量无法进行修改。而当修饰函数时，代表这个函数的返回值无法进行修改。</p>
+
+<p>要额外注意一下，在修饰指针变量时的用法：</p>
+
+<pre><code class="language-C++">const char *string1 = &quot;Hello World!&quot;;
+// *string1 = 'h';  错误，string1 指针所指向的内容无法修改
+string1 = &quot;other string&quot;;
+
+char const *string2 = &quot;Hello World!&quot;;
+// *string2 = 'h';  错误，这种写法和第一种相同
+string2 = &quot;other string&quot;;
+
+char *const string3 = &quot;Hello World!&quot;;
+string3[0] = 'h';
+// string3 = &quot;other string&quot;;  错误，string3 指针的指向无法修改
+
+const char * const string4 = &quot;Hello World!&quot;;
+// 这种写法既不能修改指针指向，也不能通过这个指针修改指向的内容
+</code></pre>
+
+<h3 id="修饰类的成员函数">修饰类的成员函数</h3>
+
+<p>const 可以修饰基本类型如 char 等，也可以修饰自己创建的类的对象。在 const 修饰类的对象时，必须保证被修饰的对象无法对类中的内容作出修改。C++ 中规定，被 const 修饰的对象只能调用类里的 const 成员函数。</p>
+
+<p>声明类的 const 成员函数与声明 const 变量不一样（如果一样放在前面的话，就会变成修饰返回值了），在修饰类的成员函数时，const 应当在函数名的后面，如：</p>
+
+<pre><code class="language-C++">class Date {
+public:
+    Date(int mn, int dy, int yr) {
+    }
+
+    int getMonth() const;     // A read-only function
+    void setMonth(int mn);   // A write function; can't be const
+private:
+    int month = 0;
+};
+
+int Date::getMonth() const {
+    return month;        // Doesn't modify anything
+}
+
+void Date::setMonth(int mn) {
+    month = mn;          // Modifies data member
+}
+
+int main() {
+    Date MyDate(7, 4, 1998);
+    const Date BirthDate(1, 18, 1953);
+    MyDate.setMonth(4);    // Okay
+    BirthDate.getMonth();    // Okay
+    BirthDate.setMonth(4); // C2662 Error
+}
+</code></pre>
+
+<p>示例代码来自 MSDN，能够看出来，被 const 修饰的对象无法调用非 const 的成员函数，而在 const 修饰的成员函数中，也不能调用非 const 的成员函数，或者修改任何非静态的数据成员。</p>
+
+<h2 id="static-的用法">static 的用法</h2>
+
+<p>static 用于创建一个静态持续时间的变量，被 static 修饰的变量会在静态区中（全局变量也在静态区中），在整个程序的生存时间内都存在。</p>
+
+<p>如果是在函数内定义的 static 变量，那么即使在函数外，这个变量依旧存在（但只能在其作用域内使用）。</p>
+
+<p>未赋值的 static 变量会被被初始化为 0，static 修饰的变量具有内部链接性，无法在其他文件使用。如果用 static 修饰一个全局变量的话，那么它的作用就是限制这个变量只能在当前文件（模块）使用。</p>
+
+<pre><code class="language-C++">#include &lt;iostream&gt;
+
+using namespace std;
+
+void showstat(int curr) {
+    static int nStatic;    // Value of nStatic is retained
+    // between each function call
+    nStatic += curr;
+    cout &lt;&lt; &quot;nStatic is &quot; &lt;&lt; nStatic &lt;&lt; endl;
+}
+
+int main() {
+    for (int i = 0; i &lt; 5; i++)
+        showstat(i);
+}
+</code></pre>
+
+<pre><code class="language-bash">nStatic is 0
+nStatic is 1
+nStatic is 3
+nStatic is 6
+nStatic is 10
+</code></pre>
+
+<p>依旧是 MSDN 的示例代码，这个代码就已经很好的表明了 static 的一些特性。</p>
+
+<p>在类中使用 static 变量：</p>
+
+<pre><code class="language-C++">#include &lt;iostream&gt;
+
+using namespace std;
+class CMyClass {
+public:
+   static int m_i;
+};
+
+int CMyClass::m_i = 0;
+CMyClass myObject1;
+CMyClass myObject2;
+
+int main() {
+   cout &lt;&lt; myObject1.m_i &lt;&lt; endl;
+   cout &lt;&lt; myObject2.m_i &lt;&lt; endl;
+
+   myObject1.m_i = 1;
+   cout &lt;&lt; myObject1.m_i &lt;&lt; endl;
+   cout &lt;&lt; myObject2.m_i &lt;&lt; endl;
+
+   myObject2.m_i = 2;
+   cout &lt;&lt; myObject1.m_i &lt;&lt; endl;
+   cout &lt;&lt; myObject2.m_i &lt;&lt; endl;
+
+   CMyClass::m_i = 3;
+   cout &lt;&lt; myObject1.m_i &lt;&lt; endl;
+   cout &lt;&lt; myObject2.m_i &lt;&lt; endl;
+}
+</code></pre>
+
+<pre><code class="language-bash">0
+0
+1
+1
+2
+2
+3
+3
+</code></pre>
+
+<p>在类的成员函数中使用 static 变量：</p>
+
+<pre><code class="language-C++">#include &lt;iostream&gt;
+using namespace std;
+struct C {
+   void Test(int value) {
+      static int var = 0;
+      if (var == value)
+         cout &lt;&lt; &quot;var == value&quot; &lt;&lt; endl;
+      else
+         cout &lt;&lt; &quot;var != value&quot; &lt;&lt; endl;
+
+      var = value;
+   }
+};
+
+int main() {
+   C c1;
+   C c2;
+   c1.Test(100);
+   c2.Test(100);
+}
+</code></pre>
+
+<pre><code class="language-bash">var != value
+var == value
+</code></pre>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+<li><a href="https://msdn.microsoft.com">Visual C++文档</a> - MSDN</li>
+</ul><ul class="pa0">
+  
+   <li class="list">
+     <a href="/tags/c-%E8%AF%AD%E8%A8%80" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">C 语言</a>
+   </li>
+  
+   <li class="list">
+     <a href="/tags/c&#43;&#43;" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">C&#43;&#43;</a>
+   </li>
+  
+</ul>
+<div class="mt6">
+      
+      
+      </div>
+    </section>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+  <div class="bg-light-gray pa3 nested-list-reset nested-copy-line-height nested-links">
+    <p class="f5 b mb3">Related</p>
+    <ul class="pa0 list">
+	   
+	     <li  class="mb2">
+          <a href="/posts/interview4/">面经答案整理四</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/interview3/">面经答案整理三</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/interview2/">面经答案整理二</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/interview1/">面经答案整理一</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/syn-flood/">SYN Flood 攻击原理与 C 语言实现</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/macos-unpv1-env/">MacOS 搭建 UNPv1 编译环境</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/mmap/">关于 mmap 映射的内存的释放问题</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/webbench-source-and-analysis/">WebBench 源码分析 [不推荐阅读]</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/apue-posix/">《APUE》习题：通过 POSIX 信号量函数实现父子进程的交替执行</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/apue-xsi/">《APUE》习题：通过 XSI 信号量函数实现父子进程的交替执行</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/tinyhttpd-source-and-analysis/">Tinyhttpd 源码及分析</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/apue-exercise-4.6/">《APUE》习题 4.6</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/use-scanf-in-c/">C 语言中 scanf 函数的使用</a>
+        </li>
+	    
+    </ul>
+</div>
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="https://meik2333.com" >
+    &copy; 2019 MeiK&#39;s blog
+  </a>
+    <div>
+
+
+
+
+
+
+
+
+
+
+</div>
+  </div>
+</footer>
+
+    
+
+  <script src="/dist/js/app.3fc0f988d21662902933.js"></script>
+
+
+  </body>
+</html>

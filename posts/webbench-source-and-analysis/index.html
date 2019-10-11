@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>MeiK&#39;s blog  | WebBench 源码分析 [不推荐阅读]</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="generator" content="Hugo 0.58.3" />
+    
+    
+      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+    
+
+    
+    
+      <link href="/dist/css/app.d98f2eb6bcd1eaedb7edf166bd16af26.css" rel="stylesheet">
+    
+
+    
+
+    
+      
+    
+
+    
+    
+    <meta property="og:title" content="WebBench 源码分析 [不推荐阅读]" />
+<meta property="og:description" content="在学习的过程中, 总是要阅读很多别人的代码的. 很多优秀的开源代码能够让我们受益匪浅, 也有一些代码, 看了之后只会让我们感觉浪费了时间&hellip;&hellip;
+
+Webbench是Radim Kolar在1997年写的一个在linux下使用的非常简单的网站压测工具。它使用fork()模拟多个客户端同时访问我们设定的URL，测试网站在压力下工作的性能，最多可以模拟3万个并发连接去测试网站的负载能力。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://meik2333.com/posts/webbench-source-and-analysis/" />
+<meta property="article:published_time" content="2018-07-19T21:39:23+00:00" />
+<meta property="article:modified_time" content="2018-07-19T21:39:23+00:00" />
+<meta itemprop="name" content="WebBench 源码分析 [不推荐阅读]">
+<meta itemprop="description" content="在学习的过程中, 总是要阅读很多别人的代码的. 很多优秀的开源代码能够让我们受益匪浅, 也有一些代码, 看了之后只会让我们感觉浪费了时间&hellip;&hellip;
+
+Webbench是Radim Kolar在1997年写的一个在linux下使用的非常简单的网站压测工具。它使用fork()模拟多个客户端同时访问我们设定的URL，测试网站在压力下工作的性能，最多可以模拟3万个并发连接去测试网站的负载能力。">
+
+
+<meta itemprop="datePublished" content="2018-07-19T21:39:23&#43;00:00" />
+<meta itemprop="dateModified" content="2018-07-19T21:39:23&#43;00:00" />
+<meta itemprop="wordCount" content="2049">
+
+
+
+<meta itemprop="keywords" content="C 语言,网络编程," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="WebBench 源码分析 [不推荐阅读]"/>
+<meta name="twitter:description" content="在学习的过程中, 总是要阅读很多别人的代码的. 很多优秀的开源代码能够让我们受益匪浅, 也有一些代码, 看了之后只会让我们感觉浪费了时间&hellip;&hellip;
+
+Webbench是Radim Kolar在1997年写的一个在linux下使用的非常简单的网站压测工具。它使用fork()模拟多个客户端同时访问我们设定的URL，测试网站在压力下工作的性能，最多可以模拟3万个并发连接去测试网站的负载能力。"/>
+
+  </head>
+
+  <body class="ma0 avenir bg-near-white">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l justify-between items-center center">
+    <a href="https://meik2333.com" class="f3 fw2 hover-white no-underline white-90 dib">
+      MeiK&#39;s blog
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  <article class="flex-l flex-wrap justify-between mw8 center ph3">
+
+    <header class="mt4 w-100">
+      <p class="f6 b helvetica tracked">
+          
+        POSTS
+      </p>
+      <h1 class="f1 athelas mb1">WebBench 源码分析 [不推荐阅读]</h1>
+      
+      
+      <time class="f6 mv4 dib tracked" datetime="2018-07-19T21:39:23Z">July 19, 2018</time>
+      
+      
+    </header>
+
+    <section class="nested-copy-line-height lh-copy serif f4 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><p>在学习的过程中, 总是要阅读很多别人的代码的. 很多优秀的开源代码能够让我们受益匪浅, 也有一些代码, 看了之后只会让我们感觉浪费了时间&hellip;&hellip;</p>
+
+<p>Webbench是Radim Kolar在1997年写的一个在linux下使用的非常简单的网站压测工具。它使用fork()模拟多个客户端同时访问我们设定的URL，测试网站在压力下工作的性能，最多可以模拟3万个并发连接去测试网站的负载能力。</p>
+
+<h2 id="问题">问题</h2>
+
+<p>看完这个项目之后, 我注意到了这个项目的一些问题</p>
+
+<ul>
+<li>滥用全局变量</li>
+<li>一个函数将一个全局变量作为函数参数传递给了另一个函数</li>
+<li>代码风格不一致, 同样的功能(获取指定字符串位置)用了好几种不同的办法, 还混写在了一起</li>
+<li><code>strcat(str1 + strlen(str1), str2)</code> 这种神奇的操作</li>
+<li>可能会创建多个子进程(文档描述中说明可以上万个), 却只判断了最后一个是否成功</li>
+<li>使用 <code>sleep</code> 来调度父子进程的先后关系</li>
+<li>管道没有关闭不需要的一端</li>
+<li>奇怪的变量复用, 比如在子进程中用 <code>pid</code> 又去表示了 <code>fscanf</code> 的返回值</li>
+<li>&hellip;&hellip;</li>
+</ul>
+
+<h2 id="建议">建议</h2>
+
+<p>不要看这个项目! 不要看这个项目! 不要看这个项目!</p>
+
+<p>除非你想要从中获得什么反面的教学用例</p>
+
+<p>如果你想要通过一个代码并不长、并不复杂的项目来学习一个 HTTP 服务相关的话, 那么我推荐 <a href="/2018/06/29/Tinyhttpd-源码及分析/">Tinyhttpd 源码及分析</a>. 虽然那个项目也有一些问题, 只能作为一个玩具使用, 但是对于学习来说是有一定意义的.</p>
+
+<h2 id="源代码">源代码</h2>
+
+<p>我居然用了一个多小时的时间看完了他的源代码并且加上了注释&hellip;&hellip;</p>
+
+<h3 id="socket-c">socket.c</h3>
+
+<pre><code class="language-C">/* $Id: socket.c 1.1 1995/01/01 07:11:14 cthuang Exp $
+ *
+ * This module has been modified by Radim Kolar for OS/2 emx
+ */
+
+/***********************************************************************
+  module:       socket.c
+  program:      popclient
+  SCCS ID:      @(#)socket.c    1.5  4/1/94
+  programmer:   Virginia Tech Computing Center
+  compiler:     DEC RISC C compiler (Ultrix 4.1)
+  environment:  DEC Ultrix 4.3
+  description:  UNIX sockets code.
+ ***********************************************************************/
+
+#include &lt;arpa/inet.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;netdb.h&gt;
+#include &lt;netinet/in.h&gt;
+#include &lt;stdarg.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;sys/time.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;unistd.h&gt;
+
+int Socket(const char *host, int clientPort) {
+    int sock;
+    unsigned long inaddr;
+    struct sockaddr_in ad;
+    struct hostent *hp;
+
+    memset(&amp;ad, 0, sizeof(ad));
+    ad.sin_family = AF_INET;
+
+    /* 尝试以 IP 形式解析 */
+    inaddr = inet_addr(host);
+    if (inaddr != INADDR_NONE)
+        memcpy(&amp;ad.sin_addr, &amp;inaddr, sizeof(inaddr));
+    else { /* 如果解析失败, 则尝试通过 DNS 进行转换 */
+        /* gethostbyname 是过时的函数, 应当使用 getaddrinfo 替换掉它 */
+        hp = gethostbyname(host);
+        if (hp == NULL) return -1;
+        memcpy(&amp;ad.sin_addr, hp-&gt;h_addr, hp-&gt;h_length);
+    }
+    ad.sin_port = htons(clientPort);
+
+    /* 创建 socket 连接 */
+    sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock &lt; 0) return sock;
+    if (connect(sock, (struct sockaddr *)&amp;ad, sizeof(ad)) &lt; 0) return -1;
+    return sock;
+}
+
+</code></pre>
+
+<h3 id="webbench-c">webbench.c</h3>
+
+<pre><code class="language-C">/*
+ * (C) Radim Kolar 1997-2004
+ * This is free software, see GNU Public License version 2 for
+ * details.
+ *
+ * Simple forking WWW Server benchmark:
+ *
+ * Usage:
+ *   webbench --help
+ *
+ * Return codes:
+ *    0 - sucess
+ *    1 - benchmark failed (server is not on-line)
+ *    2 - bad param
+ *    3 - internal error, fork failed
+ *
+ */
+
+#include &lt;getopt.h&gt;
+#include &lt;rpc/types.h&gt;
+#include &lt;signal.h&gt;
+#include &lt;strings.h&gt;
+#include &lt;sys/param.h&gt;
+#include &lt;time.h&gt;
+#include &lt;unistd.h&gt;
+#include &quot;socket.c&quot;
+
+/* values */
+volatile int timerexpired = 0;
+int speed = 0;
+int failed = 0;
+int bytes = 0;
+
+/* globals */
+int http10 = 1; /* 0 - http/0.9, 1 - http/1.0, 2 - http/1.1 */
+/* Allow: GET, HEAD, OPTIONS, TRACE */
+#define METHOD_GET 0
+#define METHOD_HEAD 1
+#define METHOD_OPTIONS 2
+#define METHOD_TRACE 3
+#define PROGRAM_VERSION &quot;1.5&quot;
+int method = METHOD_GET;
+int clients = 1;
+int force = 0;
+int force_reload = 0;
+int proxyport = 80;
+char *proxyhost = NULL;
+int benchtime = 30;
+
+/* internal */
+int mypipe[2];
+char host[MAXHOSTNAMELEN];
+#define REQUEST_SIZE 2048
+char request[REQUEST_SIZE];
+
+static const struct option long_options[] = {
+    {&quot;force&quot;, no_argument, &amp;force, 1},
+    {&quot;reload&quot;, no_argument, &amp;force_reload, 1},
+    {&quot;time&quot;, required_argument, NULL, 't'},
+    {&quot;help&quot;, no_argument, NULL, '?'},
+    {&quot;http09&quot;, no_argument, NULL, '9'},
+    {&quot;http10&quot;, no_argument, NULL, '1'},
+    {&quot;http11&quot;, no_argument, NULL, '2'},
+    /* 绑定命令行参数与变量 */
+    {&quot;get&quot;, no_argument, &amp;method, METHOD_GET},
+    {&quot;head&quot;, no_argument, &amp;method, METHOD_HEAD},
+    {&quot;options&quot;, no_argument, &amp;method, METHOD_OPTIONS},
+    {&quot;trace&quot;, no_argument, &amp;method, METHOD_TRACE},
+    {&quot;version&quot;, no_argument, NULL, 'V'},
+    {&quot;proxy&quot;, required_argument, NULL, 'p'},
+    {&quot;clients&quot;, required_argument, NULL, 'c'},
+    {NULL, 0, NULL, 0}};
+
+/* prototypes */
+static void benchcore(const char *host, const int port, const char *request);
+static int bench(void);
+static void build_request(const char *url);
+
+static void alarm_handler(int signal) { timerexpired = 1; }
+
+static void usage(void) {
+    fprintf(
+        stderr,
+        &quot;webbench [option]... URL\n&quot;
+        &quot;  -f|--force               Don't wait for reply from server.\n&quot;
+        &quot;  -r|--reload              Send reload request - Pragma: no-cache.\n&quot;
+        &quot;  -t|--time &lt;sec&gt;          Run benchmark for &lt;sec&gt; seconds. Default &quot;
+        &quot;30.\n&quot;
+        &quot;  -p|--proxy &lt;server:port&gt; Use proxy server for request.\n&quot;
+        &quot;  -c|--clients &lt;n&gt;         Run &lt;n&gt; HTTP clients at once. Default &quot;
+        &quot;one.\n&quot;
+        &quot;  -9|--http09              Use HTTP/0.9 style requests.\n&quot;
+        &quot;  -1|--http10              Use HTTP/1.0 protocol.\n&quot;
+        &quot;  -2|--http11              Use HTTP/1.1 protocol.\n&quot;
+        &quot;  --get                    Use GET request method.\n&quot;
+        &quot;  --head                   Use HEAD request method.\n&quot;
+        &quot;  --options                Use OPTIONS request method.\n&quot;
+        &quot;  --trace                  Use TRACE request method.\n&quot;
+        &quot;  -?|-h|--help             This information.\n&quot;
+        &quot;  -V|--version             Display program version.\n&quot;);
+}
+
+int main(int argc, char *argv[]) {
+    /* 读取命令行参数 */
+    int opt = 0;
+    int options_index = 0;
+    char *tmp = NULL;
+
+    if (argc == 1) {
+        usage();
+        return 2;
+    }
+
+    while ((opt = getopt_long(argc, argv, &quot;912Vfrt:p:c:?h&quot;, long_options,
+                              &amp;options_index)) != EOF) {
+        switch (opt) {
+            case 0:
+                break;
+            case 'f':
+                /* 设置 force 模式 */
+                force = 1;
+                break;
+            case 'r':
+                /* 设置 reload 模式 */
+                force_reload = 1;
+                break;
+            case '9':
+                /* HTTP/0.9 */
+                http10 = 0;
+                break;
+            case '1':
+                /* HTTP/1.0 */
+                http10 = 1;
+                break;
+            case '2':
+                /* HTTP/1.1 */
+                http10 = 2;
+                break;
+            case 'V':
+                /* 打印版本信息并退出 */
+                printf(PROGRAM_VERSION &quot;\n&quot;);
+                exit(0);
+            case 't':
+                /* 设置运行时间 */
+                benchtime = atoi(optarg);
+                break;
+            case 'p':
+                /* proxy server parsing server:port */
+                /**
+                 * 解析代理设置, 使用 &quot;:&quot; 分割代理字符串
+                 * eg: -p 127.0.0.1:1080
+                 * proxyhost(char *): &quot;127.0.0.1&quot;
+                 * proxyport(int): 1080
+                 * */
+                tmp = strrchr(optarg, ':');
+                proxyhost = optarg;
+                if (tmp == NULL) {
+                    break;
+                }
+                /* 判断是否提供 hostname */
+                if (tmp == optarg) {
+                    fprintf(stderr,
+                            &quot;Error in option --proxy %s: Missing hostname.\n&quot;,
+                            optarg);
+                    return 2;
+                }
+                /* 判断是否提供 port */
+                if (tmp == optarg + strlen(optarg) - 1) {
+                    fprintf(
+                        stderr,
+                        &quot;Error in option --proxy %s Port number is missing.\n&quot;,
+                        optarg);
+                    return 2;
+                }
+                *tmp = '\0';
+                proxyport = atoi(tmp + 1);
+                break;
+            case ':':
+            case 'h':
+            case '?':
+                /* 打印帮助 */
+                usage();
+                return 2;
+                break;
+            case 'c':
+                /* 设置客户端个数 */
+                clients = atoi(optarg);
+                break;
+        }
+    }
+
+    /**
+     * 当所有带选项的参数都已读取结束, optind
+     * 应当指向第一个不包含选项的命令行参数 若 optind == argc,
+     * 则代表没有不包含选项的命令行参数
+     * */
+    if (optind == argc) {
+        fprintf(stderr, &quot;webbench: Missing URL!\n&quot;);
+        usage();
+        return 2;
+    }
+
+    /* 设置 clients 和 benchtime 的默认值 */
+    if (clients == 0) clients = 1;
+    if (benchtime == 0) benchtime = 30;
+
+    /* Copyright */
+    /* 打印 Copyright */
+    fprintf(stderr,
+            &quot;Webbench - Simple Web Benchmark &quot; PROGRAM_VERSION
+            &quot;\n&quot;
+            &quot;Copyright (c) Radim Kolar 1997-2004, GPL Open Source Software.\n&quot;);
+
+    build_request(argv[optind]);
+
+    // print request info ,do it in function build_request
+    /*printf(&quot;Benchmarking: &quot;);
+
+    switch(method)
+    {
+        case METHOD_GET:
+        default:
+        printf(&quot;GET&quot;);break;
+        case METHOD_OPTIONS:
+        printf(&quot;OPTIONS&quot;);break;
+        case METHOD_HEAD:
+        printf(&quot;HEAD&quot;);break;
+        case METHOD_TRACE:
+        printf(&quot;TRACE&quot;);break;
+    }
+
+    printf(&quot; %s&quot;,argv[optind]);
+
+    switch(http10)
+    {
+        case 0: printf(&quot; (using HTTP/0.9)&quot;);break;
+        case 2: printf(&quot; (using HTTP/1.1)&quot;);break;
+    }
+
+    printf(&quot;\n&quot;);
+    */
+
+    /* 打印配置 */
+    printf(&quot;Runing info: &quot;);
+
+    if (clients == 1)
+        printf(&quot;1 client&quot;);
+    else
+        printf(&quot;%d clients&quot;, clients);
+
+    printf(&quot;, running %d sec&quot;, benchtime);
+
+    if (force) printf(&quot;, early socket close&quot;);
+    if (proxyhost != NULL)
+        printf(&quot;, via proxy server %s:%d&quot;, proxyhost, proxyport);
+    if (force_reload) printf(&quot;, forcing reload&quot;);
+
+    printf(&quot;.\n&quot;);
+
+    /* 开始执行 */
+    return bench();
+}
+
+void build_request(const char *url) {
+    char tmp[10];
+    int i;
+
+    // bzero(host,MAXHOSTNAMELEN);
+    // bzero(request,REQUEST_SIZE);
+    memset(host, 0, MAXHOSTNAMELEN);
+    memset(request, 0, REQUEST_SIZE);
+
+    /* 根据 reload 和 method 等参数调整 HTTP */
+    if (force_reload &amp;&amp; proxyhost != NULL &amp;&amp; http10 &lt; 1) http10 = 1;
+    if (method == METHOD_HEAD &amp;&amp; http10 &lt; 1) http10 = 1;
+    if (method == METHOD_OPTIONS &amp;&amp; http10 &lt; 2) http10 = 2;
+    if (method == METHOD_TRACE &amp;&amp; http10 &lt; 2) http10 = 2;
+
+    switch (method) {
+        default:
+        case METHOD_GET:
+            strcpy(request, &quot;GET&quot;);
+            break;
+        case METHOD_HEAD:
+            strcpy(request, &quot;HEAD&quot;);
+            break;
+        case METHOD_OPTIONS:
+            strcpy(request, &quot;OPTIONS&quot;);
+            break;
+        case METHOD_TRACE:
+            strcpy(request, &quot;TRACE&quot;);
+            break;
+    }
+
+    strcat(request, &quot; &quot;);
+
+    /* 检查 URL 是否合法 */
+    if (NULL == strstr(url, &quot;://&quot;)) {
+        fprintf(stderr, &quot;\n%s: is not a valid URL.\n&quot;, url);
+        exit(2);
+    }
+    /* 检查 URL 长度 */
+    if (strlen(url) &gt; 1500) {
+        fprintf(stderr, &quot;URL is too long.\n&quot;);
+        exit(2);
+    }
+    /* 忽略大小写对比两个字符串的前 n 个字符 */
+    /* 仅支持 HTTP 协议 */
+    if (0 != strncasecmp(&quot;http://&quot;, url, 7)) {
+        fprintf(stderr,
+                &quot;\nOnly HTTP protocol is directly supported, set --proxy for &quot;
+                &quot;others.\n&quot;);
+        exit(2);
+    }
+
+    /* protocol/host delimiter */
+    /* 获得去掉协议后的 URL */
+    i = strstr(url, &quot;://&quot;) - url + 3;
+
+    /* 判断 '/' 是否在 URL 中出现过 */
+    if (strchr(url + i, '/') == NULL) {
+        fprintf(stderr,
+                &quot;\nInvalid URL syntax - hostname don't ends with '/'.\n&quot;);
+        exit(2);
+    }
+
+    /* url + i 指向 URL 去掉协议后的开头 */
+    if (proxyhost == NULL) {
+        /* get port from hostname */
+        /**
+         * 如果没有使用代理, 则解析 URL 到 host 和 proxyport
+         * eg: http://127.0.0.1:8080/
+         * host(char *): 127.0.0.1
+         * proxyport(int): 8080
+         * */
+        if (index(url + i, ':') != NULL &amp;&amp;
+            index(url + i, ':') &lt; index(url + i, '/')) { /* 如果指定了端口 */
+            strncpy(host, url + i, strchr(url + i, ':') - url - i);
+            // bzero(tmp,10);
+            memset(tmp, 0, 10);
+            strncpy(tmp, index(url + i, ':') + 1,
+                    strchr(url + i, '/') - index(url + i, ':') - 1);
+            /* printf(&quot;tmp=%s\n&quot;,tmp); */
+            proxyport = atoi(tmp);
+            if (proxyport == 0) proxyport = 80;
+        } else { /* 没有指定端口 */
+            strncpy(host, url + i, strcspn(url + i, &quot;/&quot;));
+        }
+        // printf(&quot;Host=%s\n&quot;,host);
+        /**
+         * 这个 request + strlen(request) 我实在是没看懂
+         * strlen 获得 request 后第一个 '\0' 的位置
+         * strcat 替换 request 后第一个 '\0' 并追加字符串, 在末尾添加 '\0'
+         * 那为什么要先找到 '\0' 的位置再去 strcat......
+         * */
+        strcat(request + strlen(request), url + i + strcspn(url + i, &quot;/&quot;));
+    } else {
+        // printf(&quot;ProxyHost=%s\nProxyPort=%d\n&quot;,proxyhost,proxyport);
+        strcat(request, url);
+    }
+
+    /* 拼接 HTTP 协议 */
+    if (http10 == 1)
+        strcat(request, &quot; HTTP/1.0&quot;);
+    else if (http10 == 2)
+        strcat(request, &quot; HTTP/1.1&quot;);
+
+    strcat(request, &quot;\r\n&quot;);
+
+    /* 拼接 UA */
+    if (http10 &gt; 0)
+        strcat(request, &quot;User-Agent: WebBench &quot; PROGRAM_VERSION &quot;\r\n&quot;);
+    /* 拼接 Host */
+    if (proxyhost == NULL &amp;&amp; http10 &gt; 0) {
+        strcat(request, &quot;Host: &quot;);
+        strcat(request, host);
+        strcat(request, &quot;\r\n&quot;);
+    }
+
+    /* 拼接其余字段 */
+    if (force_reload &amp;&amp; proxyhost != NULL) {
+        strcat(request, &quot;Pragma: no-cache\r\n&quot;);
+    }
+
+    if (http10 &gt; 1) strcat(request, &quot;Connection: close\r\n&quot;);
+
+    /* add empty line at end */
+    if (http10 &gt; 0) strcat(request, &quot;\r\n&quot;);
+
+    printf(&quot;\nRequest:\n%s\n&quot;, request);
+}
+
+/* vraci system rc error kod */
+static int bench(void) {
+    int i, j, k;
+    pid_t pid = 0;
+    FILE *f;
+
+    /* check avaibility of target server */
+    i = Socket(proxyhost == NULL ? host : proxyhost, proxyport);
+    if (i &lt; 0) {
+        fprintf(stderr, &quot;\nConnect to server failed. Aborting benchmark.\n&quot;);
+        return 1;
+    }
+    close(i);
+
+    /* create pipe */
+    /* 创建管道 */
+    if (pipe(mypipe)) {
+        perror(&quot;pipe failed.&quot;);
+        return 3;
+    }
+
+    /* not needed, since we have alarm() in childrens */
+    /* wait 4 next system clock tick */
+    /*
+    cas=time(NULL);
+    while(time(NULL)==cas)
+    sched_yield();
+    */
+
+    /* fork childs */
+    /* 创建处理子进程 */
+    for (i = 0; i &lt; clients; i++) {
+        pid = fork();
+        /* 不推荐将 fork 成功和失败的情况放在一起处理 */
+        if (pid &lt;= (pid_t)0) {
+            /* child process or error*/
+            /* 你不能确定进程将于何时中断 */
+            /* 因此这种方法并不推荐使用 */
+            sleep(1); /* make childs faster */
+            break;
+        }
+    }
+
+    /* 这是? 创建了多个子进程, 然后判断最后一个 fork 是否成功? */
+    if (pid &lt; (pid_t)0) {
+        fprintf(stderr, &quot;problems forking worker no. %d\n&quot;, i);
+        perror(&quot;fork failed.&quot;);
+        return 3;
+    }
+
+    if (pid == (pid_t)0) {
+        /* I am a child */
+        /* 开始发送请求 */
+        /* 取全局变量中的 request 作为参数传给本文件内的另一个函数 */
+        /* 什么写法...... */
+        if (proxyhost == NULL)
+            benchcore(host, proxyport, request);
+        else
+            benchcore(proxyhost, proxyport, request);
+
+        /* write results to pipe */
+        /* 将结果写入 pipe */
+        /* 此处没有关闭 mypipe[0] */
+        /* 不知是何用意 */
+        f = fdopen(mypipe[1], &quot;w&quot;);
+        if (f == NULL) {
+            perror(&quot;open pipe for writing failed.&quot;);
+            return 3;
+        }
+        /* fprintf(stderr,&quot;Child - %d %d\n&quot;,speed,failed); */
+        fprintf(f, &quot;%d %d %d\n&quot;, speed, failed, bytes);
+        fclose(f);
+
+        return 0;
+    } else {
+        /* 同样的, 此处没有关闭 mypipe[1] */
+        f = fdopen(mypipe[0], &quot;r&quot;);
+        if (f == NULL) {
+            perror(&quot;open pipe for reading failed.&quot;);
+            return 3;
+        }
+
+        /* 设置无缓冲 */
+        setvbuf(f, NULL, _IONBF, 0);
+
+        speed = 0;
+        failed = 0;
+        bytes = 0;
+
+        while (1) {
+            pid = fscanf(f, &quot;%d %d %d&quot;, &amp;i, &amp;j, &amp;k);
+            if (pid &lt; 2) {
+                fprintf(stderr, &quot;Some of our childrens died.\n&quot;);
+                break;
+            }
+
+            speed += i;
+            failed += j;
+            bytes += k;
+
+            /* fprintf(stderr,&quot;*Knock* %d %d read=%d\n&quot;,speed,failed,pid); */
+            if (--clients == 0) break;
+        }
+
+        fclose(f);
+
+        printf(
+            &quot;\nSpeed=%d pages/min, %d bytes/sec.\nRequests: %d susceed, %d &quot;
+            &quot;failed.\n&quot;,
+            (int)((speed + failed) / (benchtime / 60.0f)),
+            (int)(bytes / (float)benchtime), speed, failed);
+    }
+
+    return i;
+}
+
+void benchcore(const char *host, const int port, const char *req) {
+    int rlen;
+    char buf[1500];
+    int s, i;
+    struct sigaction sa;
+
+    /* setup alarm signal handler */
+    /* 设置 SIGALRM 信号的处理程序 */
+    sa.sa_handler = alarm_handler;
+    sa.sa_flags = 0;
+    if (sigaction(SIGALRM, &amp;sa, NULL)) exit(3);
+
+    /* 设置定时器, 超时产生 SIGALRM 信号 */
+    alarm(benchtime);  // after benchtime,then exit
+
+    rlen = strlen(req);
+nexttry:
+    while (1) {
+        /**
+         * 一直重试(重新发送一遍)
+         * 直到超时
+         * 如果超时的话, 把 failed--(是说被计时器中断的那个不算错误吗?)
+         * */
+        if (timerexpired) {
+            if (failed &gt; 0) {
+                /* fprintf(stderr,&quot;Correcting failed by signal\n&quot;); */
+                failed--;
+            }
+            return;
+        }
+
+        s = Socket(host, port);
+        if (s &lt; 0) {
+            failed++;
+            continue;
+        }
+        if (rlen != write(s, req, rlen)) {
+            failed++;
+            close(s);
+            continue;
+        }
+        if (http10 == 0)
+            if (shutdown(s, 1)) {
+                failed++;
+                close(s);
+                continue;
+            }
+        if (force == 0) {
+            /* read all available data from socket */
+            /* 读取服务器响应 */
+            while (1) {
+                if (timerexpired) break;
+                i = read(s, buf, 1500);
+                /* fprintf(stderr,&quot;%d\n&quot;,i); */
+                if (i &lt; 0) {
+                    failed++;
+                    close(s);
+                    goto nexttry;
+                } else if (i == 0)
+                    break;
+                else
+                    bytes += i;
+            }
+        }
+        if (close(s)) {
+            failed++;
+            continue;
+        }
+        speed++;
+    }
+}
+
+</code></pre><ul class="pa0">
+  
+   <li class="list">
+     <a href="/tags/c-%E8%AF%AD%E8%A8%80" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">C 语言</a>
+   </li>
+  
+   <li class="list">
+     <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">网络编程</a>
+   </li>
+  
+</ul>
+<div class="mt6">
+      
+      
+      </div>
+    </section>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+  <div class="bg-light-gray pa3 nested-list-reset nested-copy-line-height nested-links">
+    <p class="f5 b mb3">Related</p>
+    <ul class="pa0 list">
+	   
+	     <li  class="mb2">
+          <a href="/posts/tinyhttpd-source-and-analysis/">Tinyhttpd 源码及分析</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/apue-posix/">《APUE》习题：通过 POSIX 信号量函数实现父子进程的交替执行</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/apue-xsi/">《APUE》习题：通过 XSI 信号量函数实现父子进程的交替执行</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/apue-exercise-4.6/">《APUE》习题 4.6</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/use-scanf-in-c/">C 语言中 scanf 函数的使用</a>
+        </li>
+	    
+    </ul>
+</div>
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="https://meik2333.com" >
+    &copy; 2019 MeiK&#39;s blog
+  </a>
+    <div>
+
+
+
+
+
+
+
+
+
+
+</div>
+  </div>
+</footer>
+
+    
+
+  <script src="/dist/js/app.3fc0f988d21662902933.js"></script>
+
+
+  </body>
+</html>

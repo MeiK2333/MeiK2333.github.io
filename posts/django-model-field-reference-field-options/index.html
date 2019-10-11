@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>MeiK&#39;s blog  | Django Model field reference - Field options</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="generator" content="Hugo 0.58.3" />
+    
+    
+      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+    
+
+    
+    
+      <link href="/dist/css/app.d98f2eb6bcd1eaedb7edf166bd16af26.css" rel="stylesheet">
+    
+
+    
+
+    
+      
+    
+
+    
+    
+    <meta property="og:title" content="Django Model field reference - Field options" />
+<meta property="og:description" content="翻译自官方文档，django 中模型字段可用的参数及其含义。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://meik2333.com/posts/django-model-field-reference-field-options/" />
+<meta property="article:published_time" content="2018-02-22T00:00:01+00:00" />
+<meta property="article:modified_time" content="2018-02-22T00:00:01+00:00" />
+<meta itemprop="name" content="Django Model field reference - Field options">
+<meta itemprop="description" content="翻译自官方文档，django 中模型字段可用的参数及其含义。">
+
+
+<meta itemprop="datePublished" content="2018-02-22T00:00:01&#43;00:00" />
+<meta itemprop="dateModified" content="2018-02-22T00:00:01&#43;00:00" />
+<meta itemprop="wordCount" content="466">
+
+
+
+<meta itemprop="keywords" content="Python,Django," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Django Model field reference - Field options"/>
+<meta name="twitter:description" content="翻译自官方文档，django 中模型字段可用的参数及其含义。"/>
+
+  </head>
+
+  <body class="ma0 avenir bg-near-white">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l justify-between items-center center">
+    <a href="https://meik2333.com" class="f3 fw2 hover-white no-underline white-90 dib">
+      MeiK&#39;s blog
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  <article class="flex-l flex-wrap justify-between mw8 center ph3">
+
+    <header class="mt4 w-100">
+      <p class="f6 b helvetica tracked">
+          
+        POSTS
+      </p>
+      <h1 class="f1 athelas mb1">Django Model field reference - Field options</h1>
+      
+      
+      <time class="f6 mv4 dib tracked" datetime="2018-02-22T00:00:01Z">February 22, 2018</time>
+      
+      
+    </header>
+
+    <section class="nested-copy-line-height lh-copy serif f4 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><p>翻译自<a href="https://docs.djangoproject.com/en/2.0/ref/models/fields/">官方文档</a>，django 中模型字段可用的参数及其含义。</p>
+
+<p>以下参数适用于所有字段类型，全部都是可选的。</p>
+
+<h1 id="null">null</h1>
+
+<h2 id="field-null">Field.null</h2>
+
+<p>如果此项为 True ， django 将在数据库中以 NULL 来存储空值，默认为 False 。</p>
+
+<p>避免在基于字符串的字段中使用 null ，如 CharField 和 TextField 。如果一个基于字符串的字段有 null=True ，则意味这它的“无数据”有两个可能的值： NULL 和空字符串。在大多数情况下，为“无数据”提供两个可能的值是多余的， django 的约定是使用空字符串，而不是 NULL 。有一个例外：当一个 CharField 字段有 unique=True 和 blank=True 的设置时， null=True 需要被设置以防止使用空值保存多个对象是出现的唯一约束。</p>
+
+<p>对于基于字符串的字段和非基于字符串的字段，还需要设置 blank=True 来选择是否允许表单中的空值，因为 null 参数仅影响数据库的存储。</p>
+
+<p>如果您想要使 BooleanField 字段接受 null ，则需要使用 NullBooleanField 字段来代替。</p>
+
+<hr />
+
+<h1 id="blank">blank</h1>
+
+<h2 id="field-blank">Field.blank</h2>
+
+<p>如果此选项为 True ，该字段被允许为空白，默认为 False 。</p>
+
+<p>请注意，这与 null 不同。 null 只与数据库相关，而 blank 是和验证相关的，如果一个字段中的 blank=True ，表单验证将允许输入一个空值，否则，该字段的值是必须的。</p>
+
+<hr />
+
+<h1 id="choices">choices</h1>
+
+<h2 id="field-choices">Field.choices</h2>
+
+<p>一个可迭代的对象（比如列表或者元组），迭代的项是包括两个项目。例如 [(A, B), (A, B) &hellip;] 。如果给定了此设置，则其对应的默认的表单部件是一个选择框与这些选项，而不是普通的文本字段。</p>
+
+<p>每个元组的第一个元素是要在模型上设置的实际的值，第二个元素是可读的一个名称。例如：</p>
+
+<pre><code class="language-python">YEAR_IN_SCHOOL_CHOICES = (
+    ('FR', 'Freshman'),
+    ('SO', 'Sophomore'),
+    ('JR', 'Junior'),
+    ('SR', 'Senior'),
+)
+</code></pre>
+
+<p>最好在模型类中定义选项，并为每个值定义一个适当命名的常量：</p>
+
+<pre><code class="language-python">from django.db import models
+
+class Student(models.Model):
+    FRESHMAN = 'FR'
+    SOPHOMORE = 'SO'
+    JUNIOR = 'JR'
+    SENIOR = 'SR'
+    YEAR_IN_SCHOOL_CHOICES = (
+        (FRESHMAN, 'Freshman'),
+        (SOPHOMORE, 'Sophomore'),
+        (JUNIOR, 'Junior'),
+        (SENIOR, 'Senior'),
+    )
+    year_in_school = models.CharField(
+        max_length=2,
+        choices=YEAR_IN_SCHOOL_CHOICES,
+        default=FRESHMAN,
+    )
+
+    def is_upperclass(self):
+        return self.year_in_school in (self.JUNIOR, self.SENIOR)
+</code></pre>
+
+<p>尽管可以在模型类之外定义一个选择列表并且引用它，但在模型类中定义将是的这些信息与类相关联，并且容易引用。</p>
+
+<p>您还可以像下面这样定义它：</p>
+
+<pre><code class="language-python">MEDIA_CHOICES = (
+    ('Audio', (
+            ('vinyl', 'Vinyl'),
+            ('cd', 'CD'),
+        )
+    ),
+    ('Video', (
+            ('vhs', 'VHS Tape'),
+            ('dvd', 'DVD'),
+        )
+    ),
+    ('unknown', 'Unknown'),
+)
+</code></pre>
+
+<p>对于 choices 中设置的每个模型字段， django 将添加一个方法来检索当前字段对应的可读名称，即 get_FOO_display()：</p>
+
+<pre><code class="language-python">from django.db import models
+
+class Person(models.Model):
+    SHIRT_SIZES = (
+        ('S', 'Small'),
+        ('M', 'Medium'),
+        ('L', 'Large'),
+    )
+    name = models.CharField(max_length=60)
+    shirt_size = models.CharField(max_length=2, choices=SHIRT_SIZES)
+
+&gt;&gt;&gt; p = Person(name=&quot;Fred Flintstone&quot;, shirt_size=&quot;L&quot;)
+&gt;&gt;&gt; p.save()
+&gt;&gt;&gt; p.shirt_size
+'L'
+&gt;&gt;&gt; p.get_shirt_size_display()
+'Large'
+</code></pre>
+
+<p>选择可以是任何的可迭代对象，不一定是列表或者元组。这让你可以动态的构建选择。但如果你的 choices 是动态的，那么最好有一个合适的数据库表来存储。</p>
+
+<p>除非 blank=False 在字段中被设置，否则选择框默认将显示 default 的标签&rdquo;&mdash;&mdash;&mdash;&ldquo;，要覆盖此行为，请在 choices 元组中添加 None，比如：(None, &lsquo;Your String For Display&rsquo;)。或者，你也可以使用空字符串。</p>
+
+<hr />
+
+<h1 id="db-column">db_column</h1>
+
+<h2 id="field-db-column">Field.db_column</h2>
+
+<p>用于设置此字段在数据库中的名称，如果没有给定， django 将使用该字段的名称。</p>
+
+<p>此设置可以为 SQL 保留字或者 Python 变量名不允许使用的字符， django 将自动处理好后台的联系。</p>
+
+<hr />
+
+<h1 id="db-index">db_index</h1>
+
+<h2 id="field-db-index">Field.db_index</h2>
+
+<p>如果此设置为 True ，则为此字段创建数据库索引。</p>
+
+<hr />
+
+<h1 id="db-tablespace">db_tablespace</h1>
+
+<h2 id="field-db-tablespace">Field.db_tablespace</h2>
+
+<p>如果此字段已经设置了索引，则用此字段索引数据库表空间的名称。默认值是项目的DEFAULT_INDEX_TABLESPACE设置（如果已设置）或 db_tablespace模型（如果有）。如果后端不支持索引的表空间，则忽略此选项。</p>
+
+<p>注意：SQLite 和 MySQL 不支持数据库表空间的设置，PostgreSQL和Oracle支持。此设置是通过组织磁盘布局来优化数据库性能的。</p>
+
+<hr />
+
+<h1 id="default">default</h1>
+
+<h2 id="field-default">Field.default</h2>
+
+<p>字段的默认值，可以是一个常量值或者一个可调用的对象。如果是一个可调用的对象，则在每次创建新对象的时候都会调用它。</p>
+
+<p>default 的值不能是可变对象（模型实例、list、set等），因为对该对象的同一实例的引用将被用作所有新模型实例中的默认值。除非将所需的默认值包装成一个可调用的对象。例如，如果想要为 JSONField 字段指定一个默认的 dict ，使用函数：</p>
+
+<pre><code class="language-python">def contact_default():
+    return {&quot;email&quot;: &quot;to1@example.com&quot;}
+
+contact_info = JSONField(&quot;ContactInfo&quot;, default=contact_default)
+</code></pre>
+
+<p>lambda 不能用于该字段选项，因为他们无法被迁移序列化（关于迁移序列化，详见 django 官网文档）。</p>
+
+<p>对于像ForeignKey映射到模型实例的字段，默认值应该是它们引用的字段的值（pk，除非通过to_field设置引用了其他键），而不是模型实例。</p>
+
+<p>default 是在未为该字段提供值的时候使用的默认值，如果该字段是主键，则即使有该设置，也会使用默认值。</p>
+
+<hr />
+
+<h1 id="editable">editable</h1>
+
+<h2 id="field-editable">Field.editable</h2>
+
+<p>如果该设置为 False ，则该字段不会在管理员或者 <a href="https://docs.djangoproject.com/en/2.0/topics/forms/modelforms/#django.forms.ModelForm">ModelForm</a> 中被显示，在模型验证中也会被跳过。默认为 True 。</p>
+
+<hr />
+
+<h1 id="error-messages">error_messages</h1>
+
+<h2 id="field-error-messages">Field.error_messages</h2>
+
+<p>该参数允许您覆盖该字段异常时引发的默认消息，传入一个字典，其中包含与要覆盖的错误信息相匹配的键。</p>
+
+<p>错误信息键包括：null，blank，invalid，invalid_choice，unique，unique_for_date。</p>
+
+<p>这些错误通常不会被传递到表单，官方文档也没有关于此字段的使用事例和更多的说明。</p>
+
+<hr />
+
+<h1 id="help-text">help_text</h1>
+
+<h2 id="field-help-text">Field.help_text</h2>
+
+<p>使用默认的窗体小部件时显示的额外的“帮助”文本，即使此字段并没有被用于表单，作为字段的文档也很有用。</p>
+
+<p>如果在自动生成的表单中显示的话，则不会被 HTML 转义，如：</p>
+
+<pre><code class="language-python">help_text=&quot;Please use the following format: &lt;em&gt;YYYY-MM-DD&lt;/em&gt;.&quot;
+</code></pre>
+
+<p>如果有必要的话，也可以通过 django.utils.html.escape() 来转义 HTML 特殊字符，确保避开来自不受信任的用户的跨站脚本攻击。</p>
+
+<hr />
+
+<h1 id="primary-key">primary_key</h1>
+
+<h2 id="field-primary-key">Field.primary_key</h2>
+
+<p>如果为 True ，则此字段为模型的主键。</p>
+
+<p>如果没有指定一个字段的 primary_key=True ，则 django 会自动添加一个 AutoField 来保存主键。因此除非必要，请不要在其他字段上设置 primary_key=True 。</p>
+
+<p>primary_key=True 同时代表了 null=False 和 unique=True ，一个对象值允许有一个主键。</p>
+
+<p>主键的字段是只读的，如果您更改了一个已有的对象的主键并保存，那么会保存一个额外的对象（而不会修改之前的对象）。</p>
+
+<hr />
+
+<h1 id="unique">unique</h1>
+
+<h2 id="field-unique">Field.unique</h2>
+
+<p>如果此参数为 True ，则该字段在整个表中必须是唯一的。</p>
+
+<p>这是在数据库级别与模型验证级别实施的，如果在 unique=True 的字段中保存具有重复值的对象，则会引发一个 django.db.IntegrityError 的错误。</p>
+
+<p>此选项在除了 ManyToManyField 和 OneToOneField 以外的任何字段类型中都有效。</p>
+
+<p>请注意：如果 unique 为 True ，则不需要指定 db_index ，因为 unique 意味着创建唯一索引。</p>
+
+<hr />
+
+<h1 id="unique-for-date">unique_for_date</h1>
+
+<h2 id="field-unique-for-date">Field.unique_for_date</h2>
+
+<p>将其值设置为一个 DateField 或者 DateTimeField 的名称，要求此字段对于给定的日期字段的值是唯一的。</p>
+
+<p>举例来说：如果有一个 CharField 字段 title 和 DateField 字段 pub_time ， title 字段的 unique_for_date 值为 &lsquo;pub_time&rsquo;，那么不允许 title 和 pub_time 同时相同的数据出现。</p>
+
+<p>这个设置是在模型验证期间进行的验证，不会在数据库级别验证。因此，如果字段的 editable=False 的话，将跳过此验证。</p>
+
+<hr />
+
+<h1 id="unique-for-month">unique_for_month</h1>
+
+<h2 id="field-unique-for-month">Field.unique_for_month</h2>
+
+<p>类似 unique_for_date，但该设置要求月份是唯一的。</p>
+
+<hr />
+
+<h1 id="unique-for-year">unique_for_year</h1>
+
+<h2 id="field-unique-for-year">Field.unique_for_year</h2>
+
+<p>我不说你们也明白了吧&hellip;</p>
+
+<hr />
+
+<h1 id="verbose-name">verbose_name</h1>
+
+<h2 id="field-verbose-name">Field.verbose_name</h2>
+
+<p>该字段的可读名称，如果没有给出详细名称， django 将会自动使用该字段的属性名，并把下划线转换为空格。</p>
+
+<hr />
+
+<h1 id="validators">validators</h1>
+
+<h2 id="field-validators">Field.validators</h2>
+
+<p>要为此字段运行的验证程序列表。</p>
+
+<pre><code class="language-python">from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+
+def validate_even(value):
+    if value % 2 != 0:
+        raise ValidationError(
+            _('%(value)s is not an even number'),
+            params={'value': value},
+        )
+</code></pre>
+
+<pre><code class="language-python">from django.db import models
+
+class MyModel(models.Model):
+    even_field = models.IntegerField(validators=[validate_even])
+</code></pre>
+
+<p>可以在窗体中使用同样的验证函数</p>
+
+<pre><code class="language-python">from django import forms
+
+class MyForm(forms.Form):
+    even_field = forms.IntegerField(validators=[validate_even])
+</code></pre>
+
+<h2 id="registering-and-fetching-lookups">Registering and fetching lookups</h2>
+
+<p>这个我看不懂，就直接放官方文档吧。</p>
+
+<p>Field implements the <a href="https://docs.djangoproject.com/en/2.0/ref/models/lookups/#lookup-registration-api">lookup registration API</a>. The API can be used to customize which lookups are available for a field class, and how lookups are fetched from a field.</p><ul class="pa0">
+  
+   <li class="list">
+     <a href="/tags/python" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">Python</a>
+   </li>
+  
+   <li class="list">
+     <a href="/tags/django" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">Django</a>
+   </li>
+  
+</ul>
+<div class="mt6">
+      
+      
+      </div>
+    </section>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+  <div class="bg-light-gray pa3 nested-list-reset nested-copy-line-height nested-links">
+    <p class="f5 b mb3">Related</p>
+    <ul class="pa0 list">
+	   
+	     <li  class="mb2">
+          <a href="/posts/django-model-field-reference-field-types/">Django Model field reference - Field types</a>
+        </li>
+	    
+    </ul>
+</div>
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="https://meik2333.com" >
+    &copy; 2019 MeiK&#39;s blog
+  </a>
+    <div>
+
+
+
+
+
+
+
+
+
+
+</div>
+  </div>
+</footer>
+
+    
+
+  <script src="/dist/js/app.3fc0f988d21662902933.js"></script>
+
+
+  </body>
+</html>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>单元测试 on MeiK&#39;s blog</title>
+    <link>https://meik2333.com/tags/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/</link>
+    <description>Recent content in 单元测试 on MeiK&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 23 Feb 2018 00:23:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://meik2333.com/tags/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Python 中的单元测试（ unittest 的基础用法）</title>
+      <link>https://meik2333.com/posts/unit-testing-in-python/</link>
+      <pubDate>Fri, 23 Feb 2018 00:23:00 +0000</pubDate>
+      
+      <guid>https://meik2333.com/posts/unit-testing-in-python/</guid>
+      <description>&lt;p&gt;“单元测试（unit testing），是指对软件中的最小可测试单元进行检查和验证。”—— 百度百科&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

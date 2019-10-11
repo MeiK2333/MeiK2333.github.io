@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>总结 on MeiK&#39;s blog</title>
+    <link>https://meik2333.com/tags/%E6%80%BB%E7%BB%93/</link>
+    <description>Recent content in 总结 on MeiK&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 31 Dec 2018 23:52:45 +0000</lastBuildDate>
+    
+	<atom:link href="https://meik2333.com/tags/%E6%80%BB%E7%BB%93/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>2018 年度总结</title>
+      <link>https://meik2333.com/posts/2018/</link>
+      <pubDate>Mon, 31 Dec 2018 23:52:45 +0000</pubDate>
+      
+      <guid>https://meik2333.com/posts/2018/</guid>
+      <description>&lt;p&gt;总结我的 2018。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

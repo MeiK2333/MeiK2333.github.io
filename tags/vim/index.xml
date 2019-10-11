@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>VIM on MeiK&#39;s blog</title>
+    <link>https://meik2333.com/tags/vim/</link>
+    <description>Recent content in VIM on MeiK&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 04 Jul 2018 19:08:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://meik2333.com/tags/vim/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>VIM 实战</title>
+      <link>https://meik2333.com/posts/use-vim/</link>
+      <pubDate>Wed, 04 Jul 2018 19:08:00 +0000</pubDate>
+      
+      <guid>https://meik2333.com/posts/use-vim/</guid>
+      <description>&lt;p&gt;贴几个我自己平时使用 vim 时的需求和解决方案&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>VIM 命令学习</title>
+      <link>https://meik2333.com/posts/study-vim/</link>
+      <pubDate>Tue, 26 Jun 2018 20:55:35 +0000</pubDate>
+      
+      <guid>https://meik2333.com/posts/study-vim/</guid>
+      <description>&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://coolshell.cn/articles/5426.html&#34;&gt;简明 VIM 练级攻略 - 陈皓&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://blog.csdn.net/scaleqiao/article/details/45153379&#34;&gt;史上最全的Vim命令 - 作者不详&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

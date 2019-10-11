@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>MeiK&#39;s blog  | Linux 中多个进程操作同一个文件时会发生什么</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="generator" content="Hugo 0.58.3" />
+    
+    
+      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+    
+
+    
+    
+      <link href="/dist/css/app.d98f2eb6bcd1eaedb7edf166bd16af26.css" rel="stylesheet">
+    
+
+    
+
+    
+      
+    
+
+    
+    
+    <meta property="og:title" content="Linux 中多个进程操作同一个文件时会发生什么" />
+<meta property="og:description" content="与 Windows 不同， Linux 允许一个文件在写入的时候被读取（或者在被读取的时候写入），本文就来探索一下多个进程同时读写同一个文件会产生的效果。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://meik2333.com/posts/linux-many-proc-write-file/" />
+<meta property="article:published_time" content="2019-03-27T14:24:23+00:00" />
+<meta property="article:modified_time" content="2019-03-27T14:24:23+00:00" />
+<meta itemprop="name" content="Linux 中多个进程操作同一个文件时会发生什么">
+<meta itemprop="description" content="与 Windows 不同， Linux 允许一个文件在写入的时候被读取（或者在被读取的时候写入），本文就来探索一下多个进程同时读写同一个文件会产生的效果。">
+
+
+<meta itemprop="datePublished" content="2019-03-27T14:24:23&#43;00:00" />
+<meta itemprop="dateModified" content="2019-03-27T14:24:23&#43;00:00" />
+<meta itemprop="wordCount" content="396">
+
+
+
+<meta itemprop="keywords" content="Go,Linux," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Linux 中多个进程操作同一个文件时会发生什么"/>
+<meta name="twitter:description" content="与 Windows 不同， Linux 允许一个文件在写入的时候被读取（或者在被读取的时候写入），本文就来探索一下多个进程同时读写同一个文件会产生的效果。"/>
+
+  </head>
+
+  <body class="ma0 avenir bg-near-white">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l justify-between items-center center">
+    <a href="https://meik2333.com" class="f3 fw2 hover-white no-underline white-90 dib">
+      MeiK&#39;s blog
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  <article class="flex-l flex-wrap justify-between mw8 center ph3">
+
+    <header class="mt4 w-100">
+      <p class="f6 b helvetica tracked">
+          
+        POSTS
+      </p>
+      <h1 class="f1 athelas mb1">Linux 中多个进程操作同一个文件时会发生什么</h1>
+      
+      
+      <time class="f6 mv4 dib tracked" datetime="2019-03-27T14:24:23Z">March 27, 2019</time>
+      
+      
+    </header>
+
+    <section class="nested-copy-line-height lh-copy serif f4 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><p><a href="https://softwareengineering.stackexchange.com/questions/288025/reading-file-during-write-on-linux">与 Windows 不同</a>， Linux 允许一个文件在写入的时候被读取（或者在被读取的时候写入），本文就来探索一下多个进程同时读写同一个文件会产生的效果。</p>
+
+<h2 id="read-read">Read + Read</h2>
+
+<p>多个进程同时读取同一个文件不会出现问题的，放心去干吧。</p>
+
+<h2 id="read-write">Read + Write</h2>
+
+<p>本文的重点研究对象。Linux 通过文件描述符表维护了打开的文件描述符信息，而文件描述符表中的每一项都指向一个内核维护的文件表，文件表指向打开的文件的 <a href="https://www.freebsd.org/cgi/man.cgi?query=vnode">vnode</a>(Unix) 和 <a href="https://en.wikipedia.org/wiki/Inode">inode</a>。同时，文件表保存了进程对文件读写的偏移量等信息。</p>
+
+<p>我们通过两个简单的 Go 语言程序来测试一下在读文件的同时修改文件会发生什么：</p>
+
+<p><strong>testwrite.go</strong></p>
+
+<pre><code class="language-go">func writeFile(filename string, data string) {
+	f, _ := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY, 0644)
+	defer f.Close()
+	body := []byte(data)
+	_, _ = f.Write(body)
+}
+
+func main() {
+	// 首先向文件中写入 “Hello World!”
+	writeFile(&quot;test.txt&quot;, &quot;Hello World!&quot;)
+	time.Sleep(7 * time.Second)
+	// 七秒后，修改文件内容，写入 “Author MeiK!”
+	writeFile(&quot;test.txt&quot;, &quot;Author MeiK!&quot;)
+}
+</code></pre>
+
+<p><strong>testread.go</strong></p>
+
+<pre><code class="language-go">func readFile(filename string) {
+	f, _ := os.OpenFile(filename, unix.O_RDONLY, 0644)
+	defer f.Close()
+
+	body := make([]byte, 1)
+	n := 1
+	for n != 0 {
+		time.Sleep(time.Second)
+		var err error
+		n, err = f.Read(body)
+		if err == io.EOF {
+			break
+		}
+		s, _ := f.Seek(0, os.SEEK_CUR)
+		fmt.Printf(&quot;%c %d\n&quot;, body, s)
+	}
+}
+
+func main() {
+	readFile(&quot;test.txt&quot;)
+}
+</code></pre>
+
+<p>同时执行两个程序：</p>
+
+<pre><code class="language-shell">./testwrite &amp; ./testread
+</code></pre>
+
+<p>输出：</p>
+
+<pre><code>[H] 1
+[e] 2
+[l] 3
+[l] 4
+[o] 5
+[ ] 6
+[ ] 7
+[M] 8
+[e] 9
+[i] 10
+[K] 11
+[!] 12
+</code></pre>
+
+<p>这个程序打印了读取到的内容以及读取到每一步的文件偏移量。我们首先写入 <code>Hello World!</code>，开始每秒读取一个字符，并且在 7 秒后重新将 <code>Author MeiK!</code> 写入文件。我们最终读取到了什么呢？既不是 <code>Hello World!</code>，也不是 <code>Author MeiK!</code>，而是 <code>Hello  MeiK!</code>。我们每个字符串读取到了一半！</p>
+
+<p>从每一步的文件偏移量来看，读取的程序只是按部就班的一个字符一个字符的读取文件，对文件内容的变化毫无感知，当读取到文件结尾的 <code>EOF</code> 时结束读取。</p>
+
+<p>那么我们要如何保证读取与写入的一致性呢？ Linux 提供了 <code>fcntl</code> 系统调用，可以<a href="https://www.gnu.org/software/libc/manual/html_node/File-Locks.html">锁定文件</a>。</p>
+
+<p>我们对刚刚的文件稍作修改，使用 <code>fcntl</code> 进行加锁：</p>
+
+<p><strong>testwrite.go</strong></p>
+
+<pre><code class="language-go">func writeFile(filename string, data string) {
+	fmt.Println(&quot;write start&quot;)
+	f, _ := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY, 0644)
+	defer f.Close()
+
+	flockT := unix.Flock_t{
+		Type:   unix.F_WRLCK,
+		Whence: io.SeekStart,
+		Start:  0,
+		Len:    0,
+	}
+	_ = unix.FcntlFlock(f.Fd(), unix.F_SETLKW, &amp;flockT)
+
+	body := []byte(data)
+	_, _ = f.Write(body)
+	fmt.Println(&quot;write end&quot;)
+}
+
+func main() {
+	// 首先向文件中写入 “Hello World!”
+	writeFile(&quot;test.txt&quot;, &quot;Hello World!&quot;)
+	time.Sleep(7 * time.Second)
+	// 七秒后，修改文件内容，写入 “Author MeiK!”
+	writeFile(&quot;test.txt&quot;, &quot;Author MeiK!&quot;)
+}
+</code></pre>
+
+<p><strong>testread.go</strong></p>
+
+<pre><code class="language-go">func readFile(filename string) {
+	f, _ := os.OpenFile(filename, unix.O_RDONLY, 0644)
+	defer f.Close()
+
+	flockT := unix.Flock_t{
+		Type:   unix.F_RDLCK,
+		Whence: io.SeekStart,
+		Start:  0,
+		Len:    0,
+	}
+	_ = unix.FcntlFlock(f.Fd(), unix.F_SETLKW, &amp;flockT)
+
+	body := make([]byte, 1)
+	n := 1
+	for n != 0 {
+		time.Sleep(time.Second)
+		var err error
+		n, err = f.Read(body)
+		if err == io.EOF {
+			break
+		}
+		s, _ := f.Seek(0, os.SEEK_CUR)
+		fmt.Printf(&quot;%c %d\n&quot;, body, s)
+	}
+}
+
+func main() {
+	readFile(&quot;test.txt&quot;)
+}
+</code></pre>
+
+<p>额外添加 <code>write start</code> 和 <code>write end</code> 来标识当前进度，执行结果如下：</p>
+
+<pre><code>write start
+write end
+[H] 1
+[e] 2
+[l] 3
+[l] 4
+[o] 5
+[ ] 6
+write start
+[W] 7
+[o] 8
+[r] 9
+[l] 10
+[d] 11
+[!] 12
+write end
+</code></pre>
+
+<p>可以看到，第一次写入文件时，进程很快的完成了写入；而当第二次写入时，由于此时 <code>read</code> 进程对文件加锁了，导致写入进程阻塞，直到读取结束后， <code>write</code> 进程才把内容写入了文件。因此 <code>read</code> 进程读取到的就是第一次写入的内容 <code>Hello World!</code>。完美的解决了我们的问题，可喜可贺。</p>
+
+<p>不过，还有两点需要注意：</p>
+
+<ol>
+<li>文件锁是与进程相关的，一个进程中的多个线程/协程对同一个文件进行的锁操作会互相覆盖掉，从而无效。</li>
+<li><code>fcntl</code> 创建的锁是建议性锁，只有写入的进程和读取的进程都遵循建议才有效；对应的有强制性锁，会在每次文件操作时进行判断，但性能较差，因此 Linux/Unix 系统默认采用的是建议性锁。</li>
+</ol>
+
+<p>关于不同类型锁之间的交互，可以参照此表：</p>
+
+<table>
+<thead>
+<tr>
+<th>当前状态</th>
+<th>加读锁</th>
+<th>加写锁</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>无锁</td>
+<td>允许</td>
+<td>允许</td>
+</tr>
+
+<tr>
+<td>一个或多个读锁</td>
+<td>允许</td>
+<td>拒绝</td>
+</tr>
+
+<tr>
+<td>一个写锁</td>
+<td>拒绝</td>
+<td>拒绝</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="write-write">Write + Write</h2>
+
+<p>两个进程同时写入可以和 <code>Write + Read</code> 一样靠加锁来解决同步问题，不过还有其他的解决方案：假如我们现在有多个进程在将日志写入同一个日志文件，那么我们可以使用 <code>O_APPEND</code> 标志来打开文件，这样在每次写入时都会 <code>lseek</code> 到文件末尾进行写入，这是一个原子操作，因此不会产生同步问题。</p>
+
+<h2 id="结论">结论</h2>
+
+<p>如果一个文件在读取的同时被修改（而没有添加任何锁机制的话），那么将可能会读到错误的数据，很多时候这比读不到数据或读到旧版本的数据的后果更加可怕……因此，如果有准确性要求较高的文件读取的情景的话，最好还是用强制性锁对文件进行保护。</p><ul class="pa0">
+  
+   <li class="list">
+     <a href="/tags/go" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">Go</a>
+   </li>
+  
+   <li class="list">
+     <a href="/tags/linux" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">Linux</a>
+   </li>
+  
+</ul>
+<div class="mt6">
+      
+      
+      </div>
+    </section>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="https://meik2333.com" >
+    &copy; 2019 MeiK&#39;s blog
+  </a>
+    <div>
+
+
+
+
+
+
+
+
+
+
+</div>
+  </div>
+</footer>
+
+    
+
+  <script src="/dist/js/app.3fc0f988d21662902933.js"></script>
+
+
+  </body>
+</html>

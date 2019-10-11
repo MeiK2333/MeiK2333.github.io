@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>MeiK&#39;s blog  | Python 中的单元测试（ unittest 的基础用法）</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="generator" content="Hugo 0.58.3" />
+    
+    
+      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+    
+
+    
+    
+      <link href="/dist/css/app.d98f2eb6bcd1eaedb7edf166bd16af26.css" rel="stylesheet">
+    
+
+    
+
+    
+      
+    
+
+    
+    
+    <meta property="og:title" content="Python 中的单元测试（ unittest 的基础用法）" />
+<meta property="og:description" content="“单元测试（unit testing），是指对软件中的最小可测试单元进行检查和验证。”—— 百度百科" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://meik2333.com/posts/unit-testing-in-python/" />
+<meta property="article:published_time" content="2018-02-23T00:23:00+00:00" />
+<meta property="article:modified_time" content="2018-02-23T00:23:00+00:00" />
+<meta itemprop="name" content="Python 中的单元测试（ unittest 的基础用法）">
+<meta itemprop="description" content="“单元测试（unit testing），是指对软件中的最小可测试单元进行检查和验证。”—— 百度百科">
+
+
+<meta itemprop="datePublished" content="2018-02-23T00:23:00&#43;00:00" />
+<meta itemprop="dateModified" content="2018-02-23T00:23:00&#43;00:00" />
+<meta itemprop="wordCount" content="305">
+
+
+
+<meta itemprop="keywords" content="Python,单元测试," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Python 中的单元测试（ unittest 的基础用法）"/>
+<meta name="twitter:description" content="“单元测试（unit testing），是指对软件中的最小可测试单元进行检查和验证。”—— 百度百科"/>
+
+  </head>
+
+  <body class="ma0 avenir bg-near-white">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l justify-between items-center center">
+    <a href="https://meik2333.com" class="f3 fw2 hover-white no-underline white-90 dib">
+      MeiK&#39;s blog
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  <article class="flex-l flex-wrap justify-between mw8 center ph3">
+
+    <header class="mt4 w-100">
+      <p class="f6 b helvetica tracked">
+          
+        POSTS
+      </p>
+      <h1 class="f1 athelas mb1">Python 中的单元测试（ unittest 的基础用法）</h1>
+      
+      
+      <time class="f6 mv4 dib tracked" datetime="2018-02-23T00:23:00Z">February 23, 2018</time>
+      
+      
+    </header>
+
+    <section class="nested-copy-line-height lh-copy serif f4 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><p>“单元测试（unit testing），是指对软件中的最小可测试单元进行检查和验证。”—— 百度百科</p>
+
+<h1 id="学习背景">学习背景</h1>
+
+<p>作为一个敲代码纯靠脑补的鶸，之前在阅读某开源规范时看到，没有完备的单元测试的项目是不安全的。然而学习编程这两年多以来从来没有在自己的代码中使用过单元测试。这次学习 django ，文档中又强调了单元测试的重要性，借此机会，学习一下单元测试。</p>
+
+<hr />
+
+<h1 id="介绍">介绍</h1>
+
+<p>Python 中，单元测试是用来对一个模块、一个函数或者一个类来进行正确性检验的测试工作。</p>
+
+<p>对于一个已有的（或者还没有的）函数或类，构造出一些输入数据，然后验证其运行的结果与我们预期的是否相同，从而判断这个模块编写是否正确。同时，如果后续修改更新了这些代码，只要简单的运行一遍单元测试，就可以知道之前的修改是否对原有功能造成了破坏。</p>
+
+<p>单元测试不仅可以用于已有代码的测试，也可以用于指明开发方向。有一个著名的理念就是“测试驱动开发”，大概就是说先用单元测试描述想法，然后再去开发对应的代码。</p>
+
+<hr />
+
+<h1 id="一个小例子">一个小例子</h1>
+
+<p>比如我们现在有一个函数 <code>abs()</code> ，用于求输入的绝对值，那么我们可以构造一些测试用例：</p>
+
+<ol>
+<li><p>输入正数，比如 <code>1</code> 、 <code>1.2</code> 、 <code>0.99</code> ，期待返回值与输入相同；</p></li>
+
+<li><p>输入负数，比如 <code>-1</code> 、 <code>-1.2</code> 、 <code>-0.99</code> ，期待返回值与输入相反；</p></li>
+
+<li><p>输入 <code>0</code> ，期待返回 <code>0</code> ；</p></li>
+
+<li><p>输入非数值类型，比如 <code>None</code> 、 <code>[]</code> 、 <code>{}</code> ，期待抛出 <code>TypeError</code> 。</p></li>
+</ol>
+
+<p>把上面的测试用例放到一个测试模块里，就是一个完整的单元测试。</p>
+
+<p>如果单元测试通过，说明我们测试的这个函数能够正常工作。如果单元测试不通过，要么函数有bug，要么测试条件输入不正确，总之，需要修复使单元测试能够通过。</p>
+
+<p>我这里直接引用廖雪峰老师的<a href="https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/00143191629979802b566644aa84656b50cd484ec4a7838000">教程</a>里面的一个例子：</p>
+
+<hr />
+
+<p>我们来编写一个 <code>Dict</code> 类，这个类的行为和 <code>dict</code> 一致，但是可以通过属性来访问，用起来就像下面这样：</p>
+
+<pre><code class="language-python">&gt;&gt;&gt; d = Dict(a=1, b=2)
+&gt;&gt;&gt; d['a']
+1
+&gt;&gt;&gt; d.a
+1
+</code></pre>
+
+<p>mydict.py 代码如下：</p>
+
+<pre><code class="language-python">class Dict(dict):
+
+    def __init__(self, **kw):
+        super().__init__(**kw)
+
+    def __getattr__(self, key):
+        try:
+            return self[key]
+        except KeyError:
+            raise AttributeError(r&quot;'Dict' object has no attribute '%s'&quot; % key)
+
+    def __setattr__(self, key, value):
+        self[key] = value
+</code></pre>
+
+<p>为了编写单元测试，我们需要引入Python自带的 <code>unittest</code> 模块，编写 <code>mydict_test.py</code> 如下：</p>
+
+<pre><code class="language-python">import unittest
+
+from mydict import Dict
+
+class TestDict(unittest.TestCase):
+
+    def test_init(self):
+        d = Dict(a=1, b='test')
+        self.assertEqual(d.a, 1)
+        self.assertEqual(d.b, 'test')
+        self.assertTrue(isinstance(d, dict))
+
+    def test_key(self):
+        d = Dict()
+        d['key'] = 'value'
+        self.assertEqual(d.key, 'value')
+
+    def test_attr(self):
+        d = Dict()
+        d.key = 'value'
+        self.assertTrue('key' in d)
+        self.assertEqual(d['key'], 'value')
+
+    def test_keyerror(self):
+        d = Dict()
+        with self.assertRaises(KeyError):
+            value = d['empty']
+
+    def test_attrerror(self):
+        d = Dict()
+        with self.assertRaises(AttributeError):
+            value = d.empty
+</code></pre>
+
+<p>编写单元测试时，我们需要编写一个测试类，从 <code>unittest.TestCase</code> 继承。</p>
+
+<p>以 <code>test</code> 开头的方法就是测试方法，不以 <code>test</code> 开头的方法不被认为是测试方法，测试的时候不会被执行。</p>
+
+<p>对每一类测试都需要编写一个 <code>test_xxx()</code> 方法。由于 <code>unittest.TestCase</code> 提供了很多内置的条件判断，我们只需要调用这些方法就可以断言输出是否是我们所期望的。最常用的断言就是 <code>assertEqual()</code> ：</p>
+
+<pre><code class="language-python">self.assertEqual(abs(-1), 1) # 断言函数返回的结果与1相等
+</code></pre>
+
+<p>另一种重要的断言就是期待抛出指定类型的Error，比如通过 <code>d['empty']</code> 访问不存在的key时，断言会抛出 <code>KeyError</code> ：</p>
+
+<pre><code class="language-python">with self.assertRaises(KeyError):
+    value = d['empty']
+</code></pre>
+
+<p>而通过 <code>d.empty</code> 访问不存在的key时，我们期待抛出 <code>AttributeError</code>：</p>
+
+<pre><code class="language-python">with self.assertRaises(AttributeError):
+    value = d.empty
+</code></pre>
+
+<hr />
+
+<h1 id="运行单元测试">运行单元测试</h1>
+
+<p>通过在代码中添加 <code>unittest.main()</code> ，可以通过命令行的形式执行单元测试。也就是在写的测试文件底部添加：</p>
+
+<pre><code class="language-python">if __name__ == '__main__':
+    unittest.main()
+</code></pre>
+
+<p>单元测试可以直接作为 Python 脚本执行：</p>
+
+<pre><code class="language-shell">python mydict_test.py
+</code></pre>
+
+<p>也可以在命令行通过参数 <code>-m unittest</code> 直接运行单元测试：</p>
+
+<pre><code class="language-shell">python -m unittest mydict_test
+</code></pre>
+
+<p>推荐使用第二种方式执行，因为通过这种方式可以同时运行多个测试文件，也可以通过添加参数获得一些其他的功能。比如添加 <code>-v</code> 选项以获得更详细的提示。</p>
+
+<pre><code class="language-shell">python -m unittest -v mydict_test
+</code></pre>
+
+<p>通过 <code>-h</code> 选项可以获得所有可使用的选项。</p>
+
+<hr />
+
+<h1 id="setup与teardown">setUp与tearDown</h1>
+
+<p>可以在单元测试中编写两个特殊的 <code>setUp()</code> 和 <code>tearDown()</code> 方法。这两个方法会分别在每调用一个测试方法的前后分别被执行。</p>
+
+<p><code>setUp()</code> 和 <code>tearDown()</code> 方法有什么用呢？设想你的测试需要启动一个数据库，这时，就可以在 <code>setUp()</code> 方法中连接数据库，在 <code>tearDown()</code> 方法中关闭数据库，这样，不必在每个测试方法中重复相同的代码。即使测试出错， <code>tearDown()</code> 也会执行。</p>
+
+<hr />
+
+<h1 id="跳过测试以及异常测试">跳过测试以及异常测试</h1>
+
+<p>unittest 支持跳过单独的测试方法或者整个类，也支持条件测试或者 expected failure （期望一个错误）测试。</p>
+
+<pre><code class="language-python">import unittest
+import sys
+
+
+class TestCase(unittest.TestCase):
+    # 此测试将被跳过
+    @unittest.skip('demonstrating sipping')
+    def test_nothing(self):
+        self.fail(&quot;shouldn't happen&quot;)
+
+    # 此测试将仅在 Windows 下执行
+    @unittest.skipUnless(sys.platform.startswith(&quot;win&quot;), 'requires Windows')
+    def test_windows_support(self):
+        pass
+
+    # 此测试期望出现错误
+    @unittest.expectedFailure
+    def test_format(self):
+        self.assertEqual(True, False)
+
+
+if __name__ == '__main__':
+    unittest.main()
+</code></pre>
+
+<p>被跳过的测试不会执行 <code>setUp()</code> 和 <code>tearDown()</code> 方法。</p>
+
+<hr />
+
+<h1 id="参考">参考</h1>
+
+<p>本篇博客参考了以下文章：</p>
+
+<ol>
+<li><p>廖雪峰老师的教程：<a href="https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/00143191629979802b566644aa84656b50cd484ec4a7838000">单元测试</a></p></li>
+
+<li><p>简书用户 cheneydc 的文章：<a href="https://www.jianshu.com/p/4a17a3040f07">Python单元测试-unittest</a></p></li>
+
+<li><p>unittest <a href="https://docs.python.org/2/library/unittest.html">官方文档</a></p></li>
+</ol><ul class="pa0">
+  
+   <li class="list">
+     <a href="/tags/python" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">Python</a>
+   </li>
+  
+   <li class="list">
+     <a href="/tags/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">单元测试</a>
+   </li>
+  
+</ul>
+<div class="mt6">
+      
+      
+      </div>
+    </section>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+  <div class="bg-light-gray pa3 nested-list-reset nested-copy-line-height nested-links">
+    <p class="f5 b mb3">Related</p>
+    <ul class="pa0 list">
+	   
+	     <li  class="mb2">
+          <a href="/posts/django-tutorial/">Django tutorial</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/django-model-field-reference-field-options/">Django Model field reference - Field options</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/django-model-field-reference-field-types/">Django Model field reference - Field types</a>
+        </li>
+	    
+    </ul>
+</div>
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="https://meik2333.com" >
+    &copy; 2019 MeiK&#39;s blog
+  </a>
+    <div>
+
+
+
+
+
+
+
+
+
+
+</div>
+  </div>
+</footer>
+
+    
+
+  <script src="/dist/js/app.3fc0f988d21662902933.js"></script>
+
+
+  </body>
+</html>

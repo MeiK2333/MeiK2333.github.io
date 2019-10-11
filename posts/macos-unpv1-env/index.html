@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>MeiK&#39;s blog  | MacOS 搭建 UNPv1 编译环境</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="generator" content="Hugo 0.58.3" />
+    
+    
+      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+    
+
+    
+    
+      <link href="/dist/css/app.d98f2eb6bcd1eaedb7edf166bd16af26.css" rel="stylesheet">
+    
+
+    
+
+    
+      
+    
+
+    
+    
+    <meta property="og:title" content="MacOS 搭建 UNPv1 编译环境" />
+<meta property="og:description" content="为了能够编译运行 《UNIX 网络编程》（UNPv1）上的示例代码，需要编译 libunp.a 库文件，然后才可以正常编译书中的代码。
+
+关于如何编译《UNIX 环境高级编程》（APUE）的示例代码，可以参照这里。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://meik2333.com/posts/macos-unpv1-env/" />
+<meta property="article:published_time" content="2018-08-21T20:49:13+00:00" />
+<meta property="article:modified_time" content="2018-08-21T20:49:13+00:00" />
+<meta itemprop="name" content="MacOS 搭建 UNPv1 编译环境">
+<meta itemprop="description" content="为了能够编译运行 《UNIX 网络编程》（UNPv1）上的示例代码，需要编译 libunp.a 库文件，然后才可以正常编译书中的代码。
+
+关于如何编译《UNIX 环境高级编程》（APUE）的示例代码，可以参照这里。">
+
+
+<meta itemprop="datePublished" content="2018-08-21T20:49:13&#43;00:00" />
+<meta itemprop="dateModified" content="2018-08-21T20:49:13&#43;00:00" />
+<meta itemprop="wordCount" content="231">
+
+
+
+<meta itemprop="keywords" content="UNPv1,网络编程,C 语言," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="MacOS 搭建 UNPv1 编译环境"/>
+<meta name="twitter:description" content="为了能够编译运行 《UNIX 网络编程》（UNPv1）上的示例代码，需要编译 libunp.a 库文件，然后才可以正常编译书中的代码。
+
+关于如何编译《UNIX 环境高级编程》（APUE）的示例代码，可以参照这里。"/>
+
+  </head>
+
+  <body class="ma0 avenir bg-near-white">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l justify-between items-center center">
+    <a href="https://meik2333.com" class="f3 fw2 hover-white no-underline white-90 dib">
+      MeiK&#39;s blog
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  <article class="flex-l flex-wrap justify-between mw8 center ph3">
+
+    <header class="mt4 w-100">
+      <p class="f6 b helvetica tracked">
+          
+        POSTS
+      </p>
+      <h1 class="f1 athelas mb1">MacOS 搭建 UNPv1 编译环境</h1>
+      
+      
+      <time class="f6 mv4 dib tracked" datetime="2018-08-21T20:49:13Z">August 21, 2018</time>
+      
+      
+    </header>
+
+    <section class="nested-copy-line-height lh-copy serif f4 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><p>为了能够编译运行 《UNIX 网络编程》（UNPv1）上的示例代码，需要编译 <code>libunp.a</code> 库文件，然后才可以正常编译书中的代码。</p>
+
+<p>关于如何编译《UNIX 环境高级编程》（APUE）的示例代码，可以参照<a href="https://github.com/MeiK2333/apue/tree/master/apue.3e">这里</a>。</p>
+
+<h2 id="准备工作">准备工作</h2>
+
+<p>首先需要去<a href="http://www.unpbook.com/src.html">官网</a>下载所需的头文件，下载之后将其解压。</p>
+
+<p>切换文件夹</p>
+
+<pre><code class="language-shell">cd unpv13e
+vim README
+</code></pre>
+
+<p>其中有 <code>README</code> 文件指示了如何编译这些文件，但是在 MacOS 下直接按照其步骤会出现一些问题。</p>
+
+<h2 id="开始编译">开始编译</h2>
+
+<pre><code class="language-shell">./configure
+cd lib
+make
+
+cd ../libfree
+make
+</code></pre>
+
+<p>此处出现报错</p>
+
+<pre><code class="language-shell">inet_ntop.c:56:1: error: conflicting types for 'inet_ntop'
+inet_ntop(af, src, dst, size)
+^
+/usr/include/arpa/inet.h:77:13: note: previous declaration is here
+const char      *inet_ntop(int, const void *, char *, socklen_t);
+                 ^
+1 error generated.
+</code></pre>
+
+<p>找到 <code>inet_ntop.c</code> 文件，把 <code>#include &lt;arpa/inet.h&gt;</code> 这行注释掉，再次执行 <code>make</code>。</p>
+
+<h2 id="测试">测试</h2>
+
+<pre><code class="language-shell">cd ../intro    
+make daytimetcpcli
+</code></pre>
+
+<p>然后执行编译好的 <code>daytimetcpcli</code> 程序，如果你之前没有完成书上 1.5 的“一个简单的时间获取服务器程序”，那么你这里按照 <code>README</code> 中的方法是不行的。（事实上你肯定没有这个程序，因为这个程序需要 <code>unp.h</code> 头文件，而你现在正在编译它&hellip;）</p>
+
+<pre><code class="language-shell">./daytimetcpcli 127.0.0.1
+connect error: Connection refused
+</code></pre>
+
+<p>这时候我们可以在 <a href="https://tf.nist.gov/tf-cgi/servers.cgi">NIST Internet Time Servers</a> 来找一个可用的时间服务器地址进行测试</p>
+
+<pre><code class="language-shell">./daytimetcpcli 129.6.15.28
+
+58351 18-08-21 12:38:39 50 0 0 724.4 UTC(NIST) *
+</code></pre>
+
+<h2 id="使用">使用</h2>
+
+<p>虽然 <code>libunp.a</code> 已经成功编译出来了，但是如果每次编写程序的时候都要将这个文件添加到查找目录里未免过于繁琐。我们可以将静态链接库添加到系统目录中。</p>
+
+<p>回到主目录，首先修改 <code>./lib/unp.h</code>，将其中的 <code>#include &quot;../config.h&quot;</code> 修改为 <code>#include &quot;config.h&quot;</code>，然后拷贝文件。</p>
+
+<pre><code class="language-shell">sudo cp ./config.h  /usr/local/include
+sudo cp ./lib/unp.h  /usr/local/include
+
+sudo cp ./libunp.a  /usr/local/lib
+</code></pre>
+
+<p>我们用书中 3.4 的确定主机字节序的程序来测试一下。</p>
+
+<pre><code class="language-C">// byteorder.c
+#include &quot;unp.h&quot;
+
+int main(int argc, char *argv[]) {
+    union {
+        short s;
+        char c[sizeof(short)];
+    } un;
+    un.s = 0x0102;
+    printf(&quot;%s: &quot;, CPU_VENDOR_OS);
+    if (sizeof(short) == 2) {
+        if (un.c[0] == 1 &amp;&amp; un.c[1] == 2) {
+            printf(&quot;big-endian\n&quot;);
+        } else if (un.c[0] == 2 &amp;&amp; un.c[1] == 1) {
+            printf(&quot;little-endian\n&quot;);
+        } else {
+            printf(&quot;unknown\n&quot;);
+        }
+    } else {
+        printf(&quot;sizeof(short) = %d\n&quot;, sizeof(short));
+    }
+    exit(0);
+}
+</code></pre>
+
+<p>编译时指定库文件链接 <code>-lunp</code></p>
+
+<pre><code class="language-shell">gcc byteorder.c -lunp -o byteorder
+./byteorder 
+i386-apple-darwin17.7.0: little-endian
+</code></pre>
+
+<p>运行成功！</p>
+
+<p>另附一份 CLion 的 CMakeList.txt：</p>
+
+<pre><code class="language-CMake">cmake_minimum_required(VERSION 3.9)
+project(UNPv1 C)
+
+include_directories(/usr/local/include)
+set(CMAKE_C_STANDARD 11)
+
+add_executable(UNPv1 main.c)
+
+target_link_libraries(UNPv1 unp)
+</code></pre>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+<li><a href="https://www.jianshu.com/p/7e395e4f8515">UNIX网络编程（第3版）环境搭建——使用MAC OSX10.10 - 简书</a></li>
+<li><a href="https://www.cnblogs.com/52php/p/5684487.html">《UNIX网络编程(第3版)》unp.h等源码文件的编译安装 - 博客园</a></li>
+<li><a href="https://github.com/MeiK2333/apue/tree/master/apue.3e">MeiK 的 GitHub</a></li>
+</ul><ul class="pa0">
+  
+   <li class="list">
+     <a href="/tags/unpv1" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">UNPv1</a>
+   </li>
+  
+   <li class="list">
+     <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">网络编程</a>
+   </li>
+  
+   <li class="list">
+     <a href="/tags/c-%E8%AF%AD%E8%A8%80" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">C 语言</a>
+   </li>
+  
+</ul>
+<div class="mt6">
+      
+      
+      </div>
+    </section>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+  <div class="bg-light-gray pa3 nested-list-reset nested-copy-line-height nested-links">
+    <p class="f5 b mb3">Related</p>
+    <ul class="pa0 list">
+	   
+	     <li  class="mb2">
+          <a href="/posts/tcp-status/">TCP 连接的流程与状态转换</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/tcp-connection/">TCP 的三次握手与四次挥手</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/webbench-source-and-analysis/">WebBench 源码分析 [不推荐阅读]</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/tinyhttpd-source-and-analysis/">Tinyhttpd 源码及分析</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/mmap/">关于 mmap 映射的内存的释放问题</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/study-curl/">curl 学习</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/apue-posix/">《APUE》习题：通过 POSIX 信号量函数实现父子进程的交替执行</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/apue-xsi/">《APUE》习题：通过 XSI 信号量函数实现父子进程的交替执行</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/apue-exercise-4.6/">《APUE》习题 4.6</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/use-scanf-in-c/">C 语言中 scanf 函数的使用</a>
+        </li>
+	    
+    </ul>
+</div>
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="https://meik2333.com" >
+    &copy; 2019 MeiK&#39;s blog
+  </a>
+    <div>
+
+
+
+
+
+
+
+
+
+
+</div>
+  </div>
+</footer>
+
+    
+
+  <script src="/dist/js/app.3fc0f988d21662902933.js"></script>
+
+
+  </body>
+</html>

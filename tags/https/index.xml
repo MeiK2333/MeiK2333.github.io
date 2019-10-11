@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>HTTPS on MeiK&#39;s blog</title>
+    <link>https://meik2333.com/tags/https/</link>
+    <description>Recent content in HTTPS on MeiK&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 07 Mar 2018 08:34:05 +0000</lastBuildDate>
+    
+	<atom:link href="https://meik2333.com/tags/https/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>CentOS 7 &#43; Nginx 配置 HTTPS （使用 Let&#39;s Encrypt ）</title>
+      <link>https://meik2333.com/posts/use-lets-encrypt/</link>
+      <pubDate>Wed, 07 Mar 2018 08:34:05 +0000</pubDate>
+      
+      <guid>https://meik2333.com/posts/use-lets-encrypt/</guid>
+      <description>&lt;p&gt;谷歌浏览器自 17 年起标记非 HTTPS 的网站的密码输入为不安全的，从 18 年 7 月份起将所有非 HTTPS 的网站标记为不安全。在谷歌 14 年的&lt;a href=&#34;https://webmasters.googleblog.com/2014/08/https-as-ranking-signal.html&#34;&gt;这篇博客&lt;/a&gt;中说明，谷歌搜索引擎将会提高 HTTPS 网站的权重。&lt;/p&gt;
+
+&lt;p&gt;使用了 HTTPS 协议的网站不一定是安全的，但是不使用 HTTPS 的网站是很不安全的。在手机浏览器上访问一些 HTTP 的网站，经常会被插入运营商的广告；使用不安全的网络连接时，浏览内容也很容易被拦截。因此，网站升级为 HTTPS 是很有必要的。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

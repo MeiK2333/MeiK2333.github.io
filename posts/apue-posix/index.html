@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>MeiK&#39;s blog  | 《APUE》习题：通过 POSIX 信号量函数实现父子进程的交替执行</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="generator" content="Hugo 0.58.3" />
+    
+    
+      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+    
+
+    
+    
+      <link href="/dist/css/app.d98f2eb6bcd1eaedb7edf166bd16af26.css" rel="stylesheet">
+    
+
+    
+
+    
+      
+    
+
+    
+    
+    <meta property="og:title" content="《APUE》习题：通过 POSIX 信号量函数实现父子进程的交替执行" />
+<meta property="og:description" content="通过 POSIX 信号量函数实现父子进程交替执行." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://meik2333.com/posts/apue-posix/" />
+<meta property="article:published_time" content="2018-07-17T16:01:09+00:00" />
+<meta property="article:modified_time" content="2018-07-17T16:01:09+00:00" />
+<meta itemprop="name" content="《APUE》习题：通过 POSIX 信号量函数实现父子进程的交替执行">
+<meta itemprop="description" content="通过 POSIX 信号量函数实现父子进程交替执行.">
+
+
+<meta itemprop="datePublished" content="2018-07-17T16:01:09&#43;00:00" />
+<meta itemprop="dateModified" content="2018-07-17T16:01:09&#43;00:00" />
+<meta itemprop="wordCount" content="217">
+
+
+
+<meta itemprop="keywords" content="C 语言,APUE," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="《APUE》习题：通过 POSIX 信号量函数实现父子进程的交替执行"/>
+<meta name="twitter:description" content="通过 POSIX 信号量函数实现父子进程交替执行."/>
+
+  </head>
+
+  <body class="ma0 avenir bg-near-white">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l justify-between items-center center">
+    <a href="https://meik2333.com" class="f3 fw2 hover-white no-underline white-90 dib">
+      MeiK&#39;s blog
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  <article class="flex-l flex-wrap justify-between mw8 center ph3">
+
+    <header class="mt4 w-100">
+      <p class="f6 b helvetica tracked">
+          
+        POSTS
+      </p>
+      <h1 class="f1 athelas mb1">《APUE》习题：通过 POSIX 信号量函数实现父子进程的交替执行</h1>
+      
+      
+      <time class="f6 mv4 dib tracked" datetime="2018-07-17T16:01:09Z">July 17, 2018</time>
+      
+      
+    </header>
+
+    <section class="nested-copy-line-height lh-copy serif f4 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><p>通过 POSIX 信号量函数实现父子进程交替执行.</p>
+
+<p>与 XSI 信号量函数不同, POSIX 信号量函数更加易用, 也更加安全. 但是 POSIX 信号量只能有 +1 和 -1 操作, 因此<a href="/2018/07/17/《APUE》习题：通过-XSI-信号量函数实现父子进程的交替执行/">之前使用</a>的交替增加的方法也就变得不可行了.</p>
+
+<p>但是, 我们有另一种更加优雅的方式来实现父子进程交替执行, 之前使用的方法其实有很大的隐患: sem_op 字段是 short 类型的, 如果交替次数过多, 很容易溢出. 这次我们使用两个 POSIX 信号量来更加优雅和安全的实现同样的功能.</p>
+
+<p>原理很简单: 申请两个信号量, 初始都为 0 , 父进程执行操作后, 释放 2 , 申请 1; 子进程首先申请 2 , 执行操作后释放 1. 这样, 父进程操作后, 因为没有 2 资源, 就需要等待子进程操作, 子进程释放 1 之后, 父进程继续执行.</p>
+
+<p>代码如下:</p>
+
+<pre><code class="language-C">#include &lt;fcntl.h&gt;
+#include &lt;semaphore.h&gt;
+#include &lt;sys/mman.h&gt;
+#include &quot;apue.h&quot;
+
+#define NLOOPS 1000
+#define SIZE sizeof(long)
+
+static int update(long *ptr) { return ((*ptr)++); }
+
+int main() {
+    int i, counter;
+    pid_t pid;
+    void *area;
+
+    sem_t *st1, *st2;
+
+    st1 = sem_open(&quot;/test1&quot;, O_CREAT, 0600, 0);
+    st2 = sem_open(&quot;/test2&quot;, O_CREAT, 0600, 0);
+    sem_unlink(&quot;/test1&quot;);
+    sem_unlink(&quot;/test2&quot;);
+
+    if ((area = mmap(0, SIZE, PROT_READ | PROT_WRITE, MAP_ANON | MAP_SHARED, -1,
+                     0)) == MAP_FAILED) {
+        err_sys(&quot;mmap error&quot;);
+    }
+
+    if ((pid = fork()) &lt; 0) {
+        err_sys(&quot;fork error&quot;);
+    } else if (pid &gt; 0) {
+        for (i = 0; i &lt; NLOOPS; i += 2) {
+            if ((counter = update((long *)area)) != i) {
+                err_quit(&quot;parent: expected %d, got %d&quot;, i, counter);
+            }
+            printf(&quot;update %d from parent\n&quot;, i);
+
+            sem_post(st2);
+            sem_wait(st1);
+        }
+    } else {
+        for (i = 1; i &lt; NLOOPS + 1; i += 2) {
+            sem_wait(st2);
+
+            if ((counter = update((long *)area)) != i) {
+                err_quit(&quot;child:expected %d, got %d&quot;, i, counter);
+            }
+            printf(&quot;update %d from child\n&quot;, i);
+
+            sem_post(st1);
+        }
+    }
+    exit(0);
+}
+</code></pre><ul class="pa0">
+  
+   <li class="list">
+     <a href="/tags/c-%E8%AF%AD%E8%A8%80" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">C 语言</a>
+   </li>
+  
+   <li class="list">
+     <a href="/tags/apue" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">APUE</a>
+   </li>
+  
+</ul>
+<div class="mt6">
+      
+      
+      </div>
+    </section>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+  <div class="bg-light-gray pa3 nested-list-reset nested-copy-line-height nested-links">
+    <p class="f5 b mb3">Related</p>
+    <ul class="pa0 list">
+	   
+	     <li  class="mb2">
+          <a href="/posts/apue-xsi/">《APUE》习题：通过 XSI 信号量函数实现父子进程的交替执行</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/apue-exercise-4.6/">《APUE》习题 4.6</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/tinyhttpd-source-and-analysis/">Tinyhttpd 源码及分析</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/use-scanf-in-c/">C 语言中 scanf 函数的使用</a>
+        </li>
+	    
+    </ul>
+</div>
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="https://meik2333.com" >
+    &copy; 2019 MeiK&#39;s blog
+  </a>
+    <div>
+
+
+
+
+
+
+
+
+
+
+</div>
+  </div>
+</footer>
+
+    
+
+  <script src="/dist/js/app.3fc0f988d21662902933.js"></script>
+
+
+  </body>
+</html>

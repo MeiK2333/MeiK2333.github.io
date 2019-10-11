@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>MeiK&#39;s blog  | 如何写一个评测姬 - 第三篇</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="generator" content="Hugo 0.58.3" />
+    
+    
+      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+    
+
+    
+    
+      <link href="/dist/css/app.d98f2eb6bcd1eaedb7edf166bd16af26.css" rel="stylesheet">
+    
+
+    
+
+    
+      
+    
+
+    
+    
+    <meta property="og:title" content="如何写一个评测姬 - 第三篇" />
+<meta property="og:description" content="从零开始实现一个 OJ 评测姬。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://meik2333.com/posts/judger3/" />
+<meta property="article:published_time" content="2019-05-05T15:22:54+00:00" />
+<meta property="article:modified_time" content="2019-05-05T15:22:54+00:00" />
+<meta itemprop="name" content="如何写一个评测姬 - 第三篇">
+<meta itemprop="description" content="从零开始实现一个 OJ 评测姬。">
+
+
+<meta itemprop="datePublished" content="2019-05-05T15:22:54&#43;00:00" />
+<meta itemprop="dateModified" content="2019-05-05T15:22:54&#43;00:00" />
+<meta itemprop="wordCount" content="192">
+
+
+
+<meta itemprop="keywords" content="OnlineJudge,评测姬," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="如何写一个评测姬 - 第三篇"/>
+<meta name="twitter:description" content="从零开始实现一个 OJ 评测姬。"/>
+
+  </head>
+
+  <body class="ma0 avenir bg-near-white">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l justify-between items-center center">
+    <a href="https://meik2333.com" class="f3 fw2 hover-white no-underline white-90 dib">
+      MeiK&#39;s blog
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  <article class="flex-l flex-wrap justify-between mw8 center ph3">
+
+    <header class="mt4 w-100">
+      <p class="f6 b helvetica tracked">
+          
+        POSTS
+      </p>
+      <h1 class="f1 athelas mb1">如何写一个评测姬 - 第三篇</h1>
+      
+      
+      <time class="f6 mv4 dib tracked" datetime="2019-05-05T15:22:54Z">May 5, 2019</time>
+      
+      
+    </header>
+
+    <section class="nested-copy-line-height lh-copy serif f4 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><p>从零开始实现一个 OJ 评测姬。</p>
+
+<p>这一篇我们讲一下如何执行一个程序、重定向其输入输出。并实现一个最简单的评测姬。</p>
+
+<h2 id="执行一个新的进程">执行一个新的进程</h2>
+
+<p>Linux 下可以使用 <a href="http://man7.org/linux/man-pages/man3/system.3.html"><code>system</code></a> 函数来运行一个进程，用法如下：</p>
+
+<pre><code class="language-c">#include &lt;stdlib.h&gt;
+int main() {
+    system(&quot;echo Hello World&quot;);
+    return 0;
+}
+</code></pre>
+
+<p>但 <code>system</code> 并不能满足我们的需求，我们需要在进程运行前进行一些自定义的操作，比如重定向流等。因此我们使用层级更低的 <code>fork</code> 来创建一个新的进程，使用 <code>exec</code> 函数来执行我们指定的进程（<code>system</code> 的实现也是 <code>fork</code> + <code>execl</code>）。在 <code>fork</code> 之后重定向流，然后 <code>exec</code> 来执行用户提交的程序，就可以实现我们的需求了。</p>
+
+<p>使用 <code>fork</code> + <code>exec</code> 来改写上面的程序，就是这样：</p>
+
+<pre><code class="language-c">#include &lt;unistd.h&gt;
+int main() {
+    int pid = fork();
+    if (pid == 0) {
+        // 重定向流或其他操作
+        execl(&quot;/bin/sh&quot;, &quot;sh&quot;, &quot;-c&quot;, &quot;echo Hello World&quot;, (char *) NULL);
+    }
+    return 0;
+}
+</code></pre>
+
+<p>虽然代码量比之前要多，但是我们可以在执行用户程序之前进行自定义的操作。同理，虽然<a href="https://www.microsoft.com/en-us/research/publication/a-fork-in-the-road/">有研究证明</a> 使用 <code>fork</code> + <code>exec</code> 来执行新的进程的性能远低于 <code>posix_spawn</code>，但是我们还是只能选择这个方案。</p>
+
+<h2 id="重定向流">重定向流</h2>
+
+<p>使用过 Linux 的同学可能对命令行重定向输入输出已经很熟悉了，<code>bash</code> 使用大于和小于的符号来表示流的重定向：</p>
+
+<pre><code class="language-bash">$ echo Hello World &gt; hello.txt
+$ cat hello.txt
+Hello World
+</code></pre>
+
+<p>其中的 <code>&gt;</code> 的用处就是将程序的标准输出重定向到文件中，本来应该被打印在终端上的内容被写入了文件。同理，<code>&lt;</code> 的作用是可以使用文件内的内容替代标准输入来传给程序。</p>
+
+<p>这样做有什么意义呢？因为我们的题目数据都是文件形式，我们的答案对比函数也是基于文件的。有一些 OJ 是要求用户自行从文件中读取输入数据，并将答案写入到文件的，但大部分 OJ 都允许用户提交直接读标准输出 <code>stdin</code>、直接写标准输出 <code>stdout</code> 的代码。因此，从标准流到文件的转换就需要我们来进行处理。</p>
+
+<p>Linux 可以使用 <a href="http://man7.org/linux/man-pages/man2/dup2.2.html"><code>dup2</code></a> 函数来重定向流，使得文件流连接标准流，这样进程就可以直接从标准输入输出流中读取写入文件了。</p>
+
+<pre><code class="language-c">#include &lt;unistd.h&gt;
+#include &lt;stdio.h&gt;
+int main() {
+    FILE *out_file = fopen(&quot;output.txt&quot;, &quot;w&quot;);
+    dup2(fileno(out_file), STDOUT_FILENO);
+    printf(&quot;Hello World&quot;);
+    return 0;
+}
+</code></pre>
+
+<p>执行代码：</p>
+
+<pre><code class="language-bash">$ ./a.out
+$ cat output.txt 
+Hello World
+</code></pre>
+
+<p>可以看到，<code>printf</code> 并没有把 <code>Hello World</code> 打印到屏幕上，而是将其写入了文件。</p>
+
+<h2 id="结合">结合</h2>
+
+<p>运行新的进程和重定向流的方法都有了，我们可以尝试结合一下这两者。为了方便起见，这里我们先不考虑编译的问题，直接使用 <code>system</code> 函数。结合完成的代码大概长这样：</p>
+
+<pre><code class="language-c">void BaseRun(char *code_file_name, char *input_file_name) {
+    char cmd[1024];
+    strcpy(cmd, &quot;gcc &quot;);
+    strcpy(cmd + 4, code_file_name);
+    system(cmd);
+    int pid = fork();
+    if (pid == 0) {
+        FILE *input_file = fopen(input_file_name, &quot;r&quot;);
+        dup2(fileno(input_file), STDIN_FILENO);
+        execl(&quot;a.out&quot;, (char *) NULL);
+    }
+}
+</code></pre>
+
+<p>完整代码以及对 <code>A + B Problem</code> 的测试在 GitHub 上：<a href="https://github.com/MeiK2333/ZeroJudger/tree/master/baserun">https://github.com/MeiK2333/ZeroJudger/tree/master/baserun</a>。</p>
+
+<h2 id="总结">总结</h2>
+
+<p>本篇讲解了实现一个评测姬最重要的核心功能：编译、执行用户代码。配合上一篇的评测函数，现在我们已经可以实现一个最基本的评测姬了。但这样还不够，评测姬会执行用户提交的代码，用户是有可能会提交恶意的代码的，我们需要某些手段来保证评测姬的安全。下一篇我们就来看看如何保证评测姬的安全。</p><ul class="pa0">
+  
+   <li class="list">
+     <a href="/tags/onlinejudge" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">OnlineJudge</a>
+   </li>
+  
+   <li class="list">
+     <a href="/tags/%E8%AF%84%E6%B5%8B%E5%A7%AC" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">评测姬</a>
+   </li>
+  
+</ul>
+<div class="mt6">
+      
+      
+      </div>
+    </section>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+  <div class="bg-light-gray pa3 nested-list-reset nested-copy-line-height nested-links">
+    <p class="f5 b mb3">Related</p>
+    <ul class="pa0 list">
+	   
+	     <li  class="mb2">
+          <a href="/posts/judger2/">如何写一个评测姬 - 第二篇</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/judger1/">如何写一个评测姬 - 第一篇</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/online-judge-faq/">OnlineJudge 评测原理与常见问题解答</a>
+        </li>
+	    
+	     <li  class="mb2">
+          <a href="/posts/online-judge-get-memory-usage/">关于评测姬的内存测量问题</a>
+        </li>
+	    
+    </ul>
+</div>
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="https://meik2333.com" >
+    &copy; 2019 MeiK&#39;s blog
+  </a>
+    <div>
+
+
+
+
+
+
+
+
+
+
+</div>
+  </div>
+</footer>
+
+    
+
+  <script src="/dist/js/app.3fc0f988d21662902933.js"></script>
+
+
+  </body>
+</html>

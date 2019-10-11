@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>MeiK&#39;s blog  | Django Model field reference - Field types</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="generator" content="Hugo 0.58.3" />
+    
+    
+      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+    
+
+    
+    
+      <link href="/dist/css/app.d98f2eb6bcd1eaedb7edf166bd16af26.css" rel="stylesheet">
+    
+
+    
+
+    
+      
+    
+
+    
+    
+    <meta property="og:title" content="Django Model field reference - Field types" />
+<meta property="og:description" content="翻译自官方文档，django 中可用的模型字段及其含义。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://meik2333.com/posts/django-model-field-reference-field-types/" />
+<meta property="article:published_time" content="2018-02-22T00:00:00+00:00" />
+<meta property="article:modified_time" content="2018-02-22T00:00:00+00:00" />
+<meta itemprop="name" content="Django Model field reference - Field types">
+<meta itemprop="description" content="翻译自官方文档，django 中可用的模型字段及其含义。">
+
+
+<meta itemprop="datePublished" content="2018-02-22T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2018-02-22T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="465">
+
+
+
+<meta itemprop="keywords" content="Python,Django," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Django Model field reference - Field types"/>
+<meta name="twitter:description" content="翻译自官方文档，django 中可用的模型字段及其含义。"/>
+
+  </head>
+
+  <body class="ma0 avenir bg-near-white">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l justify-between items-center center">
+    <a href="https://meik2333.com" class="f3 fw2 hover-white no-underline white-90 dib">
+      MeiK&#39;s blog
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  <article class="flex-l flex-wrap justify-between mw8 center ph3">
+
+    <header class="mt4 w-100">
+      <p class="f6 b helvetica tracked">
+          
+        POSTS
+      </p>
+      <h1 class="f1 athelas mb1">Django Model field reference - Field types</h1>
+      
+      
+      <time class="f6 mv4 dib tracked" datetime="2018-02-22T00:00:00Z">February 22, 2018</time>
+      
+      
+    </header>
+
+    <section class="nested-copy-line-height lh-copy serif f4 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><p>翻译自<a href="https://docs.djangoproject.com/en/2.0/ref/models/fields/">官方文档</a>，django 中可用的模型字段及其含义。</p>
+
+<h1 id="autofield">AutoField</h1>
+
+<p>一个 id 自动递增的 IntegerField 字段，您通常不需要直接使用它，如果不指定主键字段，那么一个 AutoField 字段将被自动添加到模型中。</p>
+
+<hr />
+
+<h1 id="bigautofield">BigAutoField</h1>
+
+<p>和 AutoField 类似，不同之处在于，它的数字范围是 1 到 9223372036854775807 。</p>
+
+<hr />
+
+<h1 id="bigintegerfield">BigIntegerField</h1>
+
+<p>一个 64 位整数，类似 IntegerField ，不同之处在于他的合法数字范围是 -9223372036854775808 到 9223372036854775807 。该字段的默认表单部件是 TextInput 。</p>
+
+<hr />
+
+<h1 id="binaryfield">BinaryField</h1>
+
+<p>用于存储原始二进制数据的字段，它只支持 bytes 。请注意，该字段的功能有限，比如不支持过滤查询集，也不可能包含在一个 ModelForm 中。</p>
+
+<p>尽管您可能会考虑将数据存储在数据库中，但 99% 的情况下这是糟糕的设计，请考虑使用静态文件来代替。</p>
+
+<hr />
+
+<h1 id="booleanfield">BooleanField</h1>
+
+<p>True / False</p>
+
+<p>该字段的默认表单部件是 CheckboxInput</p>
+
+<p>如果您需要接受 null 值，则应该使用 NullBooleanField 。</p>
+
+<hr />
+
+<h1 id="charfield">CharField</h1>
+
+<p>用于存储字符串，对于大量的文字，请使用 TextField 。</p>
+
+<p>该字段的默认部件是 TextInput 。</p>
+
+<p>CharField 有一个额外的必要参数：</p>
+
+<h2 id="charfield-max-length">CharField.max_length</h2>
+
+<p>字段的最大长度（以字符为单位）。在数据库级别和 django 验证中执行。</p>
+
+<hr />
+
+<h1 id="datefield">DateField</h1>
+
+<p>日期，由 Python 中的 datetime.date 实例表示，有一些额外的可选参数：</p>
+
+<h2 id="datefield-auto-now">DateField.auto_now</h2>
+
+<p>每次保存对象是自动将字段设置为现在，仅在 model.save() 时更新，使用其他方式更新字段时不会自动更新，比如 QuerySet.update() 。</p>
+
+<h2 id="datefield-auto-now-add">DateField.auto_now_add</h2>
+
+<p>首次创建对象时，自动将字段设置为现在。如果设置了此选项，则字段的 default 设置将失效。如果您希望自动保存其他形式的日期：
+- For DateField: default=date.today - from  datetime.date.today()
+- For DateTimeField: default=timezone.now - fromdjango.utils.timezone.now()</p>
+
+<p>该字段的默认部件为 TextInput。</p>
+
+<hr />
+
+<h1 id="datetimefield">DateTimeField</h1>
+
+<p>日期和时间，由 Python 的 datetime.datetime 实例表示。默认部件为 TextInput 。</p>
+
+<p>与 DateField 有相同的额外参数（auto_now 和 auto_now_add）。</p>
+
+<hr />
+
+<h1 id="decimalfield">DecimalField</h1>
+
+<p>一个固定精度的十进制数，由 Python 中的 Decimal 实例表示，有两个必需的参数：</p>
+
+<h2 id="decimalfield-max-digits">DecimalField.max_digits</h2>
+
+<p>允许的最大位数，此数字必须大于等于 decimal_places 。</p>
+
+<h2 id="decimalfield-decimal-places">DecimalField.decimal_places</h2>
+
+<p>用数字存储的小数位数。</p>
+
+<p>例如，存储数字 999 ，精确到小数点后两位：</p>
+
+<pre><code class="language-python">models.DecimalField(..., max_digits=5, decimal_places=2)
+</code></pre>
+
+<p>存可能到十亿的数字，精确到小数点后十位：</p>
+
+<pre><code class="language-python">models.DecimalField(..., max_digits=19, decimal_places=10)
+</code></pre>
+
+<p>该字段的默认表单控件为 NumberInput 。</p>
+
+<hr />
+
+<h1 id="durationfield">DurationField</h1>
+
+<p>用于存储时间段的字段，由 Python 中的 timedelta 表示。</p>
+
+<p>在不同的数据库中表现可能不同，请谨慎使用。</p>
+
+<hr />
+
+<h1 id="emailfield">EmailField</h1>
+
+<p>顾名思义……将会由 EmailValidator 验证。</p>
+
+<hr />
+
+<h1 id="filefield">FileField</h1>
+
+<p>文件上传字段，不支持 primary_key 参数，如果使用将出错。</p>
+
+<p>有两个可选的参数：</p>
+
+<h2 id="filefield-upload-to">FileField.upload_to</h2>
+
+<p>该属性提供了设置上传目录和文件名的方法，有两种设置方式：
+您可以指定一个字符串值，它可以包含 strftime() 格式，将会被上传的时间所取代。例如：</p>
+
+<pre><code class="language-python">class MyModel(models.Model):
+    # file will be uploaded to MEDIA_ROOT/uploads
+    upload = models.FileField(upload_to='uploads/')
+    # or...
+    # file will be saved to MEDIA_ROOT/uploads/2017/02/21
+    upload = models.FileField(upload_to='uploads/%Y/%m/%d/')
+</code></pre>
+
+<p>您也可以使用默认值 FileSystemStorage ，然而我没看懂使用默认值会如何处理。</p>
+
+<p>upload_to 可以被调用，返回上传路径。关于此项更详细的介绍，可以查看官方文档。</p>
+
+<h2 id="filefield-storage">FileField.storage</h2>
+
+<p>用于处理文件的存储和检索。请参阅<a href="https://docs.djangoproject.com/en/2.0/topics/files/">Managing files</a></p>
+
+<p>该字段默认的部件是 ClearableFileInout 。</p>
+
+<p>在模型中使用 FileField 或者 ImageField 需要几个步骤：</p>
+
+<ol>
+<li><p>在 settings.py 中，需要定义 MEDIA_ROOT ，是您想要 django 存储上传文件的目录的完整路径，（出于性能考虑，这些文件不应当存在数据库中）。定义 MEDIA_URL （例如：&rdquo;/media/&ldquo;），确保该目录可以由 Web 服务器的用户账户写入。</p></li>
+
+<li><p>将 FileField 或 ImageField 添加到您的模型中，定义 upload_to 选项以指定 MEDIA_ROOT 下用于上传文件的子目录。</p></li>
+
+<li><p>所有存在数据库中的数据都是路径， django 提供了一个名为 url 的便利属性，如果你的 ImageField 的字段名为 mug_shot ，那么你可以在模板中获得图像的绝对路径： {{ object.mug_shot.url }} 。</p></li>
+</ol>
+
+<p>例如您 MEDIA_ROOT 的设置为 &lsquo;/home/media&rsquo;，并且 upload_to 设置为 &lsquo;photos/%Y/%m/%d&rsquo;，其中的&rsquo;%Y/%m/%d&rsquo;将会被 strftime() 格式化，假设在2007年1月15日上传文件，那么文件将被保存至目录 /home/media/photos/2007/01/15 。</p>
+
+<p>如果您想要检索上传文件的文件名或者文件大小，可以使用 name 和 size 属性，有关更多的可用属性和方法，请参阅 <a href="https://docs.djangoproject.com/en/2.0/ref/files/file/#django.core.files.File">File</a>类的定义和<a href="https://docs.djangoproject.com/en/2.0/topics/files/">Managing files</a> 。</p>
+
+<p>请注意，无论何时，都应该密切的关注上传的文件以及它们的类型，以避免安全漏洞。</p>
+
+<p>FileField 在数据库中创建为 varchar 的默认最大长度为 100 个字符的列，可以使用 max_length 参数来修改其最大长度。</p>
+
+<h2 id="filefield-和-fieldfile">FileField 和 FieldFile</h2>
+
+<p>当访问 FileField 模型时，会提供一个 FieldFile 实例作为访问基础文件的代理。</p>
+
+<p>实例从 File 类继承了诸如 read 和 write 等方法，save 与 delete 方法将会影响到 FieldFile 数据库中关联的模型对象。</p>
+
+<h3 id="fieldfile-name">FieldFile.name</h3>
+
+<p>文件的名称</p>
+
+<h3 id="fieldfile-size">FieldFile.size</h3>
+
+<p>文件大小</p>
+
+<h3 id="fieldfile-url">FieldFile.url</h3>
+
+<p>访问文件的相对 URL</p>
+
+<h3 id="fieldfile-open-mode-rb">FieldFile.open(mode=&lsquo;rb&rsquo;)</h3>
+
+<p>pass</p>
+
+<h3 id="fieldfile-close">FieldFile.close()</h3>
+
+<p>pass</p>
+
+<h3 id="fieldfile-save-name-content-save-true">FieldFile.save(name, content, save=True)</h3>
+
+<p>此方法获取文件名和文件内容，并将它们传递给字段的存储类。</p>
+
+<p>coutent 参数 应该是 django.core.files 对象的一个实例：</p>
+
+<pre><code class="language-python">from django.core.files import File
+# Open an existing file using Python's built-in open()
+f = open('/path/to/hello.world')
+myfile = File(f)
+
+
+# 使用 Python 字符串构造
+from django.core.files.base import ContentFile
+myfile = ContentFile(&quot;hello world&quot;)
+
+
+</code></pre>
+
+<h3 id="fieldfile-delete-save-true">FieldFile.delete(save=True)</h3>
+
+<p>删除与此实例相关联的文件并清除字段上的所有属性，可选参数 save 空值在删除文件后是否保存模型实例，默认为 True 。</p>
+
+<p>请注意：删除模型时，相关的文件不会被删除，您需要自己处理它。</p>
+
+<hr />
+
+<h1 id="filepathfield">FilePathField</h1>
+
+<p>请参照官方文档（我确实不知道是干啥的）。</p>
+
+<hr />
+
+<h1 id="floatfield">FloatField</h1>
+
+<p>由 Python 中的 float 表示的浮点数。</p>
+
+<p>默认控件为 NumberInput 。</p>
+
+<hr />
+
+<h1 id="imagefield">ImageField</h1>
+
+<p>继承 FileField 的所有属性和方法，同时会验证上传的是有效的图像。</p>
+
+<p>有两个额外的可选参数：</p>
+
+<ul>
+<li><p>ImageField.height_field</p></li>
+
+<li><p>ImageField.width_field</p></li>
+</ul>
+
+<p>需要 pillow 库。</p>
+
+<p>该字段的默认表单部件是 ClearableInput 。</p>
+
+<hr />
+
+<h1 id="integerfield">IntegerField</h1>
+
+<p>一个整数 -2147483648 到 2147483647 ，默认表单控件为 NumberInput 。</p>
+
+<hr />
+
+<h1 id="genericipaddressfield">GenericIpAddressField</h1>
+
+<p>字符串格式的 IPv4 或者 IPv6 地址，默认表单控件为 TextInput 。</p>
+
+<p>具体的请参照官方文档。</p>
+
+<hr />
+
+<h1 id="nullbooleanfield">NullBooleanField</h1>
+
+<p>类似 BooleanField ，但允许 NULL 作为其中一个选项，默认表单部件为 NullBooleanSelect 。</p>
+
+<hr />
+
+<h1 id="positiveintegerfield">PositiveIntegerField</h1>
+
+<p>类似 IntegerField ，但是必须是正数或 0 ，范围是 0 到 2147483647 。</p>
+
+<hr />
+
+<h1 id="positivesmallintegerfield">PositiveSmallIntegerField</h1>
+
+<p>类似 PositiveIntegerField ，范围是 0 到 32767 。</p>
+
+<hr />
+
+<h1 id="slugfield">SlugField</h1>
+
+<p>一个短的标签，只包含字母、数字、下划线和连字符，通常被用于 URL ，长度限制为 50 。</p>
+
+<hr />
+
+<h1 id="smallintegerfield">SmallIntegerField</h1>
+
+<p>类似 IntegerField ，范围 -32768 到 32767 。</p>
+
+<hr />
+
+<h1 id="textfield">TextField</h1>
+
+<p>一个大文本字段，默认表单小部件为 Textarea 。</p>
+
+<hr />
+
+<h1 id="timefield">TimeField</h1>
+
+<p>一个时间，由 Python 中的 datetime.time 实例表示，与 DateField 可以使用相同的自动填充选项。</p>
+
+<p>该字段的默认表单部件为 TextInput 。</p>
+
+<hr />
+
+<h1 id="urlfield">URLField</h1>
+
+<p>一个 CharField ，代表一个 URL ，默认长度限制为 200 。</p>
+
+<p>默认部件为 TextInput 。</p>
+
+<hr />
+
+<h1 id="uuidfield">UUIDField</h1>
+
+<p>用于存储通用唯一标识符的字段，使用 Python 的 uuid 类。</p>
+
+<p>可用于 AutoField 的 primary_key</p>
+
+<pre><code class="language-python">import uuid
+from django.db import models
+
+class MyUUIDModel(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # other fields
+</code></pre><ul class="pa0">
+  
+   <li class="list">
+     <a href="/tags/python" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">Python</a>
+   </li>
+  
+   <li class="list">
+     <a href="/tags/django" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">Django</a>
+   </li>
+  
+</ul>
+<div class="mt6">
+      
+      
+      </div>
+    </section>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="https://meik2333.com" >
+    &copy; 2019 MeiK&#39;s blog
+  </a>
+    <div>
+
+
+
+
+
+
+
+
+
+
+</div>
+  </div>
+</footer>
+
+    
+
+  <script src="/dist/js/app.3fc0f988d21662902933.js"></script>
+
+
+  </body>
+</html>
