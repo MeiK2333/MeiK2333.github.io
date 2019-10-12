@@ -37,7 +37,7 @@
 
 <meta itemprop="datePublished" content="2019-05-05T15:22:54&#43;00:00" />
 <meta itemprop="dateModified" content="2019-05-05T15:22:54&#43;00:00" />
-<meta itemprop="wordCount" content="192">
+<meta itemprop="wordCount" content="188">
 
 
 
@@ -111,83 +111,65 @@
 <h2 id="执行一个新的进程">执行一个新的进程</h2>
 
 <p>Linux 下可以使用 <a href="http://man7.org/linux/man-pages/man3/system.3.html"><code>system</code></a> 函数来运行一个进程，用法如下：</p>
-
-<pre><code class="language-c">#include &lt;stdlib.h&gt;
-int main() {
-    system(&quot;echo Hello World&quot;);
-    return 0;
-}
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdlib.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+    system(<span style="color:#e6db74">&#34;echo Hello World&#34;</span>);
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}</code></pre></div>
 <p>但 <code>system</code> 并不能满足我们的需求，我们需要在进程运行前进行一些自定义的操作，比如重定向流等。因此我们使用层级更低的 <code>fork</code> 来创建一个新的进程，使用 <code>exec</code> 函数来执行我们指定的进程（<code>system</code> 的实现也是 <code>fork</code> + <code>execl</code>）。在 <code>fork</code> 之后重定向流，然后 <code>exec</code> 来执行用户提交的程序，就可以实现我们的需求了。</p>
 
 <p>使用 <code>fork</code> + <code>exec</code> 来改写上面的程序，就是这样：</p>
-
-<pre><code class="language-c">#include &lt;unistd.h&gt;
-int main() {
-    int pid = fork();
-    if (pid == 0) {
-        // 重定向流或其他操作
-        execl(&quot;/bin/sh&quot;, &quot;sh&quot;, &quot;-c&quot;, &quot;echo Hello World&quot;, (char *) NULL);
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;unistd.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+    <span style="color:#66d9ef">int</span> pid <span style="color:#f92672">=</span> fork();
+    <span style="color:#66d9ef">if</span> (pid <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+        <span style="color:#75715e">// 重定向流或其他操作
+</span><span style="color:#75715e"></span>        execl(<span style="color:#e6db74">&#34;/bin/sh&#34;</span>, <span style="color:#e6db74">&#34;sh&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>, <span style="color:#e6db74">&#34;echo Hello World&#34;</span>, (<span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>) NULL);
     }
-    return 0;
-}
-</code></pre>
-
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}</code></pre></div>
 <p>虽然代码量比之前要多，但是我们可以在执行用户程序之前进行自定义的操作。同理，虽然<a href="https://www.microsoft.com/en-us/research/publication/a-fork-in-the-road/">有研究证明</a> 使用 <code>fork</code> + <code>exec</code> 来执行新的进程的性能远低于 <code>posix_spawn</code>，但是我们还是只能选择这个方案。</p>
 
 <h2 id="重定向流">重定向流</h2>
 
 <p>使用过 Linux 的同学可能对命令行重定向输入输出已经很熟悉了，<code>bash</code> 使用大于和小于的符号来表示流的重定向：</p>
-
-<pre><code class="language-bash">$ echo Hello World &gt; hello.txt
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ echo Hello World &gt; hello.txt
 $ cat hello.txt
-Hello World
-</code></pre>
-
+Hello World</code></pre></div>
 <p>其中的 <code>&gt;</code> 的用处就是将程序的标准输出重定向到文件中，本来应该被打印在终端上的内容被写入了文件。同理，<code>&lt;</code> 的作用是可以使用文件内的内容替代标准输入来传给程序。</p>
 
 <p>这样做有什么意义呢？因为我们的题目数据都是文件形式，我们的答案对比函数也是基于文件的。有一些 OJ 是要求用户自行从文件中读取输入数据，并将答案写入到文件的，但大部分 OJ 都允许用户提交直接读标准输出 <code>stdin</code>、直接写标准输出 <code>stdout</code> 的代码。因此，从标准流到文件的转换就需要我们来进行处理。</p>
 
 <p>Linux 可以使用 <a href="http://man7.org/linux/man-pages/man2/dup2.2.html"><code>dup2</code></a> 函数来重定向流，使得文件流连接标准流，这样进程就可以直接从标准输入输出流中读取写入文件了。</p>
-
-<pre><code class="language-c">#include &lt;unistd.h&gt;
-#include &lt;stdio.h&gt;
-int main() {
-    FILE *out_file = fopen(&quot;output.txt&quot;, &quot;w&quot;);
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;unistd.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+    FILE <span style="color:#f92672">*</span>out_file <span style="color:#f92672">=</span> fopen(<span style="color:#e6db74">&#34;output.txt&#34;</span>, <span style="color:#e6db74">&#34;w&#34;</span>);
     dup2(fileno(out_file), STDOUT_FILENO);
-    printf(&quot;Hello World&quot;);
-    return 0;
-}
-</code></pre>
-
+    printf(<span style="color:#e6db74">&#34;Hello World&#34;</span>);
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}</code></pre></div>
 <p>执行代码：</p>
-
-<pre><code class="language-bash">$ ./a.out
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ ./a.out
 $ cat output.txt 
-Hello World
-</code></pre>
-
+Hello World</code></pre></div>
 <p>可以看到，<code>printf</code> 并没有把 <code>Hello World</code> 打印到屏幕上，而是将其写入了文件。</p>
 
 <h2 id="结合">结合</h2>
 
 <p>运行新的进程和重定向流的方法都有了，我们可以尝试结合一下这两者。为了方便起见，这里我们先不考虑编译的问题，直接使用 <code>system</code> 函数。结合完成的代码大概长这样：</p>
-
-<pre><code class="language-c">void BaseRun(char *code_file_name, char *input_file_name) {
-    char cmd[1024];
-    strcpy(cmd, &quot;gcc &quot;);
-    strcpy(cmd + 4, code_file_name);
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">BaseRun</span>(<span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>code_file_name, <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>input_file_name) {
+    <span style="color:#66d9ef">char</span> cmd[<span style="color:#ae81ff">1024</span>];
+    strcpy(cmd, <span style="color:#e6db74">&#34;gcc &#34;</span>);
+    strcpy(cmd <span style="color:#f92672">+</span> <span style="color:#ae81ff">4</span>, code_file_name);
     system(cmd);
-    int pid = fork();
-    if (pid == 0) {
-        FILE *input_file = fopen(input_file_name, &quot;r&quot;);
+    <span style="color:#66d9ef">int</span> pid <span style="color:#f92672">=</span> fork();
+    <span style="color:#66d9ef">if</span> (pid <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+        FILE <span style="color:#f92672">*</span>input_file <span style="color:#f92672">=</span> fopen(input_file_name, <span style="color:#e6db74">&#34;r&#34;</span>);
         dup2(fileno(input_file), STDIN_FILENO);
-        execl(&quot;a.out&quot;, (char *) NULL);
+        execl(<span style="color:#e6db74">&#34;a.out&#34;</span>, (<span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>) NULL);
     }
-}
-</code></pre>
-
+}</code></pre></div>
 <p>完整代码以及对 <code>A + B Problem</code> 的测试在 GitHub 上：<a href="https://github.com/MeiK2333/ZeroJudger/tree/master/baserun">https://github.com/MeiK2333/ZeroJudger/tree/master/baserun</a>。</p>
 
 <h2 id="总结">总结</h2>

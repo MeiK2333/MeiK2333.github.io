@@ -37,7 +37,7 @@
 
 <meta itemprop="datePublished" content="2019-08-05T20:56:35&#43;00:00" />
 <meta itemprop="dateModified" content="2019-08-05T20:56:35&#43;00:00" />
-<meta itemprop="wordCount" content="812">
+<meta itemprop="wordCount" content="806">
 
 
 
@@ -159,8 +159,7 @@ authority = [userinfo@]host[:port]
 </ul>
 
 <p>一个常见的 URL 可能类似这样： <code>https://httpbin.org/get?key=value#1</code> ，需要注意的是， <code>#</code> 后的部分被称为 hash ，常见的作用是定位页面内的资源，一般来说不会被发送到服务器，仅在浏览器端生效。我们可以使用 <code>curl</code> 进行验证：</p>
-
-<pre><code class="language-curl">$ curl 'https://httpbin.org/get?key=value#1' -v
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-curl" data-lang="curl">$ curl &#39;https://httpbin.org/get?key=value#1&#39; -v
 ......
 &gt; GET /get?key=value HTTP/1.1
 &gt; Host: httpbin.org
@@ -169,20 +168,18 @@ authority = [userinfo@]host[:port]
 &gt;
 ......
 {
-  &quot;args&quot;: {
-    &quot;key&quot;: &quot;value&quot;
+  &#34;args&#34;: {
+    &#34;key&#34;: &#34;value&#34;
   },
-  &quot;headers&quot;: {
-    &quot;Accept&quot;: &quot;*/*&quot;,
-    &quot;Host&quot;: &quot;httpbin.org&quot;,
-    &quot;User-Agent&quot;: &quot;curl/7.54.0&quot;
+  &#34;headers&#34;: {
+    &#34;Accept&#34;: &#34;*/*&#34;,
+    &#34;Host&#34;: &#34;httpbin.org&#34;,
+    &#34;User-Agent&#34;: &#34;curl/7.54.0&#34;
   },
-  &quot;origin&quot;: &quot;36.110.78.251, 36.110.78.251&quot;,
-  &quot;url&quot;: &quot;https://httpbin.org/get?key=value&quot;
+  &#34;origin&#34;: &#34;36.110.78.251, 36.110.78.251&#34;,
+  &#34;url&#34;: &#34;https://httpbin.org/get?key=value&#34;
 }
-* Connection #0 to host httpbin.org left intact
-</code></pre>
-
+* Connection #0 to host httpbin.org left intact</code></pre></div>
 <p>可以看到， <code>#</code> 及其之后的部分并没有被发送到服务器，而 <code>key=value</code> 被解析为了键值对。</p>
 
 <p>因此， <code>fragment</code> 部分不在我们的考虑范围内，我们要发送的 <code>path</code> 实际上是这里的 <code>path</code> 加上可选的查询字符串 <code>[?query]</code> ，在上面的例子里就是 <code>/get?key=value</code> 。其格式为字符串。</p>
@@ -201,73 +198,67 @@ authority = [userinfo@]host[:port]
 <p>数据段（ <code>data</code> ）的格式为字符串，也是 HTTP 协议所规定的。根据 <code>header</code> 的不同，数据段有多种不同的解析方式，但我们先不考虑那么多，仅以字符串来表示它。</p>
 
 <p>因此，为了能够最大程度的自定义我们的请求，我们的函数签名定义为下面这样：</p>
-
-<pre><code class="language-python">def fetch(
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">fetch</span>(
     method: str, 
     url: str, 
-    params: dict = None, 
-    headers: dict = None
-    data: str = None, 
-) -&gt; str:
-</code></pre>
-
+    params: dict <span style="color:#f92672">=</span> None, 
+    headers: dict <span style="color:#f92672">=</span> None
+    data: str <span style="color:#f92672">=</span> None, 
+) <span style="color:#f92672">-&gt;</span> str:</code></pre></div>
 <h3 id="填充函数内容">填充函数内容</h3>
 
 <p>函数签名已经确定了，要填充其内容就比较简单了。我们要做的就是将每个参数填充到其应该在的位置。填充完的函数如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">fetch</span>(
+        method: str, url: str, params: dict <span style="color:#f92672">=</span> None, data: str <span style="color:#f92672">=</span> None, headers: dict <span style="color:#f92672">=</span> None
+) <span style="color:#f92672">-&gt;</span> str:
+    <span style="color:#66d9ef">if</span> url<span style="color:#f92672">.</span>startswith(<span style="color:#e6db74">&#34;http://&#34;</span>) <span style="color:#f92672">is</span> False:
+        <span style="color:#66d9ef">raise</span> <span style="color:#a6e22e">ValueError</span>(<span style="color:#e6db74">&#34;url must start with `http://`&#34;</span>)
 
-<pre><code class="language-python">def fetch(
-        method: str, url: str, params: dict = None, data: str = None, headers: dict = None
-) -&gt; str:
-    if url.startswith(&quot;http://&quot;) is False:
-        raise ValueError(&quot;url must start with `http://`&quot;)
+    _tmp <span style="color:#f92672">=</span> url[<span style="color:#ae81ff">7</span>:]<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#34;/&#34;</span>, <span style="color:#ae81ff">1</span>)
+    <span style="color:#66d9ef">if</span> len(_tmp) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span>:
+        host <span style="color:#f92672">=</span> _tmp[<span style="color:#ae81ff">0</span>]
+        path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/&#34;</span> <span style="color:#f92672">+</span> _tmp[<span style="color:#ae81ff">1</span>]
+    <span style="color:#66d9ef">else</span>:
+        host <span style="color:#f92672">=</span> _tmp[<span style="color:#ae81ff">0</span>]
+        path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/&#34;</span>
 
-    _tmp = url[7:].split(&quot;/&quot;, 1)
-    if len(_tmp) &gt; 1:
-        host = _tmp[0]
-        path = &quot;/&quot; + _tmp[1]
-    else:
-        host = _tmp[0]
-        path = &quot;/&quot;
+    method <span style="color:#f92672">=</span> method<span style="color:#f92672">.</span>upper()
+    params <span style="color:#f92672">=</span> {} <span style="color:#66d9ef">if</span> params <span style="color:#f92672">is</span> None <span style="color:#66d9ef">else</span> params
+    headers <span style="color:#f92672">=</span> {} <span style="color:#66d9ef">if</span> headers <span style="color:#f92672">is</span> None <span style="color:#66d9ef">else</span> headers
 
-    method = method.upper()
-    params = {} if params is None else params
-    headers = {} if headers is None else headers
+    params_str <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;?&#34;</span> <span style="color:#66d9ef">if</span> params <span style="color:#66d9ef">else</span> <span style="color:#e6db74">&#34;&#34;</span>
+    param_count <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+    <span style="color:#66d9ef">for</span> key, value <span style="color:#f92672">in</span> params<span style="color:#f92672">.</span>items():
+        <span style="color:#66d9ef">if</span> param_count <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>:
+            params_str <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#39;&amp;&#39;</span>
+        params_str <span style="color:#f92672">+=</span> f<span style="color:#e6db74">&#34;{key}={value}&#34;</span>
+        param_count <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
 
-    params_str = &quot;?&quot; if params else &quot;&quot;
-    param_count = 0
-    for key, value in params.items():
-        if param_count != 0:
-            params_str += '&amp;'
-        params_str += f&quot;{key}={value}&quot;
-        param_count += 1
+    request_list <span style="color:#f92672">=</span> [f<span style="color:#e6db74">&#34;{method} {path}{params_str} HTTP/1.0&#34;</span>, f<span style="color:#e6db74">&#34;Host: {host}&#34;</span>]
+    <span style="color:#66d9ef">for</span> key, value <span style="color:#f92672">in</span> headers<span style="color:#f92672">.</span>items():
+        request_list<span style="color:#f92672">.</span>append(f<span style="color:#e6db74">&#34;{key}: {value}&#34;</span>)
 
-    request_list = [f&quot;{method} {path}{params_str} HTTP/1.0&quot;, f&quot;Host: {host}&quot;]
-    for key, value in headers.items():
-        request_list.append(f&quot;{key}: {value}&quot;)
+    <span style="color:#66d9ef">if</span> data <span style="color:#f92672">is</span> <span style="color:#f92672">not</span> None:
+        request_list<span style="color:#f92672">.</span>append(f<span style="color:#e6db74">&#39;Content-Length: {len(data)}&#39;</span>)
+        request_list<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#39;&#39;</span>)  <span style="color:#75715e"># 空行，以分割header域与data域</span>
+        request_list<span style="color:#f92672">.</span>append(data)
+    request_list<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">&#34;</span>)
 
-    if data is not None:
-        request_list.append(f'Content-Length: {len(data)}')
-        request_list.append('')  # 空行，以分割header域与data域
-        request_list.append(data)
-    request_list.append(&quot;\r\n&quot;)
+    request <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">.</span>join(request_list)
 
-    request = &quot;\r\n&quot;.join(request_list)
+    sock <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>socket()
+    sock<span style="color:#f92672">.</span>connect((host, <span style="color:#ae81ff">80</span>))
+    sock<span style="color:#f92672">.</span>send(request<span style="color:#f92672">.</span>encode(<span style="color:#e6db74">&#34;ascii&#34;</span>))
 
-    sock = socket.socket()
-    sock.connect((host, 80))
-    sock.send(request.encode(&quot;ascii&quot;))
+    response <span style="color:#f92672">=</span> <span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;&#34;</span>
+    chunk <span style="color:#f92672">=</span> sock<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">4096</span>)
+    <span style="color:#66d9ef">while</span> chunk:
+        response <span style="color:#f92672">+=</span> chunk
+        chunk <span style="color:#f92672">=</span> sock<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">4096</span>)
 
-    response = b&quot;&quot;
-    chunk = sock.recv(4096)
-    while chunk:
-        response += chunk
-        chunk = sock.recv(4096)
+    sock<span style="color:#f92672">.</span>close()
 
-    sock.close()
-
-    return response.decode()
-</code></pre>
-
+    <span style="color:#66d9ef">return</span> response<span style="color:#f92672">.</span>decode()</code></pre></div>
 <p>4 - 13 行中，我们从 URL 中分割出 <code>host</code> ，因为我们的函数还不支持 https ，因此我们对非 http 的请求抛出异常。</p>
 
 <p>15 - 17 行，我们为可选的参数分配默认值，如果这些参数没有提供的话，则使用默认的策略填充。</p>
@@ -281,13 +272,10 @@ authority = [userinfo@]host[:port]
 <p>往后的操作与我们上一章中所做的一样：开启 TCP 连接、发送请求、接收响应直到连接关闭。</p>
 
 <p>试用一下我们的程序：</p>
-
-<pre><code class="language-python">&gt;&gt;&gt; from ZeroCrawler import fetch
-&gt;&gt;&gt; resp = fetch('get', 'http://httpbin.org/get')
-&gt;&gt;&gt; resp
-'HTTP/1.1 200 OK\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json\r\nDate: Tue, 30 Jul 2019 12:19:26 GMT\r\nReferrer-Policy: no-referrer-when-downgrade\r\nServer: nginx\r\nX-Content-Type-Options: nosniff\r\nX-Frame-Options: DENY\r\nX-XSS-Protection: 1; mode=block\r\nContent-Length: 146\r\nConnection: Close\r\n\r\n{\n  &quot;args&quot;: {}, \n  &quot;headers&quot;: {\n    &quot;Host&quot;: &quot;httpbin.org&quot;\n  }, \n  &quot;origin&quot;: &quot;36.110.78.251, 36.110.78.251&quot;, \n  &quot;url&quot;: &quot;https://httpbin.org/get&quot;\n}\n'
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">from</span> ZeroCrawler <span style="color:#f92672">import</span> fetch
+<span style="color:#f92672">&gt;&gt;&gt;</span> resp <span style="color:#f92672">=</span> fetch(<span style="color:#e6db74">&#39;get&#39;</span>, <span style="color:#e6db74">&#39;http://httpbin.org/get&#39;</span>)
+<span style="color:#f92672">&gt;&gt;&gt;</span> resp
+<span style="color:#e6db74">&#39;HTTP/1.1 200 OK</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">Access-Control-Allow-Credentials: true</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">Access-Control-Allow-Origin: *</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">Content-Type: application/json</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">Date: Tue, 30 Jul 2019 12:19:26 GMT</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">Referrer-Policy: no-referrer-when-downgrade</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">Server: nginx</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">X-Content-Type-Options: nosniff</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">X-Frame-Options: DENY</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">X-XSS-Protection: 1; mode=block</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">Content-Length: 146</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">Connection: Close</span><span style="color:#ae81ff">\r\n\r\n</span><span style="color:#e6db74">{</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">  &#34;args&#34;: {}, </span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">  &#34;headers&#34;: {</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">    &#34;Host&#34;: &#34;httpbin.org&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">  }, </span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">  &#34;origin&#34;: &#34;36.110.78.251, 36.110.78.251&#34;, </span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">  &#34;url&#34;: &#34;https://httpbin.org/get&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span></code></pre></div>
 <h2 id="创建一个可安装的库">创建一个可安装的库</h2>
 
 <p>至此，我们的函数已经能够有一定的可用性与灵活性了，现在我们要让其他人来使用我们的函数。</p>
@@ -295,43 +283,34 @@ authority = [userinfo@]host[:port]
 <p>如果我们的程序的用户需要通过复制代码到自己项目内的方式来使用，那未免过于原始了。我们可以将程序打包为一个包，用户可以很方便的安装我们的程序。</p>
 
 <p>官网有打包程序的文档： <a href="https://packaging.python.org/tutorials/packaging-projects/">Packaging Python Projects</a>，按照官网的指导，我们首先创建一个文件 <code>setup.py</code> ，写入如下内容：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> setuptools
 
-<pre><code class="language-python">import setuptools
+<span style="color:#66d9ef">with</span> open(<span style="color:#e6db74">&#34;README.md&#34;</span>, <span style="color:#e6db74">&#34;r&#34;</span>) <span style="color:#66d9ef">as</span> fh:
+    long_description <span style="color:#f92672">=</span> fh<span style="color:#f92672">.</span>read()
 
-with open(&quot;README.md&quot;, &quot;r&quot;) as fh:
-    long_description = fh.read()
-
-setuptools.setup(
-    name=&quot;ZeroCrawler&quot;,
-    version=&quot;0.0.2&quot;,
-    author=&quot;MeiK2333&quot;,
-    author_email=&quot;meik2333@gmail.com&quot;,
-    description=&quot;A small example package&quot;,
-    long_description=long_description,
-    long_description_content_type=&quot;text/markdown&quot;,
-    url=&quot;https://github.com/MeiK2333/ZeroCrawler&quot;,
-    packages=setuptools.find_packages(),
-)
-</code></pre>
-
+setuptools<span style="color:#f92672">.</span>setup(
+    name<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;ZeroCrawler&#34;</span>,
+    version<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;0.0.2&#34;</span>,
+    author<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;MeiK2333&#34;</span>,
+    author_email<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;meik2333@gmail.com&#34;</span>,
+    description<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;A small example package&#34;</span>,
+    long_description<span style="color:#f92672">=</span>long_description,
+    long_description_content_type<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text/markdown&#34;</span>,
+    url<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;https://github.com/MeiK2333/ZeroCrawler&#34;</span>,
+    packages<span style="color:#f92672">=</span>setuptools<span style="color:#f92672">.</span>find_packages(),
+)</code></pre></div>
 <p>这样就完成了，我们可以直接安装或使用 pip 安装：</p>
-
-<pre><code class="language-bash">$ python setup.py install  # or pip install .
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ python setup.py install  <span style="color:#75715e"># or pip install .</span>
 Processing /Users/meik/ZeroCrawler
 Installing collected packages: ZeroCrawler
-  Running setup.py install for ZeroCrawler ... done
-Successfully installed ZeroCrawler-0.0.2
-</code></pre>
-
+  Running setup.py install <span style="color:#66d9ef">for</span> ZeroCrawler ... <span style="color:#66d9ef">done</span>
+Successfully installed ZeroCrawler-0.0.2</code></pre></div>
 <p>我们可以验证一下是否安装成功，我们切换到其他目录下，然后输出一下 <code>ZeroCrawler</code> 的位置：</p>
-
-<pre><code class="language-shell">$ python -c 'import ZeroCrawler; print(ZeroCrawler.__path__)'  # 此时引入的 ZeroCrawler 是我们正在开发的版本
-['/Users/meik/ZeroCrawler/ZeroCrawler']
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ python -c <span style="color:#e6db74">&#39;import ZeroCrawler; print(ZeroCrawler.__path__)&#39;</span>  <span style="color:#75715e"># 此时引入的 ZeroCrawler 是我们正在开发的版本</span>
+<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;/Users/meik/ZeroCrawler/ZeroCrawler&#39;</span><span style="color:#f92672">]</span>
 $ cd ~
-$ python -c 'import ZeroCrawler; print(ZeroCrawler.__path__)'  # 此时引入的是我们安装的版本
-['/Users/meik/ZeroCrawler/venv/lib/python3.6/site-packages/ZeroCrawler']
-</code></pre>
-
+$ python -c <span style="color:#e6db74">&#39;import ZeroCrawler; print(ZeroCrawler.__path__)&#39;</span>  <span style="color:#75715e"># 此时引入的是我们安装的版本</span>
+<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;/Users/meik/ZeroCrawler/venv/lib/python3.6/site-packages/ZeroCrawler&#39;</span><span style="color:#f92672">]</span></code></pre></div>
 <p>可以看到， <code>ZeroCrawler</code> 库已经被安装到我们的系统里了，我们可以在其他项目中使用它。</p>
 
 <p>如果想要更多的用户可以使用我们的项目（此时已经可以被称为库了），我们可以将项目提交到 GitHub 或者 <a href="https://pypi.org/">pypi</a> ， pip 可以直接安装 GitHub 或者 pypi 上公开的库。</p>
@@ -347,77 +326,68 @@ $ python -c 'import ZeroCrawler; print(ZeroCrawler.__path__)'  # 此时引入的
 <p>我们要测试的 <code>fetch</code> 函数返回值是响应的全部内容，不方便进行解析测试，因此我们创建了一个获取响应 <code>data</code> 的助手函数。</p>
 
 <p>创建文件 <code>ZeroCrawler/utils.py</code> ，写入如下内容：</p>
-
-<pre><code class="language-python">def get_body_by_response(response):
-    &quot;&quot;&quot; 从返回的响应中获得数据正文 &quot;&quot;&quot;
-    return response.split('\r\n\r\n', 1)[1]
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_body_by_response</span>(response):
+    <span style="color:#e6db74">&#34;&#34;&#34; 从返回的响应中获得数据正文 &#34;&#34;&#34;</span>
+    <span style="color:#66d9ef">return</span> response<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\r\n\r\n</span><span style="color:#e6db74">&#39;</span>, <span style="color:#ae81ff">1</span>)[<span style="color:#ae81ff">1</span>]</code></pre></div>
 <p>然后我们开始写测试，创建文件 <code>tests/test_fetch.py</code> ，写入如下内容：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> json
+<span style="color:#f92672">import</span> unittest
 
-<pre><code class="language-python">import json
-import unittest
-
-from ZeroCrawler import fetch
-from ZeroCrawler.utils import get_body_by_response
-
-
-class TestFetch(unittest.TestCase):
-    def test_fetch(self):
-        resp = fetch(&quot;get&quot;, &quot;http://httpbin.org/get&quot;)
-        self.assertTrue(resp.startswith(&quot;HTTP/1.1 200 OK&quot;))
-
-    def test_fetch_params(self):
-        params = {&quot;key1&quot;: &quot;value1&quot;, &quot;key2&quot;: &quot;value2&quot;}
-        resp = fetch(&quot;get&quot;, &quot;http://httpbin.org/get&quot;, params=params)
-        data = get_body_by_response(resp)
-        data = json.loads(data)
-        args = data.get(&quot;args&quot;)
-        for key, value in params.items():
-            self.assertTrue(key in args.keys())
-            self.assertEqual(value, args[key])
-
-    def test_fetch_headers(self):
-        headers = {&quot;User-Agent&quot;: &quot;ZeroCrawler&quot;}
-        resp = fetch(&quot;get&quot;, &quot;http://httpbin.org/get&quot;, headers=headers)
-        data = get_body_by_response(resp)
-        data = json.loads(data)
-        resp_headers = data.get(&quot;headers&quot;)
-        for key, value in headers.items():
-            self.assertTrue(key in resp_headers.keys())
-            self.assertEqual(value, resp_headers[key])
-
-    def test_fetch_method(self):
-        methods = [&quot;get&quot;, &quot;post&quot;, &quot;put&quot;, &quot;delete&quot;, &quot;patch&quot;]
-        for method in methods:
-            resp = fetch(method, f&quot;http://httpbin.org/{method}&quot;)
-            data = get_body_by_response(resp)
-            data = json.loads(data)
-            url = data.get(&quot;url&quot;)
-            self.assertTrue(url.endswith(f&quot;httpbin.org/{method}&quot;))
-
-    def test_fetch_data(self):
-        data = &quot;Hello World!&quot;
-        resp = fetch(&quot;post&quot;, &quot;http://httpbin.org/post&quot;, data=data)
-        resp_data = get_body_by_response(resp)
-        resp_data = json.loads(resp_data)
-        self.assertEqual(resp_data[&quot;data&quot;], data)
+<span style="color:#f92672">from</span> ZeroCrawler <span style="color:#f92672">import</span> fetch
+<span style="color:#f92672">from</span> ZeroCrawler.utils <span style="color:#f92672">import</span> get_body_by_response
 
 
-if __name__ == &quot;__main__&quot;:
-    unittest.main()
-</code></pre>
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TestFetch</span>(unittest<span style="color:#f92672">.</span>TestCase):
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test_fetch</span>(self):
+        resp <span style="color:#f92672">=</span> fetch(<span style="color:#e6db74">&#34;get&#34;</span>, <span style="color:#e6db74">&#34;http://httpbin.org/get&#34;</span>)
+        self<span style="color:#f92672">.</span>assertTrue(resp<span style="color:#f92672">.</span>startswith(<span style="color:#e6db74">&#34;HTTP/1.1 200 OK&#34;</span>))
 
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test_fetch_params</span>(self):
+        params <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;key1&#34;</span>: <span style="color:#e6db74">&#34;value1&#34;</span>, <span style="color:#e6db74">&#34;key2&#34;</span>: <span style="color:#e6db74">&#34;value2&#34;</span>}
+        resp <span style="color:#f92672">=</span> fetch(<span style="color:#e6db74">&#34;get&#34;</span>, <span style="color:#e6db74">&#34;http://httpbin.org/get&#34;</span>, params<span style="color:#f92672">=</span>params)
+        data <span style="color:#f92672">=</span> get_body_by_response(resp)
+        data <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>loads(data)
+        args <span style="color:#f92672">=</span> data<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;args&#34;</span>)
+        <span style="color:#66d9ef">for</span> key, value <span style="color:#f92672">in</span> params<span style="color:#f92672">.</span>items():
+            self<span style="color:#f92672">.</span>assertTrue(key <span style="color:#f92672">in</span> args<span style="color:#f92672">.</span>keys())
+            self<span style="color:#f92672">.</span>assertEqual(value, args[key])
+
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test_fetch_headers</span>(self):
+        headers <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;User-Agent&#34;</span>: <span style="color:#e6db74">&#34;ZeroCrawler&#34;</span>}
+        resp <span style="color:#f92672">=</span> fetch(<span style="color:#e6db74">&#34;get&#34;</span>, <span style="color:#e6db74">&#34;http://httpbin.org/get&#34;</span>, headers<span style="color:#f92672">=</span>headers)
+        data <span style="color:#f92672">=</span> get_body_by_response(resp)
+        data <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>loads(data)
+        resp_headers <span style="color:#f92672">=</span> data<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;headers&#34;</span>)
+        <span style="color:#66d9ef">for</span> key, value <span style="color:#f92672">in</span> headers<span style="color:#f92672">.</span>items():
+            self<span style="color:#f92672">.</span>assertTrue(key <span style="color:#f92672">in</span> resp_headers<span style="color:#f92672">.</span>keys())
+            self<span style="color:#f92672">.</span>assertEqual(value, resp_headers[key])
+
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test_fetch_method</span>(self):
+        methods <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;get&#34;</span>, <span style="color:#e6db74">&#34;post&#34;</span>, <span style="color:#e6db74">&#34;put&#34;</span>, <span style="color:#e6db74">&#34;delete&#34;</span>, <span style="color:#e6db74">&#34;patch&#34;</span>]
+        <span style="color:#66d9ef">for</span> method <span style="color:#f92672">in</span> methods:
+            resp <span style="color:#f92672">=</span> fetch(method, f<span style="color:#e6db74">&#34;http://httpbin.org/{method}&#34;</span>)
+            data <span style="color:#f92672">=</span> get_body_by_response(resp)
+            data <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>loads(data)
+            url <span style="color:#f92672">=</span> data<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;url&#34;</span>)
+            self<span style="color:#f92672">.</span>assertTrue(url<span style="color:#f92672">.</span>endswith(f<span style="color:#e6db74">&#34;httpbin.org/{method}&#34;</span>))
+
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test_fetch_data</span>(self):
+        data <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Hello World!&#34;</span>
+        resp <span style="color:#f92672">=</span> fetch(<span style="color:#e6db74">&#34;post&#34;</span>, <span style="color:#e6db74">&#34;http://httpbin.org/post&#34;</span>, data<span style="color:#f92672">=</span>data)
+        resp_data <span style="color:#f92672">=</span> get_body_by_response(resp)
+        resp_data <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>loads(resp_data)
+        self<span style="color:#f92672">.</span>assertEqual(resp_data[<span style="color:#e6db74">&#34;data&#34;</span>], data)
+
+
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
+    unittest<span style="color:#f92672">.</span>main()</code></pre></div>
 <p>这五组测试分别测试了我们函数的五个参数，写明了进行的操作和应该出现的结果。运行它：</p>
-
-<pre><code class="language-shell">$ python -m unittest tests/test_*.py
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ python -m unittest tests/test_*.py
 ......
 ----------------------------------------------------------------------
-Ran 5 tests in 27.590s
+Ran <span style="color:#ae81ff">5</span> tests in <span style="color:#ae81ff">27</span>.590s
 
-OK
-</code></pre>
-
+OK</code></pre></div>
 <p>之后如果我们修改了项目，只要测试能通过，就代表我们现在已有的功能没有被破坏（当然，前提是有全面且合理的测试用例）。</p>
 
 <p>至此，我们的项目结构如下所示：</p>

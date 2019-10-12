@@ -177,16 +177,14 @@
 <p>当然， 80% 的可能是你的代码写的有问题，你本地能运行只是你的编译器帮你做了一点优化。</p>
 
 <p>这里列举一些常见的错误：</p>
-
-<pre><code class="language-c++">void main() {}  // 错误！main 的返回值必须为 int
-
-int main() { return 1; }  // 非零返回值的 main 函数可能让你的程序直接判错
-
-printf(&quot;%lf\n&quot;, ans);  // 输出的时候没有 %lf 这种操作，请使用 %f
-
-int cnt; cout &lt;&lt; cnt &lt;&lt; endl;  // 未初始化的变量的值是未定义的，也就是说，它可能是任何值
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>() {}  <span style="color:#75715e">// 错误！main 的返回值必须为 int
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() { <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>; }  <span style="color:#75715e">// 非零返回值的 main 函数可能让你的程序直接判错
+</span><span style="color:#75715e"></span>
+printf(<span style="color:#e6db74">&#34;%lf</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, ans);  <span style="color:#75715e">// 输出的时候没有 %lf 这种操作，请使用 %f
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">int</span> cnt; cout <span style="color:#f92672">&lt;&lt;</span> cnt <span style="color:#f92672">&lt;&lt;</span> endl;  <span style="color:#75715e">// 未初始化的变量的值是未定义的，也就是说，它可能是任何值
+</span></code></pre></div>
 <h3 id="为什么我的提交-se-了">为什么我的提交 SE 了</h3>
 
 <p>SE（System Error）顾名思义是系统错误，这个错误一般和你的代码没啥关系。但是如果你发现你的某个代码只要提交就稳定 SE 的话，那么你最好检查一下你的代码里有没有非法字符。</p>

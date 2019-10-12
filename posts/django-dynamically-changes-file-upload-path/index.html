@@ -134,18 +134,15 @@
 </table>
 
 <p>一个例子：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> django.contrib.auth <span style="color:#f92672">import</span> get_user_model
 
-<pre><code class="language-python">from django.contrib.auth import get_user_model
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">user_directory_path</span>(instance, filename):
+    <span style="color:#75715e"># file will be uploaded to MEDIA_ROOT/user_&lt;id&gt;/&lt;filename&gt;</span>
+    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;user_{0}/{1}&#39;</span><span style="color:#f92672">.</span>format(instance<span style="color:#f92672">.</span>user<span style="color:#f92672">.</span>id, filename)
 
-def user_directory_path(instance, filename):
-    # file will be uploaded to MEDIA_ROOT/user_&lt;id&gt;/&lt;filename&gt;
-    return 'user_{0}/{1}'.format(instance.user.id, filename)
-
-class MyModel(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    upload = models.FileField(upload_to=user_directory_path)
-</code></pre>
-
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyModel</span>(models<span style="color:#f92672">.</span>Model):
+    user <span style="color:#f92672">=</span> models<span style="color:#f92672">.</span>ForeignKey(get_user_model(), on_delete<span style="color:#f92672">=</span>models<span style="color:#f92672">.</span>CASCADE)
+    upload <span style="color:#f92672">=</span> models<span style="color:#f92672">.</span>FileField(upload_to<span style="color:#f92672">=</span>user_directory_path)</code></pre></div>
 <p>这样可以把文件动态的存储为 <code>user_{user_id}/{filename}</code> ，这是一个对于 <code>setting.py</code> 中设置的 <code>MEDIA_ROOT</code> 目录的相对路径。</p>
 
 <p>在设置时也可以使用模型中定义的其他字段，但是要注意的是，这个路径的计算是在对象存到数据库之前进行的，因此，如果模型中定义了 <code>AutoField</code> 自增字段，那么，在设置路径时，这个字段还没有值。</p><ul class="pa0">

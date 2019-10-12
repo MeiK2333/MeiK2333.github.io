@@ -28,8 +28,7 @@
     <meta property="og:title" content="关于 mmap 映射的内存的释放问题" />
 <meta property="og:description" content="#include &lt;sys/mman.h&gt;
 void *mmap(void *addr, size_t len, int prot, int flag, int fd, off_t off);
-// 若执行成功， 则返回映射区的起始地址；若出错，则返回 `MAP_FAILED` 。
-" />
+// 若执行成功， 则返回映射区的起始地址；若出错，则返回 `MAP_FAILED` 。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://meik2333.com/posts/mmap/" />
 <meta property="article:published_time" content="2018-08-16T20:28:25+00:00" />
@@ -37,13 +36,12 @@ void *mmap(void *addr, size_t len, int prot, int flag, int fd, off_t off);
 <meta itemprop="name" content="关于 mmap 映射的内存的释放问题">
 <meta itemprop="description" content="#include &lt;sys/mman.h&gt;
 void *mmap(void *addr, size_t len, int prot, int flag, int fd, off_t off);
-// 若执行成功， 则返回映射区的起始地址；若出错，则返回 `MAP_FAILED` 。
-">
+// 若执行成功， 则返回映射区的起始地址；若出错，则返回 `MAP_FAILED` 。">
 
 
 <meta itemprop="datePublished" content="2018-08-16T20:28:25&#43;00:00" />
 <meta itemprop="dateModified" content="2018-08-16T20:28:25&#43;00:00" />
-<meta itemprop="wordCount" content="32">
+<meta itemprop="wordCount" content="31">
 
 
 
@@ -52,8 +50,7 @@ void *mmap(void *addr, size_t len, int prot, int flag, int fd, off_t off);
 <meta name="twitter:title" content="关于 mmap 映射的内存的释放问题"/>
 <meta name="twitter:description" content="#include &lt;sys/mman.h&gt;
 void *mmap(void *addr, size_t len, int prot, int flag, int fd, off_t off);
-// 若执行成功， 则返回映射区的起始地址；若出错，则返回 `MAP_FAILED` 。
-"/>
+// 若执行成功， 则返回映射区的起始地址；若出错，则返回 `MAP_FAILED` 。"/>
 
   </head>
 
@@ -113,11 +110,9 @@ void *mmap(void *addr, size_t len, int prot, int flag, int fd, off_t off);
       
     </header>
 
-    <section class="nested-copy-line-height lh-copy serif f4 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><pre><code class="language-C">#include &lt;sys/mman.h&gt;
-void *mmap(void *addr, size_t len, int prot, int flag, int fd, off_t off);
-// 若执行成功， 则返回映射区的起始地址；若出错，则返回 `MAP_FAILED` 。
-</code></pre>
-
+    <section class="nested-copy-line-height lh-copy serif f4 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;sys/mman.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">void</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">mmap</span>(<span style="color:#66d9ef">void</span> <span style="color:#f92672">*</span>addr, size_t len, <span style="color:#66d9ef">int</span> prot, <span style="color:#66d9ef">int</span> flag, <span style="color:#66d9ef">int</span> fd, off_t off);
+<span style="color:#f92672">//</span> <span style="color:#960050;background-color:#1e0010">若执行成功，</span> <span style="color:#960050;background-color:#1e0010">则返回映射区的起始地址；若出错，则返回</span> <span style="color:#960050;background-color:#1e0010">`</span>MAP_FAILED<span style="color:#960050;background-color:#1e0010">`</span> <span style="color:#960050;background-color:#1e0010">。</span></code></pre></div>
 <p>其参数含义与可选选项可以参照<a href="http://man7.org/linux/man-pages/man2/mmap.2.html">这里</a>。</p>
 
 <p><code>mmap</code> 映射的空间应该使用 <a href="http://man7.org/linux/man-pages/man2/munmap.2.html"><code>munmap</code></a> 释放， 而非 <code>free</code> ，使用 <code>munmap</code> 后其空间将被自动释放。而如果使用 <code>free</code> 释放的话，将会导致程序卡死。</p><ul class="pa0">

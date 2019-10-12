@@ -37,7 +37,7 @@
 
 <meta itemprop="datePublished" content="2019-05-08T15:05:04&#43;00:00" />
 <meta itemprop="dateModified" content="2019-05-08T15:05:04&#43;00:00" />
-<meta itemprop="wordCount" content="184">
+<meta itemprop="wordCount" content="182">
 
 
 
@@ -113,25 +113,19 @@
 <p>用户可能因为失误而提交了占用过多资源的代码，比如死循环、占用过多内存、输出过多等。为了解决这些问题，我们需要限制用户程序的时间、内存以及输出数据的大小。</p>
 
 <p>Linux 有系统函数可以解决这个问题：<a href="https://linux.die.net/man/3/setrlimit"><code>setrlimit</code></a>。这个函数可以限制程序的 CPU 时间、内存占用、输出数据等，用法大致如下：</p>
-
-<pre><code class="language-c">#include &lt;sys/resource.h&gt;
-int main() {
-    struct rlimit rl;
-    rl.rlim_cur = rl.rlim_max = 1;
-    setrlimit(RLIMIT_CPU, &amp;rl);
-    while (1) {
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;sys/resource.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+    <span style="color:#66d9ef">struct</span> rlimit rl;
+    rl.rlim_cur <span style="color:#f92672">=</span> rl.rlim_max <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+    setrlimit(RLIMIT_CPU, <span style="color:#f92672">&amp;</span>rl);
+    <span style="color:#66d9ef">while</span> (<span style="color:#ae81ff">1</span>) {
     }
-}
-</code></pre>
-
+}</code></pre></div>
 <p>执行：</p>
-
-<pre><code class="language-bash">$ gcc main.c
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ gcc main.c
 $ time ./a.out 
-[2]    3057 cpu limit exceeded  ./a.out
-./a.out  0.98s user 0.02s system 96% cpu 1.034 total
-</code></pre>
-
+<span style="color:#f92672">[</span><span style="color:#ae81ff">2</span><span style="color:#f92672">]</span>    <span style="color:#ae81ff">3057</span> cpu limit exceeded  ./a.out
+./a.out  <span style="color:#ae81ff">0</span>.98s user <span style="color:#ae81ff">0</span>.02s system <span style="color:#ae81ff">96</span>% cpu <span style="color:#ae81ff">1</span>.034 total</code></pre></div>
 <p>可以看到，虽然我们在代码中写了个死循环，但是这个程序只运行一秒就结束了。<code>setrlimit</code> 可以对进程添加资源限制，并在超出限制时触发信号，父进程可以捕获这个信号。同时 <code>exec</code> 会继承这些限制，因此可以使用与流重定向类似的方法来添加资源限制。</p>
 
 <p>有关限制的实际代码，可以查看 <a href="https://github.com/MeiK2333/ZeroJudger/blob/master/limit/main.c">https://github.com/MeiK2333/ZeroJudger/blob/master/limit/main.c</a>。</p>
@@ -147,39 +141,32 @@ $ time ./a.out
 <h3 id="include-攻击">include 攻击</h3>
 
 <p>利用 OJ 会返回编译错误的特点，使用 C/C++ 语言使用 <code>#include</code> 来导入一个敏感的文件，然后通过编译错误的信息来获得其中敏感的数据。</p>
-
-<pre><code class="language-bash">$ echo 'password' &gt; password.txt
-$ echo '#include &lt;password.txt&gt;' &gt; main.c 
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ echo <span style="color:#e6db74">&#39;password&#39;</span> &gt; password.txt
+$ echo <span style="color:#e6db74">&#39;#include &lt;password.txt&gt;&#39;</span> &gt; main.c 
 $ gcc main.c 
-main.c:1:10: error: 'password.txt' file not found with &lt;angled&gt; include; use &quot;quotes&quot; instead
-#include &lt;password.txt&gt;
+main.c:1:10: error: <span style="color:#e6db74">&#39;password.txt&#39;</span> file not found with &lt;angled&gt; include; use <span style="color:#e6db74">&#34;quotes&#34;</span> instead
+<span style="color:#75715e">#include &lt;password.txt&gt;</span>
          ^~~~~~~~~~~~~~
-         &quot;password.txt&quot;
+         <span style="color:#e6db74">&#34;password.txt&#34;</span>
 In file included from main.c:1:
-./password.txt:1:1: error: unknown type name 'password'
+./password.txt:1:1: error: unknown type name <span style="color:#e6db74">&#39;password&#39;</span>
 password
 ^
-main.c:1:24: error: expected identifier or '('
-#include &lt;password.txt&gt;
+main.c:1:24: error: expected identifier or <span style="color:#e6db74">&#39;(&#39;</span>
+<span style="color:#75715e">#include &lt;password.txt&gt;</span>
                        ^
-3 errors generated.
-</code></pre>
-
+<span style="color:#ae81ff">3</span> errors generated.</code></pre></div>
 <p>解决方案为配置好评测用户权限，使用低权限的用户进行评测，以防止此类攻击。同时可以考虑使用 Docker 等进行评测，Docker 环境内不放任何敏感的数据。</p>
 
 <h3 id="编译超时-编译产生巨大文件-编译产生巨量错误信息">编译超时 &amp;&amp; 编译产生巨大文件 &amp;&amp; 编译产生巨量错误信息</h3>
 
 <ul>
 <li><p>编译超时</p>
-
-<pre><code class="language-c">#include &lt;/dev/random&gt;或者#include &lt;/dev/tty&gt; //(Linux)
-#include &lt;CON&gt; //(Windows)
-</code></pre></li>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;/dev/random&gt;或者#include &lt;/dev/tty&gt; //(Linux)</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;CON&gt; //(Windows)</span></code></pre></div></li>
 
 <li><p>编译产生巨大文件</p>
-
-<pre><code class="language-c">main[-1u]={1};
-</code></pre></li>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">main[<span style="color:#f92672">-</span><span style="color:#ae81ff">1u</span>]<span style="color:#f92672">=</span>{<span style="color:#ae81ff">1</span>};</code></pre></div></li>
 
 <li><p>编译产生巨量错误信息</p></li>
 </ul>
@@ -191,17 +178,11 @@ main.c:1:24: error: expected identifier or '('
 <h3 id="shell-攻击-fork-炸弹-其他系统调用攻击-网络模块攻击">shell 攻击 &amp;&amp; fork 炸弹 &amp;&amp; 其他系统调用攻击 &amp;&amp; 网络模块攻击</h3>
 
 <p>shell 攻击：</p>
-
-<pre><code class="language-c">system(&quot;reboot&quot;);
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">system(<span style="color:#e6db74">&#34;reboot&#34;</span>);</code></pre></div>
 <p><code>fork</code> 炸弹：</p>
-
-<pre><code class="language-c">while (1) {
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">while</span> (<span style="color:#ae81ff">1</span>) {
     fork();
-}
-</code></pre>
-
+}</code></pre></div>
 <p>网络模块攻击：如果评测姬没有限制联网的话，攻击的程序可以通过网络做到很多的攻击方式，程序可能会收集很多运行时评测姬和服务器的信息，然后提交到某处。</p>
 
 <p>这几种攻击方式，如果只是简单的禁用 <code>system</code> 和 <code>fork</code> 等这些函数是没有用的，因为 C/C++ 的宏可以轻易的绕过这些限制。可以考虑在系统调用的层面进行限制，大多开源的评测机都是通过限制系统调用来保证评测安全的。</p>

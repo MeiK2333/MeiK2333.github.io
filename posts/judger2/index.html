@@ -184,37 +184,34 @@
 <h2 id="标准评测的代码实现">标准评测的代码实现</h2>
 
 <p>我们要为我们的评测姬实现一个函数，这个函数接收两个参数，分别是用户程序的输出文件和标准输出文件。这个函数会对比两个文件的内容，返回标准评测的结果。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">StdCheck</span>(<span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>answer_file_name, <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>output_file_name) {
+    FILE <span style="color:#f92672">*</span>answer_file, <span style="color:#f92672">*</span>output_file;
+    answer_file <span style="color:#f92672">=</span> fopen(answer_file_name, <span style="color:#e6db74">&#34;r&#34;</span>);
+    output_file <span style="color:#f92672">=</span> fopen(output_file_name, <span style="color:#e6db74">&#34;r&#34;</span>);
 
-<pre><code class="language-c">int StdCheck(char *answer_file_name, char *output_file_name) {
-    FILE *answer_file, *output_file;
-    answer_file = fopen(answer_file_name, &quot;r&quot;);
-    output_file = fopen(output_file_name, &quot;r&quot;);
+    <span style="color:#66d9ef">int</span> ans, out;
+    <span style="color:#66d9ef">int</span> result <span style="color:#f92672">=</span> ACCEPTED;
 
-    int ans, out;
-    int result = ACCEPTED;
-
-    while (1) {
-        ans = fgetc(answer_file);
-        out = fgetc(output_file);
-        if (ans == EOF || out == EOF) {  // 文件读取结束时，值为 EOF
-            if (ans != out) {  // 如果两个文件没有同时结束，代表两个文件内容不同
-                result = WRONG_ANSWER;
+    <span style="color:#66d9ef">while</span> (<span style="color:#ae81ff">1</span>) {
+        ans <span style="color:#f92672">=</span> fgetc(answer_file);
+        out <span style="color:#f92672">=</span> fgetc(output_file);
+        <span style="color:#66d9ef">if</span> (ans <span style="color:#f92672">==</span> EOF <span style="color:#f92672">||</span> out <span style="color:#f92672">==</span> EOF) {  <span style="color:#75715e">// 文件读取结束时，值为 EOF
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">if</span> (ans <span style="color:#f92672">!=</span> out) {  <span style="color:#75715e">// 如果两个文件没有同时结束，代表两个文件内容不同
+</span><span style="color:#75715e"></span>                result <span style="color:#f92672">=</span> WRONG_ANSWER;
             }
-            goto END;
+            <span style="color:#66d9ef">goto</span> END;
         }
-        if (ans != out) {
-            result = WRONG_ANSWER;
-            goto END;
+        <span style="color:#66d9ef">if</span> (ans <span style="color:#f92672">!=</span> out) {
+            result <span style="color:#f92672">=</span> WRONG_ANSWER;
+            <span style="color:#66d9ef">goto</span> END;
         }
     }
 
     END:
     fclose(answer_file);
     fclose(output_file);
-    return result;
-}
-</code></pre>
-
+    <span style="color:#66d9ef">return</span> result;
+}</code></pre></div>
 <p>核心代码只有不足 30 行，就可以实现一个简单的标准评测的函数。如果想要额外判断 <code>PE</code> 的话，也可以在这个代码的基础上进行修改。</p>
 
 <p>连同测试一起的函数可以在 GitHub 上查看：<a href="https://github.com/MeiK2333/ZeroJudger/tree/master/stdcheck">https://github.com/MeiK2333/ZeroJudger/tree/master/stdcheck</a>。</p>

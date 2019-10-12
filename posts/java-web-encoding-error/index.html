@@ -107,21 +107,13 @@
     <section class="nested-copy-line-height lh-copy serif f4 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><p>Java 的编码问题好烦人，写个小项目都能碰见好几个……记录一些我遇到并解决的几个编码问题。</p>
 
 <h3 id="java-获得页面上传的参数乱码">Java 获得页面上传的参数乱码</h3>
-
-<pre><code class="language-java">request.setCharacterEncoding(&quot;utf-8&quot;);
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">request.<span style="color:#a6e22e">setCharacterEncoding</span>(<span style="color:#e6db74">&#34;utf-8&#34;</span>);</code></pre></div>
 <h3 id="前端的页面显示乱码">前端的页面显示乱码</h3>
-
-<pre><code class="language-java">response.setContentType(&quot;text/html;charset=utf-8&quot;);
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">response.<span style="color:#a6e22e">setContentType</span>(<span style="color:#e6db74">&#34;text/html;charset=utf-8&#34;</span>);</code></pre></div>
 <h3 id="数据库查询乱码-无法正常查询">数据库查询乱码 &amp;&amp; 无法正常查询</h3>
 
 <p>修改 Java 的数据库连接字符串，添加如下字段</p>
-
-<pre><code class="language-java">?useUnicode=true&amp;amp;characterEncoding=utf8
-</code></pre><ul class="pa0">
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">?</span>useUnicode<span style="color:#f92672">=</span><span style="color:#66d9ef">true</span><span style="color:#f92672">&amp;</span>amp;characterEncoding<span style="color:#f92672">=</span>utf8</code></pre></div><ul class="pa0">
   
    <li class="list">
      <a href="/tags/java" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">Java</a>

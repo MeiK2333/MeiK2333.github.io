@@ -145,25 +145,16 @@ CentOS:6 镜像
 <h2 id="安装-docker-镜像">安装 Docker 镜像</h2>
 
 <p>直接 pull 一个 CentOS:6 的镜像即可，我使用了国内源的加速。</p>
-
-<pre><code class="language-shell">docker pull registry.docker-cn.com/library/centos:6
-docker run -it -p 80:80 centos:6
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker pull registry.docker-cn.com/library/centos:6
+docker run -it -p <span style="color:#ae81ff">80</span>:80 centos:6</code></pre></div>
 <h2 id="安装-mysql">安装 MySQL</h2>
 
 <p>项目对 MySQL 的版本没有什么要求，因此直接 yum 安装即可。</p>
-
-<pre><code class="language-shell">yum install mysql mysql-server
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">yum install mysql mysql-server</code></pre></div>
 <h2 id="安装-apache">安装 Apache</h2>
 
 <p>Apache 的版本同样没有什么要求，直接 yum 安装。</p>
-
-<pre><code class="language-shell">yum install httpd
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">yum install httpd</code></pre></div>
 <h2 id="安装-php5-2">安装 PHP5.2</h2>
 
 <h3 id="准备工作">准备工作</h3>
@@ -171,8 +162,7 @@ docker run -it -p 80:80 centos:6
 <p>因为 yum 源里的 PHP 版本高于 5.2 ，因此需要手动下载编译 PHP 。</p>
 
 <p>首先需要下载安装 PHP 必需的一些依赖。</p>
-
-<pre><code class="language-shell">yum groupinstall &quot;Development tools&quot;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">yum groupinstall <span style="color:#e6db74">&#34;Development tools&#34;</span>
 useradd opt -d /opt/sbin
 yum install wget
 yum install epel-release
@@ -194,27 +184,22 @@ ln -s /usr/lib64/libkrb5.so /usr/lib/libkrb5.so
 ln -s /usr/lib64/libkrb5support.so /usr/lib/libkrb5support.so
 ln -s /usr/lib64/mysql /usr/lib/mysql
 usermod -aG wheel opt
-echo &quot;%wheel ALL=(ALL) NOPASSWD: ALL&quot; &gt;&gt; /etc/sudoers
-</code></pre>
-
+echo <span style="color:#e6db74">&#34;%wheel ALL=(ALL) NOPASSWD: ALL&#34;</span> &gt;&gt; /etc/sudoers</code></pre></div>
 <h3 id="安装">安装</h3>
-
-<pre><code class="language-shell">wget http://museum.php.net/php5/php-5.2.17.tar.gz
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">wget http://museum.php.net/php5/php-5.2.17.tar.gz
 tar xzf php-5.2.17.tar.gz
 cd php-5.2.17
 
-./configure --prefix=/opt/sbin/php --with-apxs2=/usr/sbin/apxs --with-config-file-path=/opt/sbin/etc/  --disable-posix   --enable-bcmath   --enable-calendar   --enable-exif   --enable-fastcgi   --enable-ftp   --enable-gd-native-ttf   --enable-libxml   --enable-magic-quotes   --enable-mbstring   --enable-pdo   --enable-soap   --enable-sockets   --enable-wddx   --enable-zip  --with-bz2   --with-curl   --with-curlwrappers   --with-freetype-dir   --with-gd   --with-gettext   --with-imap   --with-imap-ssl  --with-jpeg-dir  --with-kerberos   --with-libxml-dir  --with-libxml-dir   --with-mcrypt   --with-mhash   --with-mime-magic   --with-mysql  --with-mysqli   --with-openssl --with-openssl-dir --with-pcre-regex  --with-pdo-mysql   --with-pdo-sqlite   --with-pic   --with-png-dir   --with-pspell   --with-sqlite   --with-ttf   --with-xmlrpc   --with-xpm-dir  --with-xsl --with-zlib   --with-zlib-dir
+./configure --prefix<span style="color:#f92672">=</span>/opt/sbin/php --with-apxs2<span style="color:#f92672">=</span>/usr/sbin/apxs --with-config-file-path<span style="color:#f92672">=</span>/opt/sbin/etc/  --disable-posix   --enable-bcmath   --enable-calendar   --enable-exif   --enable-fastcgi   --enable-ftp   --enable-gd-native-ttf   --enable-libxml   --enable-magic-quotes   --enable-mbstring   --enable-pdo   --enable-soap   --enable-sockets   --enable-wddx   --enable-zip  --with-bz2   --with-curl   --with-curlwrappers   --with-freetype-dir   --with-gd   --with-gettext   --with-imap   --with-imap-ssl  --with-jpeg-dir  --with-kerberos   --with-libxml-dir  --with-libxml-dir   --with-mcrypt   --with-mhash   --with-mime-magic   --with-mysql  --with-mysqli   --with-openssl --with-openssl-dir --with-pcre-regex  --with-pdo-mysql   --with-pdo-sqlite   --with-pic   --with-png-dir   --with-pspell   --with-sqlite   --with-ttf   --with-xmlrpc   --with-xpm-dir  --with-xsl --with-zlib   --with-zlib-dir
 
 cd php-5.2.17
 sudo make install
 libtool --finish /opt/sbin/php-5.2.17/libs
 /opt/sbin/php/bin/php --version
 
-    PHP 5.2.17 (cli) (built: Dec 28 2015 13:24:10)
-    Copyright (c) 1997-2010 The PHP Group
-    Zend Engine v2.2.0, Copyright (c) 1998-2010 Zend Technologies
-</code></pre>
-
+    PHP <span style="color:#ae81ff">5</span>.2.17 <span style="color:#f92672">(</span>cli<span style="color:#f92672">)</span> <span style="color:#f92672">(</span>built: Dec <span style="color:#ae81ff">28</span> <span style="color:#ae81ff">2015</span> <span style="color:#ae81ff">13</span>:24:10<span style="color:#f92672">)</span>
+    Copyright <span style="color:#f92672">(</span>c<span style="color:#f92672">)</span> <span style="color:#ae81ff">1997</span>-2010 The PHP Group
+    Zend Engine v2.2.0, Copyright <span style="color:#f92672">(</span>c<span style="color:#f92672">)</span> <span style="color:#ae81ff">1998</span>-2010 Zend Technologies</code></pre></div>
 <h2 id="配置-apache-解析-php">配置 Apache 解析 PHP</h2>
 
 <p>将下面的代码添加到 <code>/etc/httpd/conf/httpd.conf</code> 中：</p>
@@ -230,11 +215,8 @@ LoadModule php5_module modules/libphp5.so
 </code></pre>
 
 <p>重启 Apache 和 MySQL</p>
-
-<pre><code class="language-shell">/etc/init.d/mysqld restart
-/etc/init.d/httpd restart
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">/etc/init.d/mysqld restart
+/etc/init.d/httpd restart</code></pre></div>
 <p>此时访问服务器 IP ，已经在正常解析了。</p>
 
 <h2 id="总结">总结</h2>

@@ -195,15 +195,9 @@
 <p>用数字存储的小数位数。</p>
 
 <p>例如，存储数字 999 ，精确到小数点后两位：</p>
-
-<pre><code class="language-python">models.DecimalField(..., max_digits=5, decimal_places=2)
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">models<span style="color:#f92672">.</span>DecimalField(<span style="color:#f92672">...</span>, max_digits<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>, decimal_places<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>)</code></pre></div>
 <p>存可能到十亿的数字，精确到小数点后十位：</p>
-
-<pre><code class="language-python">models.DecimalField(..., max_digits=19, decimal_places=10)
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">models<span style="color:#f92672">.</span>DecimalField(<span style="color:#f92672">...</span>, max_digits<span style="color:#f92672">=</span><span style="color:#ae81ff">19</span>, decimal_places<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>)</code></pre></div>
 <p>该字段的默认表单控件为 NumberInput 。</p>
 
 <hr />
@@ -232,15 +226,12 @@
 
 <p>该属性提供了设置上传目录和文件名的方法，有两种设置方式：
 您可以指定一个字符串值，它可以包含 strftime() 格式，将会被上传的时间所取代。例如：</p>
-
-<pre><code class="language-python">class MyModel(models.Model):
-    # file will be uploaded to MEDIA_ROOT/uploads
-    upload = models.FileField(upload_to='uploads/')
-    # or...
-    # file will be saved to MEDIA_ROOT/uploads/2017/02/21
-    upload = models.FileField(upload_to='uploads/%Y/%m/%d/')
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyModel</span>(models<span style="color:#f92672">.</span>Model):
+    <span style="color:#75715e"># file will be uploaded to MEDIA_ROOT/uploads</span>
+    upload <span style="color:#f92672">=</span> models<span style="color:#f92672">.</span>FileField(upload_to<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;uploads/&#39;</span>)
+    <span style="color:#75715e"># or...</span>
+    <span style="color:#75715e"># file will be saved to MEDIA_ROOT/uploads/2017/02/21</span>
+    upload <span style="color:#f92672">=</span> models<span style="color:#f92672">.</span>FileField(upload_to<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;uploads/%Y/%m/</span><span style="color:#e6db74">%d</span><span style="color:#e6db74">/&#39;</span>)</code></pre></div>
 <p>您也可以使用默认值 FileSystemStorage ，然而我没看懂使用默认值会如何处理。</p>
 
 <p>upload_to 可以被调用，返回上传路径。关于此项更详细的介绍，可以查看官方文档。</p>
@@ -300,20 +291,15 @@
 <p>此方法获取文件名和文件内容，并将它们传递给字段的存储类。</p>
 
 <p>coutent 参数 应该是 django.core.files 对象的一个实例：</p>
-
-<pre><code class="language-python">from django.core.files import File
-# Open an existing file using Python's built-in open()
-f = open('/path/to/hello.world')
-myfile = File(f)
-
-
-# 使用 Python 字符串构造
-from django.core.files.base import ContentFile
-myfile = ContentFile(&quot;hello world&quot;)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> django.core.files <span style="color:#f92672">import</span> File
+<span style="color:#75715e"># Open an existing file using Python&#39;s built-in open()</span>
+f <span style="color:#f92672">=</span> open(<span style="color:#e6db74">&#39;/path/to/hello.world&#39;</span>)
+myfile <span style="color:#f92672">=</span> File(f)
 
 
-</code></pre>
-
+<span style="color:#75715e"># 使用 Python 字符串构造</span>
+<span style="color:#f92672">from</span> django.core.files.base <span style="color:#f92672">import</span> ContentFile
+myfile <span style="color:#f92672">=</span> ContentFile(<span style="color:#e6db74">&#34;hello world&#34;</span>)</code></pre></div>
 <h3 id="fieldfile-delete-save-true">FieldFile.delete(save=True)</h3>
 
 <p>删除与此实例相关联的文件并清除字段上的所有属性，可选参数 save 空值在删除文件后是否保存模型实例，默认为 True 。</p>
@@ -425,14 +411,12 @@ myfile = ContentFile(&quot;hello world&quot;)
 <p>用于存储通用唯一标识符的字段，使用 Python 的 uuid 类。</p>
 
 <p>可用于 AutoField 的 primary_key</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> uuid
+<span style="color:#f92672">from</span> django.db <span style="color:#f92672">import</span> models
 
-<pre><code class="language-python">import uuid
-from django.db import models
-
-class MyUUIDModel(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    # other fields
-</code></pre><ul class="pa0">
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyUUIDModel</span>(models<span style="color:#f92672">.</span>Model):
+    id <span style="color:#f92672">=</span> models<span style="color:#f92672">.</span>UUIDField(primary_key<span style="color:#f92672">=</span>True, default<span style="color:#f92672">=</span>uuid<span style="color:#f92672">.</span>uuid4, editable<span style="color:#f92672">=</span>False)
+    <span style="color:#75715e"># other fields</span></code></pre></div><ul class="pa0">
   
    <li class="list">
      <a href="/tags/python" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">Python</a>

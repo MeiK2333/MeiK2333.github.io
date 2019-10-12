@@ -45,7 +45,7 @@
 
 <meta itemprop="datePublished" content="2018-09-24T15:02:29&#43;00:00" />
 <meta itemprop="dateModified" content="2018-09-24T15:02:29&#43;00:00" />
-<meta itemprop="wordCount" content="1242">
+<meta itemprop="wordCount" content="1230">
 
 
 
@@ -206,42 +206,37 @@
 <p>在计算常量字符串（像 <code>char str[] = &quot;Hello World!&quot;;</code> 这样定义的）的长度时，sizeof 的值会比 strlen 的值大 1，因为 strlen 不计最后的 &lsquo;\0&rsquo;。</p>
 
 <h2 id="32位-64位系统中-各种常用内置数据类型占用的字节数">32位，64位系统中，各种常用内置数据类型占用的字节数？</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C++" data-lang="C++"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">using</span> <span style="color:#66d9ef">namespace</span> std;
 
-<pre><code class="language-C++">#include &lt;iostream&gt;
-
-using namespace std;
-
-int main() {
-    cout &lt;&lt; &quot;bool: &quot; &lt;&lt; sizeof(bool) &lt;&lt; endl;
-    cout &lt;&lt; &quot;char: &quot; &lt;&lt; sizeof(char) &lt;&lt; endl;
-    cout &lt;&lt; &quot;unsigned char: &quot; &lt;&lt; sizeof(unsigned char) &lt;&lt; endl;
-    cout &lt;&lt; &quot;short: &quot; &lt;&lt; sizeof(short) &lt;&lt; endl;
-    cout &lt;&lt; &quot;int: &quot; &lt;&lt; sizeof(int) &lt;&lt; endl;
-    cout &lt;&lt; &quot;unsigned int: &quot; &lt;&lt; sizeof(unsigned int) &lt;&lt; endl;
-    cout &lt;&lt; &quot;long: &quot; &lt;&lt; sizeof(int) &lt;&lt; endl;
-    cout &lt;&lt; &quot;long long: &quot; &lt;&lt; sizeof(long long) &lt;&lt; endl;
-    cout &lt;&lt; &quot;float: &quot; &lt;&lt; sizeof(float) &lt;&lt; endl;
-    cout &lt;&lt; &quot;double: &quot; &lt;&lt; sizeof(double) &lt;&lt; endl;
-    cout &lt;&lt; &quot;*: &quot; &lt;&lt; sizeof(char *) &lt;&lt; endl;
-    return 0;
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+    cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;bool: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">bool</span>) <span style="color:#f92672">&lt;&lt;</span> endl;
+    cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;char: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">char</span>) <span style="color:#f92672">&lt;&lt;</span> endl;
+    cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;unsigned char: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">char</span>) <span style="color:#f92672">&lt;&lt;</span> endl;
+    cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;short: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">short</span>) <span style="color:#f92672">&lt;&lt;</span> endl;
+    cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;int: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">int</span>) <span style="color:#f92672">&lt;&lt;</span> endl;
+    cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;unsigned int: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span>) <span style="color:#f92672">&lt;&lt;</span> endl;
+    cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;long: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">int</span>) <span style="color:#f92672">&lt;&lt;</span> endl;
+    cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;long long: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">long</span> <span style="color:#66d9ef">long</span>) <span style="color:#f92672">&lt;&lt;</span> endl;
+    cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;float: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">float</span>) <span style="color:#f92672">&lt;&lt;</span> endl;
+    cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;double: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">double</span>) <span style="color:#f92672">&lt;&lt;</span> endl;
+    cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;*: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>) <span style="color:#f92672">&lt;&lt;</span> endl;
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
 }
-</code></pre>
-
+</code></pre></div>
 <p>64 位系统下运行：</p>
-
-<pre><code class="language-bash">bool: 1
-char: 1
-unsigned char: 1
-short: 2
-int: 4
-unsigned int: 4
-long: 4
-long long: 8
-float: 4
-double: 8
-*: 8
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">bool: <span style="color:#ae81ff">1</span>
+char: <span style="color:#ae81ff">1</span>
+unsigned char: <span style="color:#ae81ff">1</span>
+short: <span style="color:#ae81ff">2</span>
+int: <span style="color:#ae81ff">4</span>
+unsigned int: <span style="color:#ae81ff">4</span>
+long: <span style="color:#ae81ff">4</span>
+long long: <span style="color:#ae81ff">8</span>
+float: <span style="color:#ae81ff">4</span>
+double: <span style="color:#ae81ff">8</span>
+*: <span style="color:#ae81ff">8</span></code></pre></div>
 <p>32 位系统下，指针类型占 4 个字节。</p>
 
 <h2 id="virtual-inline-decltype-volatile-static-const-关键字的作用-使用场景">virtual、inline、decltype、volatile、static、const 关键字的作用？使用场景？</h2>
@@ -259,18 +254,16 @@ double: 8
 <h3 id="decltype">decltype</h3>
 
 <p>decltype 类型说明符生成指定表达式的类型，常用在模板函数中，与 auto 搭配声明返回类型。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C++" data-lang="C++"><span style="color:#75715e">//C++11
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span> T, <span style="color:#66d9ef">typename</span> U<span style="color:#f92672">&gt;</span>
+<span style="color:#66d9ef">auto</span> myFunc(T<span style="color:#f92672">&amp;&amp;</span> t, U<span style="color:#f92672">&amp;&amp;</span> u) <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">decltype</span> (forward<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span>(t) <span style="color:#f92672">+</span> forward<span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span>(u))
+        { <span style="color:#66d9ef">return</span> forward<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span>(t) <span style="color:#f92672">+</span> forward<span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span>(u); };
 
-<pre><code class="language-C++">//C++11
-template&lt;typename T, typename U&gt;
-auto myFunc(T&amp;&amp; t, U&amp;&amp; u) -&gt; decltype (forward&lt;T&gt;(t) + forward&lt;U&gt;(u))
-        { return forward&lt;T&gt;(t) + forward&lt;U&gt;(u); };
-
-//C++14
-template&lt;typename T, typename U&gt;
-decltype(auto) myFunc(T&amp;&amp; t, U&amp;&amp; u)
-        { return forward&lt;T&gt;(t) + forward&lt;U&gt;(u); };
-</code></pre>
-
+<span style="color:#75715e">//C++14
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span> T, <span style="color:#66d9ef">typename</span> U<span style="color:#f92672">&gt;</span>
+<span style="color:#66d9ef">decltype</span>(<span style="color:#66d9ef">auto</span>) myFunc(T<span style="color:#f92672">&amp;&amp;</span> t, U<span style="color:#f92672">&amp;&amp;</span> u)
+        { <span style="color:#66d9ef">return</span> forward<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span>(t) <span style="color:#f92672">+</span> forward<span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span>(u); };
+</code></pre></div>
 <p>具体内容请参照 <a href="https://docs.microsoft.com/zh-cn/cpp/cpp/decltype-cpp?view=vs-2017">MSDN</a>。</p>
 
 <h3 id="volatile">volatile</h3>
@@ -325,89 +318,77 @@ decltype(auto) myFunc(T&amp;&amp; t, U&amp;&amp; u)
 </ol>
 
 <p>比如：</p>
-
-<pre><code class="language-C++">class cls1 {
-    char ch1;
-    char ch2;
-    char ch3;
-    char ch4;
-    int int1;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C++" data-lang="C++"><span style="color:#66d9ef">class</span><span style="color:#960050;background-color:#1e0010"> </span><span style="color:#a6e22e">cls1</span> {
+    <span style="color:#66d9ef">char</span> ch1;
+    <span style="color:#66d9ef">char</span> ch2;
+    <span style="color:#66d9ef">char</span> ch3;
+    <span style="color:#66d9ef">char</span> ch4;
+    <span style="color:#66d9ef">int</span> int1;
 };
-cout &lt;&lt; sizeof(cls1) &lt;&lt; endl; // 8
-
-class cls2 {
-    char ch1;
-    char ch2;
-    char ch3;
-    int int1;
-    char ch4;
+cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(cls1) <span style="color:#f92672">&lt;&lt;</span> endl; <span style="color:#75715e">// 8
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">class</span><span style="color:#960050;background-color:#1e0010"> </span><span style="color:#a6e22e">cls2</span> {
+    <span style="color:#66d9ef">char</span> ch1;
+    <span style="color:#66d9ef">char</span> ch2;
+    <span style="color:#66d9ef">char</span> ch3;
+    <span style="color:#66d9ef">int</span> int1;
+    <span style="color:#66d9ef">char</span> ch4;
 };
-cout &lt;&lt; sizeof(cls2) &lt;&lt; endl;  // 12
-
-class cls3 {
-    char ch1;
-    char ch2;
-    char ch3;
-    int int1;
+cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(cls2) <span style="color:#f92672">&lt;&lt;</span> endl;  <span style="color:#75715e">// 12
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">class</span><span style="color:#960050;background-color:#1e0010"> </span><span style="color:#a6e22e">cls3</span> {
+    <span style="color:#66d9ef">char</span> ch1;
+    <span style="color:#66d9ef">char</span> ch2;
+    <span style="color:#66d9ef">char</span> ch3;
+    <span style="color:#66d9ef">int</span> int1;
 };
-cout &lt;&lt; sizeof(cls3) &lt;&lt; endl;  // 8
-</code></pre>
-
+cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(cls3) <span style="color:#f92672">&lt;&lt;</span> endl;  <span style="color:#75715e">// 8
+</span></code></pre></div>
 <p>如果是个空类，也会占用 1 个字节。</p>
-
-<pre><code class="language-C++">class cls4 {
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C++" data-lang="C++"><span style="color:#66d9ef">class</span><span style="color:#960050;background-color:#1e0010"> </span><span style="color:#a6e22e">cls4</span> {
 };
-cout &lt;&lt; sizeof(cls4) &lt;&lt; endl;  // 1
-</code></pre>
-
+cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(cls4) <span style="color:#f92672">&lt;&lt;</span> endl;  <span style="color:#75715e">// 1
+</span></code></pre></div>
 <p>类的普通成员函数不占用类的空间：</p>
-
-<pre><code class="language-C++">class cls5 {
-    void func1() {}
-    void func2() {}
-    void func3() {}
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C++" data-lang="C++"><span style="color:#66d9ef">class</span><span style="color:#960050;background-color:#1e0010"> </span><span style="color:#a6e22e">cls5</span> {
+    <span style="color:#66d9ef">void</span> func1() {}
+    <span style="color:#66d9ef">void</span> func2() {}
+    <span style="color:#66d9ef">void</span> func3() {}
 };
-cout &lt;&lt; sizeof(cls5) &lt;&lt; endl;  // 1
-</code></pre>
-
+cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(cls5) <span style="color:#f92672">&lt;&lt;</span> endl;  <span style="color:#75715e">// 1
+</span></code></pre></div>
 <p>如果类内有虚函数的话，那么会多占用 8 个字节（32 位为 4 个字节）：</p>
-
-<pre><code class="language-C++">class cls6 {
-    virtual void func1() {}
-    void func2() {}
-    void func3() {}
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C++" data-lang="C++"><span style="color:#66d9ef">class</span><span style="color:#960050;background-color:#1e0010"> </span><span style="color:#a6e22e">cls6</span> {
+    <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> func1() {}
+    <span style="color:#66d9ef">void</span> func2() {}
+    <span style="color:#66d9ef">void</span> func3() {}
 };
-cout &lt;&lt; sizeof(cls6) &lt;&lt; endl;  // 8
-
-class cls7 {
-    virtual void func1() {}
-    virtual void func2() {}
-    virtual void func3() {}
+cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(cls6) <span style="color:#f92672">&lt;&lt;</span> endl;  <span style="color:#75715e">// 8
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">class</span><span style="color:#960050;background-color:#1e0010"> </span><span style="color:#a6e22e">cls7</span> {
+    <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> func1() {}
+    <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> func2() {}
+    <span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> func3() {}
 };
-cout &lt;&lt; sizeof(cls7) &lt;&lt; endl;  // 8
-</code></pre>
-
+cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(cls7) <span style="color:#f92672">&lt;&lt;</span> endl;  <span style="color:#75715e">// 8
+</span></code></pre></div>
 <p>如果有类继承的话，那么子类的大小会加上基类的大小：</p>
-
-<pre><code class="language-C++">class cls1 {
-    char ch;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C++" data-lang="C++"><span style="color:#66d9ef">class</span><span style="color:#960050;background-color:#1e0010"> </span><span style="color:#a6e22e">cls1</span> {
+    <span style="color:#66d9ef">char</span> ch;
 };
-class cls2: public cls1 {
-    char ch;
+<span style="color:#66d9ef">class</span><span style="color:#960050;background-color:#1e0010"> </span><span style="color:#a6e22e">cls2</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> cls1 {
+    <span style="color:#66d9ef">char</span> ch;
 };
-cout &lt;&lt; sizeof(cls2) &lt;&lt; endl;  // 2
-</code></pre>
-
+cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(cls2) <span style="color:#f92672">&lt;&lt;</span> endl;  <span style="color:#75715e">// 2
+</span></code></pre></div>
 <p>对于虚拟继承，除了应有的大小之外，同时还会有一个指向基类的指针：</p>
-
-<pre><code class="language-C++">class cls1 {
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C++" data-lang="C++"><span style="color:#66d9ef">class</span><span style="color:#960050;background-color:#1e0010"> </span><span style="color:#a6e22e">cls1</span> {
 };
-class cls2: virtual cls1 {
-    char ch;
+<span style="color:#66d9ef">class</span><span style="color:#960050;background-color:#1e0010"> </span><span style="color:#a6e22e">cls2</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">virtual</span> cls1 {
+    <span style="color:#66d9ef">char</span> ch;
 };
-cout &lt;&lt; sizeof(cls2) &lt;&lt; endl;  // 8
-</code></pre>
-
+cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#66d9ef">sizeof</span>(cls2) <span style="color:#f92672">&lt;&lt;</span> endl;  <span style="color:#75715e">// 8
+</span></code></pre></div>
 <h2 id="static-cast-dynamic-cast-const-cast-reinpreter-cast-的区别">static_cast、dynamic_cast、const_cast、reinpreter_cast 的区别？</h2>
 
 <ul>
@@ -426,47 +407,46 @@ cout &lt;&lt; sizeof(cls2) &lt;&lt; endl;  // 8
 <ul>
 <li><p>shared_ptr
 智能指针，会通过引用计数来自动销毁。</p>
-
-<pre><code class="language-C++">class Cls {
-public:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C++" data-lang="C++"><span style="color:#66d9ef">class</span><span style="color:#960050;background-color:#1e0010"> </span><span style="color:#a6e22e">Cls</span> {
+<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
 Cls() {
-    cout &lt;&lt; &quot;new cls&quot; &lt;&lt; endl;
+    cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;new cls&#34;</span> <span style="color:#f92672">&lt;&lt;</span> endl;
 }
-~Cls() {
-    cout &lt;&lt; &quot;delete cls&quot; &lt;&lt; endl;
+<span style="color:#f92672">~</span>Cls() {
+    cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;delete cls&#34;</span> <span style="color:#f92672">&lt;&lt;</span> endl;
 }
 };
 
-void test1() {
-cout &lt;&lt; &quot;in test1&quot; &lt;&lt; endl;
-auto *cls = new Cls;
-cout &lt;&lt; &quot;out test1&quot; &lt;&lt; endl &lt;&lt; endl;
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">test1</span>() {
+cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;in test1&#34;</span> <span style="color:#f92672">&lt;&lt;</span> endl;
+<span style="color:#66d9ef">auto</span> <span style="color:#f92672">*</span>cls <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Cls;
+cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;out test1&#34;</span> <span style="color:#f92672">&lt;&lt;</span> endl <span style="color:#f92672">&lt;&lt;</span> endl;
 }
 
-void test2() {
-cout &lt;&lt; &quot;in test2&quot; &lt;&lt; endl;
-shared_ptr&lt;Cls&gt; cls = make_shared&lt;Cls&gt;();
-cout &lt;&lt; &quot;out test2&quot; &lt;&lt; endl &lt;&lt; endl;
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">test2</span>() {
+cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;in test2&#34;</span> <span style="color:#f92672">&lt;&lt;</span> endl;
+shared_ptr<span style="color:#f92672">&lt;</span>Cls<span style="color:#f92672">&gt;</span> cls <span style="color:#f92672">=</span> make_shared<span style="color:#f92672">&lt;</span>Cls<span style="color:#f92672">&gt;</span>();
+cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;out test2&#34;</span> <span style="color:#f92672">&lt;&lt;</span> endl <span style="color:#f92672">&lt;&lt;</span> endl;
 }
 
-int main() {
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
 test1();
 test2();
-while (true);
-return 0;
+<span style="color:#66d9ef">while</span> (true);
+<span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
 }
-/* 输出
-in test1
-new cls
-out test1
-
-in test2
-new cls
-out test2
-
-delete cls
-*/
-</code></pre></li>
+<span style="color:#75715e">/* 输出
+</span><span style="color:#75715e">in test1
+</span><span style="color:#75715e">new cls
+</span><span style="color:#75715e">out test1
+</span><span style="color:#75715e">
+</span><span style="color:#75715e">in test2
+</span><span style="color:#75715e">new cls
+</span><span style="color:#75715e">out test2
+</span><span style="color:#75715e">
+</span><span style="color:#75715e">delete cls
+</span><span style="color:#75715e">*/</span>
+</code></pre></div></li>
 
 <li><p>auto_ptr
 创建一个智能指针，当出现复制构造与赋值操作时原有的指针会失效。</p></li>

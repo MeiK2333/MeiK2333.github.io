@@ -117,53 +117,44 @@
 <p>我们通过两个简单的 Go 语言程序来测试一下在读文件的同时修改文件会发生什么：</p>
 
 <p><strong>testwrite.go</strong></p>
-
-<pre><code class="language-go">func writeFile(filename string, data string) {
-	f, _ := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY, 0644)
-	defer f.Close()
-	body := []byte(data)
-	_, _ = f.Write(body)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">writeFile</span>(<span style="color:#a6e22e">filename</span> <span style="color:#66d9ef">string</span>, <span style="color:#a6e22e">data</span> <span style="color:#66d9ef">string</span>) {
+	<span style="color:#a6e22e">f</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">OpenFile</span>(<span style="color:#a6e22e">filename</span>, <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">O_CREATE</span>|<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">O_WRONLY</span>, <span style="color:#ae81ff">0644</span>)
+	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">Close</span>()
+	<span style="color:#a6e22e">body</span> <span style="color:#f92672">:=</span> []byte(<span style="color:#a6e22e">data</span>)
+	<span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">_</span> = <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">Write</span>(<span style="color:#a6e22e">body</span>)
 }
 
-func main() {
-	// 首先向文件中写入 “Hello World!”
-	writeFile(&quot;test.txt&quot;, &quot;Hello World!&quot;)
-	time.Sleep(7 * time.Second)
-	// 七秒后，修改文件内容，写入 “Author MeiK!”
-	writeFile(&quot;test.txt&quot;, &quot;Author MeiK!&quot;)
-}
-</code></pre>
-
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#75715e">// 首先向文件中写入 “Hello World!”
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">writeFile</span>(<span style="color:#e6db74">&#34;test.txt&#34;</span>, <span style="color:#e6db74">&#34;Hello World!&#34;</span>)
+	<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#ae81ff">7</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
+	<span style="color:#75715e">// 七秒后，修改文件内容，写入 “Author MeiK!”
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">writeFile</span>(<span style="color:#e6db74">&#34;test.txt&#34;</span>, <span style="color:#e6db74">&#34;Author MeiK!&#34;</span>)
+}</code></pre></div>
 <p><strong>testread.go</strong></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">readFile</span>(<span style="color:#a6e22e">filename</span> <span style="color:#66d9ef">string</span>) {
+	<span style="color:#a6e22e">f</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">OpenFile</span>(<span style="color:#a6e22e">filename</span>, <span style="color:#a6e22e">unix</span>.<span style="color:#a6e22e">O_RDONLY</span>, <span style="color:#ae81ff">0644</span>)
+	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">Close</span>()
 
-<pre><code class="language-go">func readFile(filename string) {
-	f, _ := os.OpenFile(filename, unix.O_RDONLY, 0644)
-	defer f.Close()
-
-	body := make([]byte, 1)
-	n := 1
-	for n != 0 {
-		time.Sleep(time.Second)
-		var err error
-		n, err = f.Read(body)
-		if err == io.EOF {
-			break
+	<span style="color:#a6e22e">body</span> <span style="color:#f92672">:=</span> make([]<span style="color:#66d9ef">byte</span>, <span style="color:#ae81ff">1</span>)
+	<span style="color:#a6e22e">n</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">1</span>
+	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">n</span> <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span> {
+		<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
+		<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">err</span> <span style="color:#66d9ef">error</span>
+		<span style="color:#a6e22e">n</span>, <span style="color:#a6e22e">err</span> = <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">Read</span>(<span style="color:#a6e22e">body</span>)
+		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">EOF</span> {
+			<span style="color:#66d9ef">break</span>
 		}
-		s, _ := f.Seek(0, os.SEEK_CUR)
-		fmt.Printf(&quot;%c %d\n&quot;, body, s)
+		<span style="color:#a6e22e">s</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">Seek</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">SEEK_CUR</span>)
+		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;%c %d\n&#34;</span>, <span style="color:#a6e22e">body</span>, <span style="color:#a6e22e">s</span>)
 	}
 }
 
-func main() {
-	readFile(&quot;test.txt&quot;)
-}
-</code></pre>
-
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">readFile</span>(<span style="color:#e6db74">&#34;test.txt&#34;</span>)
+}</code></pre></div>
 <p>同时执行两个程序：</p>
-
-<pre><code class="language-shell">./testwrite &amp; ./testread
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">./testwrite &amp; ./testread</code></pre></div>
 <p>输出：</p>
 
 <pre><code>[H] 1
@@ -189,67 +180,61 @@ func main() {
 <p>我们对刚刚的文件稍作修改，使用 <code>fcntl</code> 进行加锁：</p>
 
 <p><strong>testwrite.go</strong></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">writeFile</span>(<span style="color:#a6e22e">filename</span> <span style="color:#66d9ef">string</span>, <span style="color:#a6e22e">data</span> <span style="color:#66d9ef">string</span>) {
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;write start&#34;</span>)
+	<span style="color:#a6e22e">f</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">OpenFile</span>(<span style="color:#a6e22e">filename</span>, <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">O_CREATE</span>|<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">O_WRONLY</span>, <span style="color:#ae81ff">0644</span>)
+	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">Close</span>()
 
-<pre><code class="language-go">func writeFile(filename string, data string) {
-	fmt.Println(&quot;write start&quot;)
-	f, _ := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY, 0644)
-	defer f.Close()
-
-	flockT := unix.Flock_t{
-		Type:   unix.F_WRLCK,
-		Whence: io.SeekStart,
-		Start:  0,
-		Len:    0,
+	<span style="color:#a6e22e">flockT</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">unix</span>.<span style="color:#a6e22e">Flock_t</span>{
+		<span style="color:#a6e22e">Type</span>:   <span style="color:#a6e22e">unix</span>.<span style="color:#a6e22e">F_WRLCK</span>,
+		<span style="color:#a6e22e">Whence</span>: <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">SeekStart</span>,
+		<span style="color:#a6e22e">Start</span>:  <span style="color:#ae81ff">0</span>,
+		<span style="color:#a6e22e">Len</span>:    <span style="color:#ae81ff">0</span>,
 	}
-	_ = unix.FcntlFlock(f.Fd(), unix.F_SETLKW, &amp;flockT)
+	<span style="color:#a6e22e">_</span> = <span style="color:#a6e22e">unix</span>.<span style="color:#a6e22e">FcntlFlock</span>(<span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">Fd</span>(), <span style="color:#a6e22e">unix</span>.<span style="color:#a6e22e">F_SETLKW</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">flockT</span>)
 
-	body := []byte(data)
-	_, _ = f.Write(body)
-	fmt.Println(&quot;write end&quot;)
+	<span style="color:#a6e22e">body</span> <span style="color:#f92672">:=</span> []byte(<span style="color:#a6e22e">data</span>)
+	<span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">_</span> = <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">Write</span>(<span style="color:#a6e22e">body</span>)
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;write end&#34;</span>)
 }
 
-func main() {
-	// 首先向文件中写入 “Hello World!”
-	writeFile(&quot;test.txt&quot;, &quot;Hello World!&quot;)
-	time.Sleep(7 * time.Second)
-	// 七秒后，修改文件内容，写入 “Author MeiK!”
-	writeFile(&quot;test.txt&quot;, &quot;Author MeiK!&quot;)
-}
-</code></pre>
-
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#75715e">// 首先向文件中写入 “Hello World!”
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">writeFile</span>(<span style="color:#e6db74">&#34;test.txt&#34;</span>, <span style="color:#e6db74">&#34;Hello World!&#34;</span>)
+	<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#ae81ff">7</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
+	<span style="color:#75715e">// 七秒后，修改文件内容，写入 “Author MeiK!”
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">writeFile</span>(<span style="color:#e6db74">&#34;test.txt&#34;</span>, <span style="color:#e6db74">&#34;Author MeiK!&#34;</span>)
+}</code></pre></div>
 <p><strong>testread.go</strong></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">readFile</span>(<span style="color:#a6e22e">filename</span> <span style="color:#66d9ef">string</span>) {
+	<span style="color:#a6e22e">f</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">OpenFile</span>(<span style="color:#a6e22e">filename</span>, <span style="color:#a6e22e">unix</span>.<span style="color:#a6e22e">O_RDONLY</span>, <span style="color:#ae81ff">0644</span>)
+	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">Close</span>()
 
-<pre><code class="language-go">func readFile(filename string) {
-	f, _ := os.OpenFile(filename, unix.O_RDONLY, 0644)
-	defer f.Close()
-
-	flockT := unix.Flock_t{
-		Type:   unix.F_RDLCK,
-		Whence: io.SeekStart,
-		Start:  0,
-		Len:    0,
+	<span style="color:#a6e22e">flockT</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">unix</span>.<span style="color:#a6e22e">Flock_t</span>{
+		<span style="color:#a6e22e">Type</span>:   <span style="color:#a6e22e">unix</span>.<span style="color:#a6e22e">F_RDLCK</span>,
+		<span style="color:#a6e22e">Whence</span>: <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">SeekStart</span>,
+		<span style="color:#a6e22e">Start</span>:  <span style="color:#ae81ff">0</span>,
+		<span style="color:#a6e22e">Len</span>:    <span style="color:#ae81ff">0</span>,
 	}
-	_ = unix.FcntlFlock(f.Fd(), unix.F_SETLKW, &amp;flockT)
+	<span style="color:#a6e22e">_</span> = <span style="color:#a6e22e">unix</span>.<span style="color:#a6e22e">FcntlFlock</span>(<span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">Fd</span>(), <span style="color:#a6e22e">unix</span>.<span style="color:#a6e22e">F_SETLKW</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">flockT</span>)
 
-	body := make([]byte, 1)
-	n := 1
-	for n != 0 {
-		time.Sleep(time.Second)
-		var err error
-		n, err = f.Read(body)
-		if err == io.EOF {
-			break
+	<span style="color:#a6e22e">body</span> <span style="color:#f92672">:=</span> make([]<span style="color:#66d9ef">byte</span>, <span style="color:#ae81ff">1</span>)
+	<span style="color:#a6e22e">n</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">1</span>
+	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">n</span> <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span> {
+		<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Sleep</span>(<span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Second</span>)
+		<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">err</span> <span style="color:#66d9ef">error</span>
+		<span style="color:#a6e22e">n</span>, <span style="color:#a6e22e">err</span> = <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">Read</span>(<span style="color:#a6e22e">body</span>)
+		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">EOF</span> {
+			<span style="color:#66d9ef">break</span>
 		}
-		s, _ := f.Seek(0, os.SEEK_CUR)
-		fmt.Printf(&quot;%c %d\n&quot;, body, s)
+		<span style="color:#a6e22e">s</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">f</span>.<span style="color:#a6e22e">Seek</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">SEEK_CUR</span>)
+		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;%c %d\n&#34;</span>, <span style="color:#a6e22e">body</span>, <span style="color:#a6e22e">s</span>)
 	}
 }
 
-func main() {
-	readFile(&quot;test.txt&quot;)
-}
-</code></pre>
-
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">readFile</span>(<span style="color:#e6db74">&#34;test.txt&#34;</span>)
+}</code></pre></div>
 <p>额外添加 <code>write start</code> 和 <code>write end</code> 来标识当前进度，执行结果如下：</p>
 
 <pre><code>write start

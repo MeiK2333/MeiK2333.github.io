@@ -41,7 +41,7 @@ Webbench是Radim Kolar在1997年写的一个在linux下使用的非常简单的�
 
 <meta itemprop="datePublished" content="2018-07-19T21:39:23&#43;00:00" />
 <meta itemprop="dateModified" content="2018-07-19T21:39:23&#43;00:00" />
-<meta itemprop="wordCount" content="2049">
+<meta itemprop="wordCount" content="2031">
 
 
 
@@ -143,648 +143,641 @@ Webbench是Radim Kolar在1997年写的一个在linux下使用的非常简单的�
 <p>我居然用了一个多小时的时间看完了他的源代码并且加上了注释&hellip;&hellip;</p>
 
 <h3 id="socket-c">socket.c</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C"><span style="color:#75715e">/* $Id: socket.c 1.1 1995/01/01 07:11:14 cthuang Exp $
+</span><span style="color:#75715e"> *
+</span><span style="color:#75715e"> * This module has been modified by Radim Kolar for OS/2 emx
+</span><span style="color:#75715e"> */</span>
 
-<pre><code class="language-C">/* $Id: socket.c 1.1 1995/01/01 07:11:14 cthuang Exp $
- *
- * This module has been modified by Radim Kolar for OS/2 emx
- */
+<span style="color:#75715e">/***********************************************************************
+</span><span style="color:#75715e">  module:       socket.c
+</span><span style="color:#75715e">  program:      popclient
+</span><span style="color:#75715e">  SCCS ID:      @(#)socket.c    1.5  4/1/94
+</span><span style="color:#75715e">  programmer:   Virginia Tech Computing Center
+</span><span style="color:#75715e">  compiler:     DEC RISC C compiler (Ultrix 4.1)
+</span><span style="color:#75715e">  environment:  DEC Ultrix 4.3
+</span><span style="color:#75715e">  description:  UNIX sockets code.
+</span><span style="color:#75715e"> ***********************************************************************/</span>
 
-/***********************************************************************
-  module:       socket.c
-  program:      popclient
-  SCCS ID:      @(#)socket.c    1.5  4/1/94
-  programmer:   Virginia Tech Computing Center
-  compiler:     DEC RISC C compiler (Ultrix 4.1)
-  environment:  DEC Ultrix 4.3
-  description:  UNIX sockets code.
- ***********************************************************************/
+<span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;arpa/inet.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;fcntl.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;netdb.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;netinet/in.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdarg.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdlib.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;string.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;sys/socket.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;sys/time.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;sys/types.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;unistd.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">Socket</span>(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>host, <span style="color:#66d9ef">int</span> clientPort) {
+    <span style="color:#66d9ef">int</span> sock;
+    <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">long</span> inaddr;
+    <span style="color:#66d9ef">struct</span> sockaddr_in ad;
+    <span style="color:#66d9ef">struct</span> hostent <span style="color:#f92672">*</span>hp;
 
-#include &lt;arpa/inet.h&gt;
-#include &lt;fcntl.h&gt;
-#include &lt;netdb.h&gt;
-#include &lt;netinet/in.h&gt;
-#include &lt;stdarg.h&gt;
-#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-#include &lt;string.h&gt;
-#include &lt;sys/socket.h&gt;
-#include &lt;sys/time.h&gt;
-#include &lt;sys/types.h&gt;
-#include &lt;unistd.h&gt;
+    memset(<span style="color:#f92672">&amp;</span>ad, <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">sizeof</span>(ad));
+    ad.sin_family <span style="color:#f92672">=</span> AF_INET;
 
-int Socket(const char *host, int clientPort) {
-    int sock;
-    unsigned long inaddr;
-    struct sockaddr_in ad;
-    struct hostent *hp;
-
-    memset(&amp;ad, 0, sizeof(ad));
-    ad.sin_family = AF_INET;
-
-    /* 尝试以 IP 形式解析 */
-    inaddr = inet_addr(host);
-    if (inaddr != INADDR_NONE)
-        memcpy(&amp;ad.sin_addr, &amp;inaddr, sizeof(inaddr));
-    else { /* 如果解析失败, 则尝试通过 DNS 进行转换 */
-        /* gethostbyname 是过时的函数, 应当使用 getaddrinfo 替换掉它 */
-        hp = gethostbyname(host);
-        if (hp == NULL) return -1;
-        memcpy(&amp;ad.sin_addr, hp-&gt;h_addr, hp-&gt;h_length);
+    <span style="color:#75715e">/* 尝试以 IP 形式解析 */</span>
+    inaddr <span style="color:#f92672">=</span> inet_addr(host);
+    <span style="color:#66d9ef">if</span> (inaddr <span style="color:#f92672">!=</span> INADDR_NONE)
+        memcpy(<span style="color:#f92672">&amp;</span>ad.sin_addr, <span style="color:#f92672">&amp;</span>inaddr, <span style="color:#66d9ef">sizeof</span>(inaddr));
+    <span style="color:#66d9ef">else</span> { <span style="color:#75715e">/* 如果解析失败, 则尝试通过 DNS 进行转换 */</span>
+        <span style="color:#75715e">/* gethostbyname 是过时的函数, 应当使用 getaddrinfo 替换掉它 */</span>
+        hp <span style="color:#f92672">=</span> gethostbyname(host);
+        <span style="color:#66d9ef">if</span> (hp <span style="color:#f92672">==</span> NULL) <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>;
+        memcpy(<span style="color:#f92672">&amp;</span>ad.sin_addr, hp<span style="color:#f92672">-&gt;</span>h_addr, hp<span style="color:#f92672">-&gt;</span>h_length);
     }
-    ad.sin_port = htons(clientPort);
+    ad.sin_port <span style="color:#f92672">=</span> htons(clientPort);
 
-    /* 创建 socket 连接 */
-    sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock &lt; 0) return sock;
-    if (connect(sock, (struct sockaddr *)&amp;ad, sizeof(ad)) &lt; 0) return -1;
-    return sock;
-}
-
-</code></pre>
-
+    <span style="color:#75715e">/* 创建 socket 连接 */</span>
+    sock <span style="color:#f92672">=</span> socket(AF_INET, SOCK_STREAM, <span style="color:#ae81ff">0</span>);
+    <span style="color:#66d9ef">if</span> (sock <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">return</span> sock;
+    <span style="color:#66d9ef">if</span> (connect(sock, (<span style="color:#66d9ef">struct</span> sockaddr <span style="color:#f92672">*</span>)<span style="color:#f92672">&amp;</span>ad, <span style="color:#66d9ef">sizeof</span>(ad)) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">return</span> sock;
+}</code></pre></div>
 <h3 id="webbench-c">webbench.c</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C"><span style="color:#75715e">/*
+</span><span style="color:#75715e"> * (C) Radim Kolar 1997-2004
+</span><span style="color:#75715e"> * This is free software, see GNU Public License version 2 for
+</span><span style="color:#75715e"> * details.
+</span><span style="color:#75715e"> *
+</span><span style="color:#75715e"> * Simple forking WWW Server benchmark:
+</span><span style="color:#75715e"> *
+</span><span style="color:#75715e"> * Usage:
+</span><span style="color:#75715e"> *   webbench --help
+</span><span style="color:#75715e"> *
+</span><span style="color:#75715e"> * Return codes:
+</span><span style="color:#75715e"> *    0 - sucess
+</span><span style="color:#75715e"> *    1 - benchmark failed (server is not on-line)
+</span><span style="color:#75715e"> *    2 - bad param
+</span><span style="color:#75715e"> *    3 - internal error, fork failed
+</span><span style="color:#75715e"> *
+</span><span style="color:#75715e"> */</span>
 
-<pre><code class="language-C">/*
- * (C) Radim Kolar 1997-2004
- * This is free software, see GNU Public License version 2 for
- * details.
- *
- * Simple forking WWW Server benchmark:
- *
- * Usage:
- *   webbench --help
- *
- * Return codes:
- *    0 - sucess
- *    1 - benchmark failed (server is not on-line)
- *    2 - bad param
- *    3 - internal error, fork failed
- *
- */
+<span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;getopt.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;rpc/types.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;signal.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;strings.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;sys/param.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;time.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;unistd.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;socket.c&#34;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">/* values */</span>
+<span style="color:#66d9ef">volatile</span> <span style="color:#66d9ef">int</span> timerexpired <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+<span style="color:#66d9ef">int</span> speed <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+<span style="color:#66d9ef">int</span> failed <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+<span style="color:#66d9ef">int</span> bytes <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
 
-#include &lt;getopt.h&gt;
-#include &lt;rpc/types.h&gt;
-#include &lt;signal.h&gt;
-#include &lt;strings.h&gt;
-#include &lt;sys/param.h&gt;
-#include &lt;time.h&gt;
-#include &lt;unistd.h&gt;
-#include &quot;socket.c&quot;
+<span style="color:#75715e">/* globals */</span>
+<span style="color:#66d9ef">int</span> http10 <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>; <span style="color:#75715e">/* 0 - http/0.9, 1 - http/1.0, 2 - http/1.1 */</span>
+<span style="color:#75715e">/* Allow: GET, HEAD, OPTIONS, TRACE */</span>
+<span style="color:#75715e">#define METHOD_GET 0
+</span><span style="color:#75715e">#define METHOD_HEAD 1
+</span><span style="color:#75715e">#define METHOD_OPTIONS 2
+</span><span style="color:#75715e">#define METHOD_TRACE 3
+</span><span style="color:#75715e">#define PROGRAM_VERSION &#34;1.5&#34;
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> method <span style="color:#f92672">=</span> METHOD_GET;
+<span style="color:#66d9ef">int</span> clients <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+<span style="color:#66d9ef">int</span> force <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+<span style="color:#66d9ef">int</span> force_reload <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+<span style="color:#66d9ef">int</span> proxyport <span style="color:#f92672">=</span> <span style="color:#ae81ff">80</span>;
+<span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>proxyhost <span style="color:#f92672">=</span> NULL;
+<span style="color:#66d9ef">int</span> benchtime <span style="color:#f92672">=</span> <span style="color:#ae81ff">30</span>;
 
-/* values */
-volatile int timerexpired = 0;
-int speed = 0;
-int failed = 0;
-int bytes = 0;
+<span style="color:#75715e">/* internal */</span>
+<span style="color:#66d9ef">int</span> mypipe[<span style="color:#ae81ff">2</span>];
+<span style="color:#66d9ef">char</span> host[MAXHOSTNAMELEN];
+<span style="color:#75715e">#define REQUEST_SIZE 2048
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">char</span> request[REQUEST_SIZE];
 
-/* globals */
-int http10 = 1; /* 0 - http/0.9, 1 - http/1.0, 2 - http/1.1 */
-/* Allow: GET, HEAD, OPTIONS, TRACE */
-#define METHOD_GET 0
-#define METHOD_HEAD 1
-#define METHOD_OPTIONS 2
-#define METHOD_TRACE 3
-#define PROGRAM_VERSION &quot;1.5&quot;
-int method = METHOD_GET;
-int clients = 1;
-int force = 0;
-int force_reload = 0;
-int proxyport = 80;
-char *proxyhost = NULL;
-int benchtime = 30;
+<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">struct</span> option long_options[] <span style="color:#f92672">=</span> {
+    {<span style="color:#e6db74">&#34;force&#34;</span>, no_argument, <span style="color:#f92672">&amp;</span>force, <span style="color:#ae81ff">1</span>},
+    {<span style="color:#e6db74">&#34;reload&#34;</span>, no_argument, <span style="color:#f92672">&amp;</span>force_reload, <span style="color:#ae81ff">1</span>},
+    {<span style="color:#e6db74">&#34;time&#34;</span>, required_argument, NULL, <span style="color:#e6db74">&#39;t&#39;</span>},
+    {<span style="color:#e6db74">&#34;help&#34;</span>, no_argument, NULL, <span style="color:#e6db74">&#39;?&#39;</span>},
+    {<span style="color:#e6db74">&#34;http09&#34;</span>, no_argument, NULL, <span style="color:#e6db74">&#39;9&#39;</span>},
+    {<span style="color:#e6db74">&#34;http10&#34;</span>, no_argument, NULL, <span style="color:#e6db74">&#39;1&#39;</span>},
+    {<span style="color:#e6db74">&#34;http11&#34;</span>, no_argument, NULL, <span style="color:#e6db74">&#39;2&#39;</span>},
+    <span style="color:#75715e">/* 绑定命令行参数与变量 */</span>
+    {<span style="color:#e6db74">&#34;get&#34;</span>, no_argument, <span style="color:#f92672">&amp;</span>method, METHOD_GET},
+    {<span style="color:#e6db74">&#34;head&#34;</span>, no_argument, <span style="color:#f92672">&amp;</span>method, METHOD_HEAD},
+    {<span style="color:#e6db74">&#34;options&#34;</span>, no_argument, <span style="color:#f92672">&amp;</span>method, METHOD_OPTIONS},
+    {<span style="color:#e6db74">&#34;trace&#34;</span>, no_argument, <span style="color:#f92672">&amp;</span>method, METHOD_TRACE},
+    {<span style="color:#e6db74">&#34;version&#34;</span>, no_argument, NULL, <span style="color:#e6db74">&#39;V&#39;</span>},
+    {<span style="color:#e6db74">&#34;proxy&#34;</span>, required_argument, NULL, <span style="color:#e6db74">&#39;p&#39;</span>},
+    {<span style="color:#e6db74">&#34;clients&#34;</span>, required_argument, NULL, <span style="color:#e6db74">&#39;c&#39;</span>},
+    {NULL, <span style="color:#ae81ff">0</span>, NULL, <span style="color:#ae81ff">0</span>}};
 
-/* internal */
-int mypipe[2];
-char host[MAXHOSTNAMELEN];
-#define REQUEST_SIZE 2048
-char request[REQUEST_SIZE];
+<span style="color:#75715e">/* prototypes */</span>
+<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">benchcore</span>(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>host, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> port, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>request);
+<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">bench</span>(<span style="color:#66d9ef">void</span>);
+<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">build_request</span>(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>url);
 
-static const struct option long_options[] = {
-    {&quot;force&quot;, no_argument, &amp;force, 1},
-    {&quot;reload&quot;, no_argument, &amp;force_reload, 1},
-    {&quot;time&quot;, required_argument, NULL, 't'},
-    {&quot;help&quot;, no_argument, NULL, '?'},
-    {&quot;http09&quot;, no_argument, NULL, '9'},
-    {&quot;http10&quot;, no_argument, NULL, '1'},
-    {&quot;http11&quot;, no_argument, NULL, '2'},
-    /* 绑定命令行参数与变量 */
-    {&quot;get&quot;, no_argument, &amp;method, METHOD_GET},
-    {&quot;head&quot;, no_argument, &amp;method, METHOD_HEAD},
-    {&quot;options&quot;, no_argument, &amp;method, METHOD_OPTIONS},
-    {&quot;trace&quot;, no_argument, &amp;method, METHOD_TRACE},
-    {&quot;version&quot;, no_argument, NULL, 'V'},
-    {&quot;proxy&quot;, required_argument, NULL, 'p'},
-    {&quot;clients&quot;, required_argument, NULL, 'c'},
-    {NULL, 0, NULL, 0}};
+<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">alarm_handler</span>(<span style="color:#66d9ef">int</span> signal) { timerexpired <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>; }
 
-/* prototypes */
-static void benchcore(const char *host, const int port, const char *request);
-static int bench(void);
-static void build_request(const char *url);
-
-static void alarm_handler(int signal) { timerexpired = 1; }
-
-static void usage(void) {
+<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">usage</span>(<span style="color:#66d9ef">void</span>) {
     fprintf(
         stderr,
-        &quot;webbench [option]... URL\n&quot;
-        &quot;  -f|--force               Don't wait for reply from server.\n&quot;
-        &quot;  -r|--reload              Send reload request - Pragma: no-cache.\n&quot;
-        &quot;  -t|--time &lt;sec&gt;          Run benchmark for &lt;sec&gt; seconds. Default &quot;
-        &quot;30.\n&quot;
-        &quot;  -p|--proxy &lt;server:port&gt; Use proxy server for request.\n&quot;
-        &quot;  -c|--clients &lt;n&gt;         Run &lt;n&gt; HTTP clients at once. Default &quot;
-        &quot;one.\n&quot;
-        &quot;  -9|--http09              Use HTTP/0.9 style requests.\n&quot;
-        &quot;  -1|--http10              Use HTTP/1.0 protocol.\n&quot;
-        &quot;  -2|--http11              Use HTTP/1.1 protocol.\n&quot;
-        &quot;  --get                    Use GET request method.\n&quot;
-        &quot;  --head                   Use HEAD request method.\n&quot;
-        &quot;  --options                Use OPTIONS request method.\n&quot;
-        &quot;  --trace                  Use TRACE request method.\n&quot;
-        &quot;  -?|-h|--help             This information.\n&quot;
-        &quot;  -V|--version             Display program version.\n&quot;);
+        <span style="color:#e6db74">&#34;webbench [option]... URL</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+        <span style="color:#e6db74">&#34;  -f|--force               Don&#39;t wait for reply from server.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+        <span style="color:#e6db74">&#34;  -r|--reload              Send reload request - Pragma: no-cache.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+        <span style="color:#e6db74">&#34;  -t|--time &lt;sec&gt;          Run benchmark for &lt;sec&gt; seconds. Default &#34;</span>
+        <span style="color:#e6db74">&#34;30.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+        <span style="color:#e6db74">&#34;  -p|--proxy &lt;server:port&gt; Use proxy server for request.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+        <span style="color:#e6db74">&#34;  -c|--clients &lt;n&gt;         Run &lt;n&gt; HTTP clients at once. Default &#34;</span>
+        <span style="color:#e6db74">&#34;one.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+        <span style="color:#e6db74">&#34;  -9|--http09              Use HTTP/0.9 style requests.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+        <span style="color:#e6db74">&#34;  -1|--http10              Use HTTP/1.0 protocol.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+        <span style="color:#e6db74">&#34;  -2|--http11              Use HTTP/1.1 protocol.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+        <span style="color:#e6db74">&#34;  --get                    Use GET request method.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+        <span style="color:#e6db74">&#34;  --head                   Use HEAD request method.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+        <span style="color:#e6db74">&#34;  --options                Use OPTIONS request method.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+        <span style="color:#e6db74">&#34;  --trace                  Use TRACE request method.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+        <span style="color:#e6db74">&#34;  -?|-h|--help             This information.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+        <span style="color:#e6db74">&#34;  -V|--version             Display program version.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
 }
 
-int main(int argc, char *argv[]) {
-    /* 读取命令行参数 */
-    int opt = 0;
-    int options_index = 0;
-    char *tmp = NULL;
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>argv[]) {
+    <span style="color:#75715e">/* 读取命令行参数 */</span>
+    <span style="color:#66d9ef">int</span> opt <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    <span style="color:#66d9ef">int</span> options_index <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>tmp <span style="color:#f92672">=</span> NULL;
 
-    if (argc == 1) {
+    <span style="color:#66d9ef">if</span> (argc <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>) {
         usage();
-        return 2;
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">2</span>;
     }
 
-    while ((opt = getopt_long(argc, argv, &quot;912Vfrt:p:c:?h&quot;, long_options,
-                              &amp;options_index)) != EOF) {
-        switch (opt) {
-            case 0:
-                break;
-            case 'f':
-                /* 设置 force 模式 */
-                force = 1;
-                break;
-            case 'r':
-                /* 设置 reload 模式 */
-                force_reload = 1;
-                break;
-            case '9':
-                /* HTTP/0.9 */
-                http10 = 0;
-                break;
-            case '1':
-                /* HTTP/1.0 */
-                http10 = 1;
-                break;
-            case '2':
-                /* HTTP/1.1 */
-                http10 = 2;
-                break;
-            case 'V':
-                /* 打印版本信息并退出 */
-                printf(PROGRAM_VERSION &quot;\n&quot;);
-                exit(0);
-            case 't':
-                /* 设置运行时间 */
-                benchtime = atoi(optarg);
-                break;
-            case 'p':
-                /* proxy server parsing server:port */
-                /**
-                 * 解析代理设置, 使用 &quot;:&quot; 分割代理字符串
-                 * eg: -p 127.0.0.1:1080
-                 * proxyhost(char *): &quot;127.0.0.1&quot;
-                 * proxyport(int): 1080
-                 * */
-                tmp = strrchr(optarg, ':');
-                proxyhost = optarg;
-                if (tmp == NULL) {
-                    break;
+    <span style="color:#66d9ef">while</span> ((opt <span style="color:#f92672">=</span> getopt_long(argc, argv, <span style="color:#e6db74">&#34;912Vfrt:p:c:?h&#34;</span>, long_options,
+                              <span style="color:#f92672">&amp;</span>options_index)) <span style="color:#f92672">!=</span> EOF) {
+        <span style="color:#66d9ef">switch</span> (opt) {
+            <span style="color:#66d9ef">case</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">:</span>
+                <span style="color:#66d9ef">break</span>;
+            <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;f&#39;</span><span style="color:#f92672">:</span>
+                <span style="color:#75715e">/* 设置 force 模式 */</span>
+                force <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+                <span style="color:#66d9ef">break</span>;
+            <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;r&#39;</span><span style="color:#f92672">:</span>
+                <span style="color:#75715e">/* 设置 reload 模式 */</span>
+                force_reload <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+                <span style="color:#66d9ef">break</span>;
+            <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;9&#39;</span><span style="color:#f92672">:</span>
+                <span style="color:#75715e">/* HTTP/0.9 */</span>
+                http10 <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+                <span style="color:#66d9ef">break</span>;
+            <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;1&#39;</span><span style="color:#f92672">:</span>
+                <span style="color:#75715e">/* HTTP/1.0 */</span>
+                http10 <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+                <span style="color:#66d9ef">break</span>;
+            <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;2&#39;</span><span style="color:#f92672">:</span>
+                <span style="color:#75715e">/* HTTP/1.1 */</span>
+                http10 <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>;
+                <span style="color:#66d9ef">break</span>;
+            <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;V&#39;</span><span style="color:#f92672">:</span>
+                <span style="color:#75715e">/* 打印版本信息并退出 */</span>
+                printf(PROGRAM_VERSION <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+                exit(<span style="color:#ae81ff">0</span>);
+            <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;t&#39;</span><span style="color:#f92672">:</span>
+                <span style="color:#75715e">/* 设置运行时间 */</span>
+                benchtime <span style="color:#f92672">=</span> atoi(optarg);
+                <span style="color:#66d9ef">break</span>;
+            <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;p&#39;</span><span style="color:#f92672">:</span>
+                <span style="color:#75715e">/* proxy server parsing server:port */</span>
+                <span style="color:#75715e">/**
+</span><span style="color:#75715e">                 * 解析代理设置, 使用 &#34;:&#34; 分割代理字符串
+</span><span style="color:#75715e">                 * eg: -p 127.0.0.1:1080
+</span><span style="color:#75715e">                 * proxyhost(char *): &#34;127.0.0.1&#34;
+</span><span style="color:#75715e">                 * proxyport(int): 1080
+</span><span style="color:#75715e">                 * */</span>
+                tmp <span style="color:#f92672">=</span> strrchr(optarg, <span style="color:#e6db74">&#39;:&#39;</span>);
+                proxyhost <span style="color:#f92672">=</span> optarg;
+                <span style="color:#66d9ef">if</span> (tmp <span style="color:#f92672">==</span> NULL) {
+                    <span style="color:#66d9ef">break</span>;
                 }
-                /* 判断是否提供 hostname */
-                if (tmp == optarg) {
+                <span style="color:#75715e">/* 判断是否提供 hostname */</span>
+                <span style="color:#66d9ef">if</span> (tmp <span style="color:#f92672">==</span> optarg) {
                     fprintf(stderr,
-                            &quot;Error in option --proxy %s: Missing hostname.\n&quot;,
+                            <span style="color:#e6db74">&#34;Error in option --proxy %s: Missing hostname.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>,
                             optarg);
-                    return 2;
+                    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">2</span>;
                 }
-                /* 判断是否提供 port */
-                if (tmp == optarg + strlen(optarg) - 1) {
+                <span style="color:#75715e">/* 判断是否提供 port */</span>
+                <span style="color:#66d9ef">if</span> (tmp <span style="color:#f92672">==</span> optarg <span style="color:#f92672">+</span> strlen(optarg) <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) {
                     fprintf(
                         stderr,
-                        &quot;Error in option --proxy %s Port number is missing.\n&quot;,
+                        <span style="color:#e6db74">&#34;Error in option --proxy %s Port number is missing.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>,
                         optarg);
-                    return 2;
+                    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">2</span>;
                 }
-                *tmp = '\0';
-                proxyport = atoi(tmp + 1);
-                break;
-            case ':':
-            case 'h':
-            case '?':
-                /* 打印帮助 */
+                <span style="color:#f92672">*</span>tmp <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;\0&#39;</span>;
+                proxyport <span style="color:#f92672">=</span> atoi(tmp <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>);
+                <span style="color:#66d9ef">break</span>;
+            <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;:&#39;</span><span style="color:#f92672">:</span>
+            <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;h&#39;</span><span style="color:#f92672">:</span>
+            <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;?&#39;</span><span style="color:#f92672">:</span>
+                <span style="color:#75715e">/* 打印帮助 */</span>
                 usage();
-                return 2;
-                break;
-            case 'c':
-                /* 设置客户端个数 */
-                clients = atoi(optarg);
-                break;
+                <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">2</span>;
+                <span style="color:#66d9ef">break</span>;
+            <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;c&#39;</span><span style="color:#f92672">:</span>
+                <span style="color:#75715e">/* 设置客户端个数 */</span>
+                clients <span style="color:#f92672">=</span> atoi(optarg);
+                <span style="color:#66d9ef">break</span>;
         }
     }
 
-    /**
-     * 当所有带选项的参数都已读取结束, optind
-     * 应当指向第一个不包含选项的命令行参数 若 optind == argc,
-     * 则代表没有不包含选项的命令行参数
-     * */
-    if (optind == argc) {
-        fprintf(stderr, &quot;webbench: Missing URL!\n&quot;);
+    <span style="color:#75715e">/**
+</span><span style="color:#75715e">     * 当所有带选项的参数都已读取结束, optind
+</span><span style="color:#75715e">     * 应当指向第一个不包含选项的命令行参数 若 optind == argc,
+</span><span style="color:#75715e">     * 则代表没有不包含选项的命令行参数
+</span><span style="color:#75715e">     * */</span>
+    <span style="color:#66d9ef">if</span> (optind <span style="color:#f92672">==</span> argc) {
+        fprintf(stderr, <span style="color:#e6db74">&#34;webbench: Missing URL!</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
         usage();
-        return 2;
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">2</span>;
     }
 
-    /* 设置 clients 和 benchtime 的默认值 */
-    if (clients == 0) clients = 1;
-    if (benchtime == 0) benchtime = 30;
+    <span style="color:#75715e">/* 设置 clients 和 benchtime 的默认值 */</span>
+    <span style="color:#66d9ef">if</span> (clients <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) clients <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">if</span> (benchtime <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) benchtime <span style="color:#f92672">=</span> <span style="color:#ae81ff">30</span>;
 
-    /* Copyright */
-    /* 打印 Copyright */
+    <span style="color:#75715e">/* Copyright */</span>
+    <span style="color:#75715e">/* 打印 Copyright */</span>
     fprintf(stderr,
-            &quot;Webbench - Simple Web Benchmark &quot; PROGRAM_VERSION
-            &quot;\n&quot;
-            &quot;Copyright (c) Radim Kolar 1997-2004, GPL Open Source Software.\n&quot;);
+            <span style="color:#e6db74">&#34;Webbench - Simple Web Benchmark &#34;</span> PROGRAM_VERSION
+            <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+            <span style="color:#e6db74">&#34;Copyright (c) Radim Kolar 1997-2004, GPL Open Source Software.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
 
     build_request(argv[optind]);
 
-    // print request info ,do it in function build_request
-    /*printf(&quot;Benchmarking: &quot;);
+    <span style="color:#75715e">// print request info ,do it in function build_request
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">/*printf(&#34;Benchmarking: &#34;);
+</span><span style="color:#75715e">
+</span><span style="color:#75715e">    switch(method)
+</span><span style="color:#75715e">    {
+</span><span style="color:#75715e">        case METHOD_GET:
+</span><span style="color:#75715e">        default:
+</span><span style="color:#75715e">        printf(&#34;GET&#34;);break;
+</span><span style="color:#75715e">        case METHOD_OPTIONS:
+</span><span style="color:#75715e">        printf(&#34;OPTIONS&#34;);break;
+</span><span style="color:#75715e">        case METHOD_HEAD:
+</span><span style="color:#75715e">        printf(&#34;HEAD&#34;);break;
+</span><span style="color:#75715e">        case METHOD_TRACE:
+</span><span style="color:#75715e">        printf(&#34;TRACE&#34;);break;
+</span><span style="color:#75715e">    }
+</span><span style="color:#75715e">
+</span><span style="color:#75715e">    printf(&#34; %s&#34;,argv[optind]);
+</span><span style="color:#75715e">
+</span><span style="color:#75715e">    switch(http10)
+</span><span style="color:#75715e">    {
+</span><span style="color:#75715e">        case 0: printf(&#34; (using HTTP/0.9)&#34;);break;
+</span><span style="color:#75715e">        case 2: printf(&#34; (using HTTP/1.1)&#34;);break;
+</span><span style="color:#75715e">    }
+</span><span style="color:#75715e">
+</span><span style="color:#75715e">    printf(&#34;\n&#34;);
+</span><span style="color:#75715e">    */</span>
 
-    switch(method)
-    {
-        case METHOD_GET:
-        default:
-        printf(&quot;GET&quot;);break;
-        case METHOD_OPTIONS:
-        printf(&quot;OPTIONS&quot;);break;
-        case METHOD_HEAD:
-        printf(&quot;HEAD&quot;);break;
-        case METHOD_TRACE:
-        printf(&quot;TRACE&quot;);break;
-    }
+    <span style="color:#75715e">/* 打印配置 */</span>
+    printf(<span style="color:#e6db74">&#34;Runing info: &#34;</span>);
 
-    printf(&quot; %s&quot;,argv[optind]);
+    <span style="color:#66d9ef">if</span> (clients <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>)
+        printf(<span style="color:#e6db74">&#34;1 client&#34;</span>);
+    <span style="color:#66d9ef">else</span>
+        printf(<span style="color:#e6db74">&#34;%d clients&#34;</span>, clients);
 
-    switch(http10)
-    {
-        case 0: printf(&quot; (using HTTP/0.9)&quot;);break;
-        case 2: printf(&quot; (using HTTP/1.1)&quot;);break;
-    }
+    printf(<span style="color:#e6db74">&#34;, running %d sec&#34;</span>, benchtime);
 
-    printf(&quot;\n&quot;);
-    */
+    <span style="color:#66d9ef">if</span> (force) printf(<span style="color:#e6db74">&#34;, early socket close&#34;</span>);
+    <span style="color:#66d9ef">if</span> (proxyhost <span style="color:#f92672">!=</span> NULL)
+        printf(<span style="color:#e6db74">&#34;, via proxy server %s:%d&#34;</span>, proxyhost, proxyport);
+    <span style="color:#66d9ef">if</span> (force_reload) printf(<span style="color:#e6db74">&#34;, forcing reload&#34;</span>);
 
-    /* 打印配置 */
-    printf(&quot;Runing info: &quot;);
+    printf(<span style="color:#e6db74">&#34;.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
 
-    if (clients == 1)
-        printf(&quot;1 client&quot;);
-    else
-        printf(&quot;%d clients&quot;, clients);
-
-    printf(&quot;, running %d sec&quot;, benchtime);
-
-    if (force) printf(&quot;, early socket close&quot;);
-    if (proxyhost != NULL)
-        printf(&quot;, via proxy server %s:%d&quot;, proxyhost, proxyport);
-    if (force_reload) printf(&quot;, forcing reload&quot;);
-
-    printf(&quot;.\n&quot;);
-
-    /* 开始执行 */
-    return bench();
+    <span style="color:#75715e">/* 开始执行 */</span>
+    <span style="color:#66d9ef">return</span> bench();
 }
 
-void build_request(const char *url) {
-    char tmp[10];
-    int i;
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">build_request</span>(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>url) {
+    <span style="color:#66d9ef">char</span> tmp[<span style="color:#ae81ff">10</span>];
+    <span style="color:#66d9ef">int</span> i;
 
-    // bzero(host,MAXHOSTNAMELEN);
-    // bzero(request,REQUEST_SIZE);
-    memset(host, 0, MAXHOSTNAMELEN);
-    memset(request, 0, REQUEST_SIZE);
+    <span style="color:#75715e">// bzero(host,MAXHOSTNAMELEN);
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// bzero(request,REQUEST_SIZE);
+</span><span style="color:#75715e"></span>    memset(host, <span style="color:#ae81ff">0</span>, MAXHOSTNAMELEN);
+    memset(request, <span style="color:#ae81ff">0</span>, REQUEST_SIZE);
 
-    /* 根据 reload 和 method 等参数调整 HTTP */
-    if (force_reload &amp;&amp; proxyhost != NULL &amp;&amp; http10 &lt; 1) http10 = 1;
-    if (method == METHOD_HEAD &amp;&amp; http10 &lt; 1) http10 = 1;
-    if (method == METHOD_OPTIONS &amp;&amp; http10 &lt; 2) http10 = 2;
-    if (method == METHOD_TRACE &amp;&amp; http10 &lt; 2) http10 = 2;
+    <span style="color:#75715e">/* 根据 reload 和 method 等参数调整 HTTP */</span>
+    <span style="color:#66d9ef">if</span> (force_reload <span style="color:#f92672">&amp;&amp;</span> proxyhost <span style="color:#f92672">!=</span> NULL <span style="color:#f92672">&amp;&amp;</span> http10 <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">1</span>) http10 <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">if</span> (method <span style="color:#f92672">==</span> METHOD_HEAD <span style="color:#f92672">&amp;&amp;</span> http10 <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">1</span>) http10 <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">if</span> (method <span style="color:#f92672">==</span> METHOD_OPTIONS <span style="color:#f92672">&amp;&amp;</span> http10 <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">2</span>) http10 <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>;
+    <span style="color:#66d9ef">if</span> (method <span style="color:#f92672">==</span> METHOD_TRACE <span style="color:#f92672">&amp;&amp;</span> http10 <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">2</span>) http10 <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>;
 
-    switch (method) {
-        default:
-        case METHOD_GET:
-            strcpy(request, &quot;GET&quot;);
-            break;
-        case METHOD_HEAD:
-            strcpy(request, &quot;HEAD&quot;);
-            break;
-        case METHOD_OPTIONS:
-            strcpy(request, &quot;OPTIONS&quot;);
-            break;
-        case METHOD_TRACE:
-            strcpy(request, &quot;TRACE&quot;);
-            break;
+    <span style="color:#66d9ef">switch</span> (method) {
+        <span style="color:#66d9ef">default</span><span style="color:#f92672">:</span>
+        <span style="color:#66d9ef">case</span> METHOD_GET:
+            strcpy(request, <span style="color:#e6db74">&#34;GET&#34;</span>);
+            <span style="color:#66d9ef">break</span>;
+        <span style="color:#66d9ef">case</span> METHOD_HEAD:
+            strcpy(request, <span style="color:#e6db74">&#34;HEAD&#34;</span>);
+            <span style="color:#66d9ef">break</span>;
+        <span style="color:#66d9ef">case</span> METHOD_OPTIONS:
+            strcpy(request, <span style="color:#e6db74">&#34;OPTIONS&#34;</span>);
+            <span style="color:#66d9ef">break</span>;
+        <span style="color:#66d9ef">case</span> METHOD_TRACE:
+            strcpy(request, <span style="color:#e6db74">&#34;TRACE&#34;</span>);
+            <span style="color:#66d9ef">break</span>;
     }
 
-    strcat(request, &quot; &quot;);
+    strcat(request, <span style="color:#e6db74">&#34; &#34;</span>);
 
-    /* 检查 URL 是否合法 */
-    if (NULL == strstr(url, &quot;://&quot;)) {
-        fprintf(stderr, &quot;\n%s: is not a valid URL.\n&quot;, url);
-        exit(2);
+    <span style="color:#75715e">/* 检查 URL 是否合法 */</span>
+    <span style="color:#66d9ef">if</span> (NULL <span style="color:#f92672">==</span> strstr(url, <span style="color:#e6db74">&#34;://&#34;</span>)) {
+        fprintf(stderr, <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">%s: is not a valid URL.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, url);
+        exit(<span style="color:#ae81ff">2</span>);
     }
-    /* 检查 URL 长度 */
-    if (strlen(url) &gt; 1500) {
-        fprintf(stderr, &quot;URL is too long.\n&quot;);
-        exit(2);
+    <span style="color:#75715e">/* 检查 URL 长度 */</span>
+    <span style="color:#66d9ef">if</span> (strlen(url) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1500</span>) {
+        fprintf(stderr, <span style="color:#e6db74">&#34;URL is too long.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+        exit(<span style="color:#ae81ff">2</span>);
     }
-    /* 忽略大小写对比两个字符串的前 n 个字符 */
-    /* 仅支持 HTTP 协议 */
-    if (0 != strncasecmp(&quot;http://&quot;, url, 7)) {
+    <span style="color:#75715e">/* 忽略大小写对比两个字符串的前 n 个字符 */</span>
+    <span style="color:#75715e">/* 仅支持 HTTP 协议 */</span>
+    <span style="color:#66d9ef">if</span> (<span style="color:#ae81ff">0</span> <span style="color:#f92672">!=</span> strncasecmp(<span style="color:#e6db74">&#34;http://&#34;</span>, url, <span style="color:#ae81ff">7</span>)) {
         fprintf(stderr,
-                &quot;\nOnly HTTP protocol is directly supported, set --proxy for &quot;
-                &quot;others.\n&quot;);
-        exit(2);
+                <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">Only HTTP protocol is directly supported, set --proxy for &#34;</span>
+                <span style="color:#e6db74">&#34;others.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+        exit(<span style="color:#ae81ff">2</span>);
     }
 
-    /* protocol/host delimiter */
-    /* 获得去掉协议后的 URL */
-    i = strstr(url, &quot;://&quot;) - url + 3;
+    <span style="color:#75715e">/* protocol/host delimiter */</span>
+    <span style="color:#75715e">/* 获得去掉协议后的 URL */</span>
+    i <span style="color:#f92672">=</span> strstr(url, <span style="color:#e6db74">&#34;://&#34;</span>) <span style="color:#f92672">-</span> url <span style="color:#f92672">+</span> <span style="color:#ae81ff">3</span>;
 
-    /* 判断 '/' 是否在 URL 中出现过 */
-    if (strchr(url + i, '/') == NULL) {
+    <span style="color:#75715e">/* 判断 &#39;/&#39; 是否在 URL 中出现过 */</span>
+    <span style="color:#66d9ef">if</span> (strchr(url <span style="color:#f92672">+</span> i, <span style="color:#e6db74">&#39;/&#39;</span>) <span style="color:#f92672">==</span> NULL) {
         fprintf(stderr,
-                &quot;\nInvalid URL syntax - hostname don't ends with '/'.\n&quot;);
-        exit(2);
+                <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">Invalid URL syntax - hostname don&#39;t ends with &#39;/&#39;.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+        exit(<span style="color:#ae81ff">2</span>);
     }
 
-    /* url + i 指向 URL 去掉协议后的开头 */
-    if (proxyhost == NULL) {
-        /* get port from hostname */
-        /**
-         * 如果没有使用代理, 则解析 URL 到 host 和 proxyport
-         * eg: http://127.0.0.1:8080/
-         * host(char *): 127.0.0.1
-         * proxyport(int): 8080
-         * */
-        if (index(url + i, ':') != NULL &amp;&amp;
-            index(url + i, ':') &lt; index(url + i, '/')) { /* 如果指定了端口 */
-            strncpy(host, url + i, strchr(url + i, ':') - url - i);
-            // bzero(tmp,10);
-            memset(tmp, 0, 10);
-            strncpy(tmp, index(url + i, ':') + 1,
-                    strchr(url + i, '/') - index(url + i, ':') - 1);
-            /* printf(&quot;tmp=%s\n&quot;,tmp); */
-            proxyport = atoi(tmp);
-            if (proxyport == 0) proxyport = 80;
-        } else { /* 没有指定端口 */
-            strncpy(host, url + i, strcspn(url + i, &quot;/&quot;));
+    <span style="color:#75715e">/* url + i 指向 URL 去掉协议后的开头 */</span>
+    <span style="color:#66d9ef">if</span> (proxyhost <span style="color:#f92672">==</span> NULL) {
+        <span style="color:#75715e">/* get port from hostname */</span>
+        <span style="color:#75715e">/**
+</span><span style="color:#75715e">         * 如果没有使用代理, 则解析 URL 到 host 和 proxyport
+</span><span style="color:#75715e">         * eg: http://127.0.0.1:8080/
+</span><span style="color:#75715e">         * host(char *): 127.0.0.1
+</span><span style="color:#75715e">         * proxyport(int): 8080
+</span><span style="color:#75715e">         * */</span>
+        <span style="color:#66d9ef">if</span> (index(url <span style="color:#f92672">+</span> i, <span style="color:#e6db74">&#39;:&#39;</span>) <span style="color:#f92672">!=</span> NULL <span style="color:#f92672">&amp;&amp;</span>
+            index(url <span style="color:#f92672">+</span> i, <span style="color:#e6db74">&#39;:&#39;</span>) <span style="color:#f92672">&lt;</span> index(url <span style="color:#f92672">+</span> i, <span style="color:#e6db74">&#39;/&#39;</span>)) { <span style="color:#75715e">/* 如果指定了端口 */</span>
+            strncpy(host, url <span style="color:#f92672">+</span> i, strchr(url <span style="color:#f92672">+</span> i, <span style="color:#e6db74">&#39;:&#39;</span>) <span style="color:#f92672">-</span> url <span style="color:#f92672">-</span> i);
+            <span style="color:#75715e">// bzero(tmp,10);
+</span><span style="color:#75715e"></span>            memset(tmp, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">10</span>);
+            strncpy(tmp, index(url <span style="color:#f92672">+</span> i, <span style="color:#e6db74">&#39;:&#39;</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>,
+                    strchr(url <span style="color:#f92672">+</span> i, <span style="color:#e6db74">&#39;/&#39;</span>) <span style="color:#f92672">-</span> index(url <span style="color:#f92672">+</span> i, <span style="color:#e6db74">&#39;:&#39;</span>) <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>);
+            <span style="color:#75715e">/* printf(&#34;tmp=%s\n&#34;,tmp); */</span>
+            proxyport <span style="color:#f92672">=</span> atoi(tmp);
+            <span style="color:#66d9ef">if</span> (proxyport <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) proxyport <span style="color:#f92672">=</span> <span style="color:#ae81ff">80</span>;
+        } <span style="color:#66d9ef">else</span> { <span style="color:#75715e">/* 没有指定端口 */</span>
+            strncpy(host, url <span style="color:#f92672">+</span> i, strcspn(url <span style="color:#f92672">+</span> i, <span style="color:#e6db74">&#34;/&#34;</span>));
         }
-        // printf(&quot;Host=%s\n&quot;,host);
-        /**
-         * 这个 request + strlen(request) 我实在是没看懂
-         * strlen 获得 request 后第一个 '\0' 的位置
-         * strcat 替换 request 后第一个 '\0' 并追加字符串, 在末尾添加 '\0'
-         * 那为什么要先找到 '\0' 的位置再去 strcat......
-         * */
-        strcat(request + strlen(request), url + i + strcspn(url + i, &quot;/&quot;));
-    } else {
-        // printf(&quot;ProxyHost=%s\nProxyPort=%d\n&quot;,proxyhost,proxyport);
-        strcat(request, url);
+        <span style="color:#75715e">// printf(&#34;Host=%s\n&#34;,host);
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">/**
+</span><span style="color:#75715e">         * 这个 request + strlen(request) 我实在是没看懂
+</span><span style="color:#75715e">         * strlen 获得 request 后第一个 &#39;\0&#39; 的位置
+</span><span style="color:#75715e">         * strcat 替换 request 后第一个 &#39;\0&#39; 并追加字符串, 在末尾添加 &#39;\0&#39;
+</span><span style="color:#75715e">         * 那为什么要先找到 &#39;\0&#39; 的位置再去 strcat......
+</span><span style="color:#75715e">         * */</span>
+        strcat(request <span style="color:#f92672">+</span> strlen(request), url <span style="color:#f92672">+</span> i <span style="color:#f92672">+</span> strcspn(url <span style="color:#f92672">+</span> i, <span style="color:#e6db74">&#34;/&#34;</span>));
+    } <span style="color:#66d9ef">else</span> {
+        <span style="color:#75715e">// printf(&#34;ProxyHost=%s\nProxyPort=%d\n&#34;,proxyhost,proxyport);
+</span><span style="color:#75715e"></span>        strcat(request, url);
     }
 
-    /* 拼接 HTTP 协议 */
-    if (http10 == 1)
-        strcat(request, &quot; HTTP/1.0&quot;);
-    else if (http10 == 2)
-        strcat(request, &quot; HTTP/1.1&quot;);
+    <span style="color:#75715e">/* 拼接 HTTP 协议 */</span>
+    <span style="color:#66d9ef">if</span> (http10 <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>)
+        strcat(request, <span style="color:#e6db74">&#34; HTTP/1.0&#34;</span>);
+    <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (http10 <span style="color:#f92672">==</span> <span style="color:#ae81ff">2</span>)
+        strcat(request, <span style="color:#e6db74">&#34; HTTP/1.1&#34;</span>);
 
-    strcat(request, &quot;\r\n&quot;);
+    strcat(request, <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">&#34;</span>);
 
-    /* 拼接 UA */
-    if (http10 &gt; 0)
-        strcat(request, &quot;User-Agent: WebBench &quot; PROGRAM_VERSION &quot;\r\n&quot;);
-    /* 拼接 Host */
-    if (proxyhost == NULL &amp;&amp; http10 &gt; 0) {
-        strcat(request, &quot;Host: &quot;);
+    <span style="color:#75715e">/* 拼接 UA */</span>
+    <span style="color:#66d9ef">if</span> (http10 <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>)
+        strcat(request, <span style="color:#e6db74">&#34;User-Agent: WebBench &#34;</span> PROGRAM_VERSION <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">&#34;</span>);
+    <span style="color:#75715e">/* 拼接 Host */</span>
+    <span style="color:#66d9ef">if</span> (proxyhost <span style="color:#f92672">==</span> NULL <span style="color:#f92672">&amp;&amp;</span> http10 <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+        strcat(request, <span style="color:#e6db74">&#34;Host: &#34;</span>);
         strcat(request, host);
-        strcat(request, &quot;\r\n&quot;);
+        strcat(request, <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">&#34;</span>);
     }
 
-    /* 拼接其余字段 */
-    if (force_reload &amp;&amp; proxyhost != NULL) {
-        strcat(request, &quot;Pragma: no-cache\r\n&quot;);
+    <span style="color:#75715e">/* 拼接其余字段 */</span>
+    <span style="color:#66d9ef">if</span> (force_reload <span style="color:#f92672">&amp;&amp;</span> proxyhost <span style="color:#f92672">!=</span> NULL) {
+        strcat(request, <span style="color:#e6db74">&#34;Pragma: no-cache</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">&#34;</span>);
     }
 
-    if (http10 &gt; 1) strcat(request, &quot;Connection: close\r\n&quot;);
+    <span style="color:#66d9ef">if</span> (http10 <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span>) strcat(request, <span style="color:#e6db74">&#34;Connection: close</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">&#34;</span>);
 
-    /* add empty line at end */
-    if (http10 &gt; 0) strcat(request, &quot;\r\n&quot;);
+    <span style="color:#75715e">/* add empty line at end */</span>
+    <span style="color:#66d9ef">if</span> (http10 <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) strcat(request, <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">&#34;</span>);
 
-    printf(&quot;\nRequest:\n%s\n&quot;, request);
+    printf(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">Request:</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">%s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, request);
 }
 
-/* vraci system rc error kod */
-static int bench(void) {
-    int i, j, k;
-    pid_t pid = 0;
-    FILE *f;
+<span style="color:#75715e">/* vraci system rc error kod */</span>
+<span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">bench</span>(<span style="color:#66d9ef">void</span>) {
+    <span style="color:#66d9ef">int</span> i, j, k;
+    pid_t pid <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    FILE <span style="color:#f92672">*</span>f;
 
-    /* check avaibility of target server */
-    i = Socket(proxyhost == NULL ? host : proxyhost, proxyport);
-    if (i &lt; 0) {
-        fprintf(stderr, &quot;\nConnect to server failed. Aborting benchmark.\n&quot;);
-        return 1;
+    <span style="color:#75715e">/* check avaibility of target server */</span>
+    i <span style="color:#f92672">=</span> Socket(proxyhost <span style="color:#f92672">==</span> NULL <span style="color:#f92672">?</span> host : proxyhost, proxyport);
+    <span style="color:#66d9ef">if</span> (i <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
+        fprintf(stderr, <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">Connect to server failed. Aborting benchmark.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>;
     }
     close(i);
 
-    /* create pipe */
-    /* 创建管道 */
-    if (pipe(mypipe)) {
-        perror(&quot;pipe failed.&quot;);
-        return 3;
+    <span style="color:#75715e">/* create pipe */</span>
+    <span style="color:#75715e">/* 创建管道 */</span>
+    <span style="color:#66d9ef">if</span> (pipe(mypipe)) {
+        perror(<span style="color:#e6db74">&#34;pipe failed.&#34;</span>);
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">3</span>;
     }
 
-    /* not needed, since we have alarm() in childrens */
-    /* wait 4 next system clock tick */
-    /*
-    cas=time(NULL);
-    while(time(NULL)==cas)
-    sched_yield();
-    */
+    <span style="color:#75715e">/* not needed, since we have alarm() in childrens */</span>
+    <span style="color:#75715e">/* wait 4 next system clock tick */</span>
+    <span style="color:#75715e">/*
+</span><span style="color:#75715e">    cas=time(NULL);
+</span><span style="color:#75715e">    while(time(NULL)==cas)
+</span><span style="color:#75715e">    sched_yield();
+</span><span style="color:#75715e">    */</span>
 
-    /* fork childs */
-    /* 创建处理子进程 */
-    for (i = 0; i &lt; clients; i++) {
-        pid = fork();
-        /* 不推荐将 fork 成功和失败的情况放在一起处理 */
-        if (pid &lt;= (pid_t)0) {
-            /* child process or error*/
-            /* 你不能确定进程将于何时中断 */
-            /* 因此这种方法并不推荐使用 */
-            sleep(1); /* make childs faster */
-            break;
+    <span style="color:#75715e">/* fork childs */</span>
+    <span style="color:#75715e">/* 创建处理子进程 */</span>
+    <span style="color:#66d9ef">for</span> (i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> clients; i<span style="color:#f92672">++</span>) {
+        pid <span style="color:#f92672">=</span> fork();
+        <span style="color:#75715e">/* 不推荐将 fork 成功和失败的情况放在一起处理 */</span>
+        <span style="color:#66d9ef">if</span> (pid <span style="color:#f92672">&lt;=</span> (pid_t)<span style="color:#ae81ff">0</span>) {
+            <span style="color:#75715e">/* child process or error*/</span>
+            <span style="color:#75715e">/* 你不能确定进程将于何时中断 */</span>
+            <span style="color:#75715e">/* 因此这种方法并不推荐使用 */</span>
+            sleep(<span style="color:#ae81ff">1</span>); <span style="color:#75715e">/* make childs faster */</span>
+            <span style="color:#66d9ef">break</span>;
         }
     }
 
-    /* 这是? 创建了多个子进程, 然后判断最后一个 fork 是否成功? */
-    if (pid &lt; (pid_t)0) {
-        fprintf(stderr, &quot;problems forking worker no. %d\n&quot;, i);
-        perror(&quot;fork failed.&quot;);
-        return 3;
+    <span style="color:#75715e">/* 这是? 创建了多个子进程, 然后判断最后一个 fork 是否成功? */</span>
+    <span style="color:#66d9ef">if</span> (pid <span style="color:#f92672">&lt;</span> (pid_t)<span style="color:#ae81ff">0</span>) {
+        fprintf(stderr, <span style="color:#e6db74">&#34;problems forking worker no. %d</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, i);
+        perror(<span style="color:#e6db74">&#34;fork failed.&#34;</span>);
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">3</span>;
     }
 
-    if (pid == (pid_t)0) {
-        /* I am a child */
-        /* 开始发送请求 */
-        /* 取全局变量中的 request 作为参数传给本文件内的另一个函数 */
-        /* 什么写法...... */
-        if (proxyhost == NULL)
+    <span style="color:#66d9ef">if</span> (pid <span style="color:#f92672">==</span> (pid_t)<span style="color:#ae81ff">0</span>) {
+        <span style="color:#75715e">/* I am a child */</span>
+        <span style="color:#75715e">/* 开始发送请求 */</span>
+        <span style="color:#75715e">/* 取全局变量中的 request 作为参数传给本文件内的另一个函数 */</span>
+        <span style="color:#75715e">/* 什么写法...... */</span>
+        <span style="color:#66d9ef">if</span> (proxyhost <span style="color:#f92672">==</span> NULL)
             benchcore(host, proxyport, request);
-        else
+        <span style="color:#66d9ef">else</span>
             benchcore(proxyhost, proxyport, request);
 
-        /* write results to pipe */
-        /* 将结果写入 pipe */
-        /* 此处没有关闭 mypipe[0] */
-        /* 不知是何用意 */
-        f = fdopen(mypipe[1], &quot;w&quot;);
-        if (f == NULL) {
-            perror(&quot;open pipe for writing failed.&quot;);
-            return 3;
+        <span style="color:#75715e">/* write results to pipe */</span>
+        <span style="color:#75715e">/* 将结果写入 pipe */</span>
+        <span style="color:#75715e">/* 此处没有关闭 mypipe[0] */</span>
+        <span style="color:#75715e">/* 不知是何用意 */</span>
+        f <span style="color:#f92672">=</span> fdopen(mypipe[<span style="color:#ae81ff">1</span>], <span style="color:#e6db74">&#34;w&#34;</span>);
+        <span style="color:#66d9ef">if</span> (f <span style="color:#f92672">==</span> NULL) {
+            perror(<span style="color:#e6db74">&#34;open pipe for writing failed.&#34;</span>);
+            <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">3</span>;
         }
-        /* fprintf(stderr,&quot;Child - %d %d\n&quot;,speed,failed); */
-        fprintf(f, &quot;%d %d %d\n&quot;, speed, failed, bytes);
+        <span style="color:#75715e">/* fprintf(stderr,&#34;Child - %d %d\n&#34;,speed,failed); */</span>
+        fprintf(f, <span style="color:#e6db74">&#34;%d %d %d</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, speed, failed, bytes);
         fclose(f);
 
-        return 0;
-    } else {
-        /* 同样的, 此处没有关闭 mypipe[1] */
-        f = fdopen(mypipe[0], &quot;r&quot;);
-        if (f == NULL) {
-            perror(&quot;open pipe for reading failed.&quot;);
-            return 3;
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+    } <span style="color:#66d9ef">else</span> {
+        <span style="color:#75715e">/* 同样的, 此处没有关闭 mypipe[1] */</span>
+        f <span style="color:#f92672">=</span> fdopen(mypipe[<span style="color:#ae81ff">0</span>], <span style="color:#e6db74">&#34;r&#34;</span>);
+        <span style="color:#66d9ef">if</span> (f <span style="color:#f92672">==</span> NULL) {
+            perror(<span style="color:#e6db74">&#34;open pipe for reading failed.&#34;</span>);
+            <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">3</span>;
         }
 
-        /* 设置无缓冲 */
-        setvbuf(f, NULL, _IONBF, 0);
+        <span style="color:#75715e">/* 设置无缓冲 */</span>
+        setvbuf(f, NULL, _IONBF, <span style="color:#ae81ff">0</span>);
 
-        speed = 0;
-        failed = 0;
-        bytes = 0;
+        speed <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+        failed <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+        bytes <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
 
-        while (1) {
-            pid = fscanf(f, &quot;%d %d %d&quot;, &amp;i, &amp;j, &amp;k);
-            if (pid &lt; 2) {
-                fprintf(stderr, &quot;Some of our childrens died.\n&quot;);
-                break;
+        <span style="color:#66d9ef">while</span> (<span style="color:#ae81ff">1</span>) {
+            pid <span style="color:#f92672">=</span> fscanf(f, <span style="color:#e6db74">&#34;%d %d %d&#34;</span>, <span style="color:#f92672">&amp;</span>i, <span style="color:#f92672">&amp;</span>j, <span style="color:#f92672">&amp;</span>k);
+            <span style="color:#66d9ef">if</span> (pid <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">2</span>) {
+                fprintf(stderr, <span style="color:#e6db74">&#34;Some of our childrens died.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+                <span style="color:#66d9ef">break</span>;
             }
 
-            speed += i;
-            failed += j;
-            bytes += k;
+            speed <span style="color:#f92672">+=</span> i;
+            failed <span style="color:#f92672">+=</span> j;
+            bytes <span style="color:#f92672">+=</span> k;
 
-            /* fprintf(stderr,&quot;*Knock* %d %d read=%d\n&quot;,speed,failed,pid); */
-            if (--clients == 0) break;
+            <span style="color:#75715e">/* fprintf(stderr,&#34;*Knock* %d %d read=%d\n&#34;,speed,failed,pid); */</span>
+            <span style="color:#66d9ef">if</span> (<span style="color:#f92672">--</span>clients <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">break</span>;
         }
 
         fclose(f);
 
         printf(
-            &quot;\nSpeed=%d pages/min, %d bytes/sec.\nRequests: %d susceed, %d &quot;
-            &quot;failed.\n&quot;,
-            (int)((speed + failed) / (benchtime / 60.0f)),
-            (int)(bytes / (float)benchtime), speed, failed);
+            <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">Speed=%d pages/min, %d bytes/sec.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">Requests: %d susceed, %d &#34;</span>
+            <span style="color:#e6db74">&#34;failed.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>,
+            (<span style="color:#66d9ef">int</span>)((speed <span style="color:#f92672">+</span> failed) <span style="color:#f92672">/</span> (benchtime <span style="color:#f92672">/</span> <span style="color:#ae81ff">60.0f</span>)),
+            (<span style="color:#66d9ef">int</span>)(bytes <span style="color:#f92672">/</span> (<span style="color:#66d9ef">float</span>)benchtime), speed, failed);
     }
 
-    return i;
+    <span style="color:#66d9ef">return</span> i;
 }
 
-void benchcore(const char *host, const int port, const char *req) {
-    int rlen;
-    char buf[1500];
-    int s, i;
-    struct sigaction sa;
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">benchcore</span>(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>host, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span> port, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>req) {
+    <span style="color:#66d9ef">int</span> rlen;
+    <span style="color:#66d9ef">char</span> buf[<span style="color:#ae81ff">1500</span>];
+    <span style="color:#66d9ef">int</span> s, i;
+    <span style="color:#66d9ef">struct</span> sigaction sa;
 
-    /* setup alarm signal handler */
-    /* 设置 SIGALRM 信号的处理程序 */
-    sa.sa_handler = alarm_handler;
-    sa.sa_flags = 0;
-    if (sigaction(SIGALRM, &amp;sa, NULL)) exit(3);
+    <span style="color:#75715e">/* setup alarm signal handler */</span>
+    <span style="color:#75715e">/* 设置 SIGALRM 信号的处理程序 */</span>
+    sa.sa_handler <span style="color:#f92672">=</span> alarm_handler;
+    sa.sa_flags <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    <span style="color:#66d9ef">if</span> (sigaction(SIGALRM, <span style="color:#f92672">&amp;</span>sa, NULL)) exit(<span style="color:#ae81ff">3</span>);
 
-    /* 设置定时器, 超时产生 SIGALRM 信号 */
-    alarm(benchtime);  // after benchtime,then exit
-
-    rlen = strlen(req);
+    <span style="color:#75715e">/* 设置定时器, 超时产生 SIGALRM 信号 */</span>
+    alarm(benchtime);  <span style="color:#75715e">// after benchtime,then exit
+</span><span style="color:#75715e"></span>
+    rlen <span style="color:#f92672">=</span> strlen(req);
 nexttry:
-    while (1) {
-        /**
-         * 一直重试(重新发送一遍)
-         * 直到超时
-         * 如果超时的话, 把 failed--(是说被计时器中断的那个不算错误吗?)
-         * */
-        if (timerexpired) {
-            if (failed &gt; 0) {
-                /* fprintf(stderr,&quot;Correcting failed by signal\n&quot;); */
-                failed--;
+    <span style="color:#66d9ef">while</span> (<span style="color:#ae81ff">1</span>) {
+        <span style="color:#75715e">/**
+</span><span style="color:#75715e">         * 一直重试(重新发送一遍)
+</span><span style="color:#75715e">         * 直到超时
+</span><span style="color:#75715e">         * 如果超时的话, 把 failed--(是说被计时器中断的那个不算错误吗?)
+</span><span style="color:#75715e">         * */</span>
+        <span style="color:#66d9ef">if</span> (timerexpired) {
+            <span style="color:#66d9ef">if</span> (failed <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+                <span style="color:#75715e">/* fprintf(stderr,&#34;Correcting failed by signal\n&#34;); */</span>
+                failed<span style="color:#f92672">--</span>;
             }
-            return;
+            <span style="color:#66d9ef">return</span>;
         }
 
-        s = Socket(host, port);
-        if (s &lt; 0) {
-            failed++;
-            continue;
+        s <span style="color:#f92672">=</span> Socket(host, port);
+        <span style="color:#66d9ef">if</span> (s <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
+            failed<span style="color:#f92672">++</span>;
+            <span style="color:#66d9ef">continue</span>;
         }
-        if (rlen != write(s, req, rlen)) {
-            failed++;
+        <span style="color:#66d9ef">if</span> (rlen <span style="color:#f92672">!=</span> write(s, req, rlen)) {
+            failed<span style="color:#f92672">++</span>;
             close(s);
-            continue;
+            <span style="color:#66d9ef">continue</span>;
         }
-        if (http10 == 0)
-            if (shutdown(s, 1)) {
-                failed++;
+        <span style="color:#66d9ef">if</span> (http10 <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>)
+            <span style="color:#66d9ef">if</span> (shutdown(s, <span style="color:#ae81ff">1</span>)) {
+                failed<span style="color:#f92672">++</span>;
                 close(s);
-                continue;
+                <span style="color:#66d9ef">continue</span>;
             }
-        if (force == 0) {
-            /* read all available data from socket */
-            /* 读取服务器响应 */
-            while (1) {
-                if (timerexpired) break;
-                i = read(s, buf, 1500);
-                /* fprintf(stderr,&quot;%d\n&quot;,i); */
-                if (i &lt; 0) {
-                    failed++;
+        <span style="color:#66d9ef">if</span> (force <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+            <span style="color:#75715e">/* read all available data from socket */</span>
+            <span style="color:#75715e">/* 读取服务器响应 */</span>
+            <span style="color:#66d9ef">while</span> (<span style="color:#ae81ff">1</span>) {
+                <span style="color:#66d9ef">if</span> (timerexpired) <span style="color:#66d9ef">break</span>;
+                i <span style="color:#f92672">=</span> read(s, buf, <span style="color:#ae81ff">1500</span>);
+                <span style="color:#75715e">/* fprintf(stderr,&#34;%d\n&#34;,i); */</span>
+                <span style="color:#66d9ef">if</span> (i <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) {
+                    failed<span style="color:#f92672">++</span>;
                     close(s);
-                    goto nexttry;
-                } else if (i == 0)
-                    break;
-                else
-                    bytes += i;
+                    <span style="color:#66d9ef">goto</span> nexttry;
+                } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (i <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>)
+                    <span style="color:#66d9ef">break</span>;
+                <span style="color:#66d9ef">else</span>
+                    bytes <span style="color:#f92672">+=</span> i;
             }
         }
-        if (close(s)) {
-            failed++;
-            continue;
+        <span style="color:#66d9ef">if</span> (close(s)) {
+            failed<span style="color:#f92672">++</span>;
+            <span style="color:#66d9ef">continue</span>;
         }
-        speed++;
+        speed<span style="color:#f92672">++</span>;
     }
-}
-
-</code></pre><ul class="pa0">
+}</code></pre></div><ul class="pa0">
   
    <li class="list">
      <a href="/tags/c-%E8%AF%AD%E8%A8%80" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">C 语言</a>
