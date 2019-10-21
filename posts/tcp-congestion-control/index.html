@@ -1,31 +1,39 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    
-    <title>MeiK&#39;s blog  | TCP 的拥塞控制</title>
-    <meta name="viewport" content="width=device-width,minimum-scale=1">
-    <meta name="generator" content="Hugo 0.58.3" />
-    
-    
-      <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
-    
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+  <meta name="generator" content="Hugo 0.58.3" />
 
-    
-    
-      <link href="/dist/css/app.d98f2eb6bcd1eaedb7edf166bd16af26.css" rel="stylesheet">
-    
+  <title>TCP 的拥塞控制 &middot; MeiK&#39;s blog</title>
 
-    
+  <link rel="shortcut icon" href="https://meik2333.com/images/favicon.ico">
+  <link rel="stylesheet" href="https://meik2333.com/css/spectre.min.css">
+  <link rel="stylesheet" href="https://meik2333.com/css/style.css">
+  <link rel="stylesheet" href="https://meik2333.com/css/highlight.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css">
+  
 
-    
-      
-    
+  
 
-    
-    
-    <meta property="og:title" content="TCP 的拥塞控制" />
+  
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-107784973-4', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  <meta property="og:title" content="TCP 的拥塞控制" />
 <meta property="og:description" content="TCP 的拥塞控制主要由慢启动、拥塞避免、快重传和快恢复四部分组成。
 
 Google 开源了新的拥塞控制算法 BBR，在实际应用中体验优于传统算法，但还没有得到普及。现在互联网上大部分的设备还是传统算法，因此传统的 TCP 的拥塞控制还有很有学习的必要的。" />
@@ -33,7 +41,9 @@ Google 开源了新的拥塞控制算法 BBR，在实际应用中体验优于传
 <meta property="og:url" content="https://meik2333.com/posts/tcp-congestion-control/" />
 <meta property="article:published_time" content="2018-09-16T19:56:47+00:00" />
 <meta property="article:modified_time" content="2018-09-16T19:56:47+00:00" />
-<meta itemprop="name" content="TCP 的拥塞控制">
+
+  
+  <meta itemprop="name" content="TCP 的拥塞控制">
 <meta itemprop="description" content="TCP 的拥塞控制主要由慢启动、拥塞避免、快重传和快恢复四部分组成。
 
 Google 开源了新的拥塞控制算法 BBR，在实际应用中体验优于传统算法，但还没有得到普及。现在互联网上大部分的设备还是传统算法，因此传统的 TCP 的拥塞控制还有很有学习的必要的。">
@@ -46,71 +56,44 @@ Google 开源了新的拥塞控制算法 BBR，在实际应用中体验优于传
 
 
 <meta itemprop="keywords" content="TCP,网络编程," />
-<meta name="twitter:card" content="summary"/>
+
+  <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="TCP 的拥塞控制"/>
 <meta name="twitter:description" content="TCP 的拥塞控制主要由慢启动、拥塞避免、快重传和快恢复四部分组成。
 
 Google 开源了新的拥塞控制算法 BBR，在实际应用中体验优于传统算法，但还没有得到普及。现在互联网上大部分的设备还是传统算法，因此传统的 TCP 的拥塞控制还有很有学习的必要的。"/>
 
-  </head>
+</head>
 
-  <body class="ma0 avenir bg-near-white">
+<body onload="setPixelFont()">
+  <div class="container p-fixed" style="z-index:3">
+  <nav class="navbar m-2 p-2 s-rounded shadow bg-primary">
+    <section class="navbar-section">
+      <button class="btn btn-action btn-primary s-circle text-gray" id="pixelfont-toggle"><i class="fas fa-robot fa-lg"></i></button>
+    </section>
+    <section class="navbar-section">
+      
+        <a class="btn btn-primary" href='https://meik2333.com'>Home</a>
+      
 
+      
+
+      
+    </section>
+  </nav>
+</div>
+
+  <section class="container grid-md">
+  <div class="columns">
     
-   
-  
-
+    
+<article class="container p-centered mt-space">
   <header>
-    <div class="bg-black">
-      <nav class="pv3 ph3 ph4-ns" role="navigation">
-  <div class="flex-l justify-between items-center center">
-    <a href="https://meik2333.com" class="f3 fw2 hover-white no-underline white-90 dib">
-      MeiK&#39;s blog
-    </a>
-    <div class="flex-l items-center">
-      
-
-      
-      
-
-
-
-
-
-
-
-
-
-
-
-    </div>
-  </div>
-</nav>
-
-    </div>
+    <h2 class="text-center">TCP 的拥塞控制</h2>
+    <h6 class="text-gray text-italic"></h6>
   </header>
-
-
-
-    <main class="pb7" role="main">
-      
-  
-  <article class="flex-l flex-wrap justify-between mw8 center ph3">
-
-    <header class="mt4 w-100">
-      <p class="f6 b helvetica tracked">
-          
-        POSTS
-      </p>
-      <h1 class="f1 athelas mb1">TCP 的拥塞控制</h1>
-      
-      
-      <time class="f6 mv4 dib tracked" datetime="2018-09-16T19:56:47Z">September 16, 2018</time>
-      
-      
-    </header>
-
-    <section class="nested-copy-line-height lh-copy serif f4 nested-links nested-img mid-gray pr4-l w-two-thirds-l"><p>TCP 的拥塞控制主要由慢启动、拥塞避免、快重传和快恢复四部分组成。</p>
+  <section class="my-gap">
+    <p>TCP 的拥塞控制主要由慢启动、拥塞避免、快重传和快恢复四部分组成。</p>
 
 <p>Google 开源了新的拥塞控制算法 BBR，在实际应用中体验优于传统算法，但还没有得到普及。现在互联网上大部分的设备还是传统算法，因此传统的 TCP 的拥塞控制还有很有学习的必要的。</p>
 
@@ -196,96 +179,67 @@ Google 开源了新的拥塞控制算法 BBR，在实际应用中体验优于传
 <li>《计算机网络》 - 电子工业出版社 谢希仁著</li>
 <li><a href="https://blog.csdn.net/itmacar/article/details/12278769">《TCP慢启动、拥塞避免、快速重传、快速恢复》</a> - CSDN</li>
 <li><a href="https://www.cnblogs.com/zszmhd/p/3623155.html">《TCP的拥塞控制 (二)》</a> - 博客园</li>
-</ul><ul class="pa0">
-  
-   <li class="list">
-     <a href="/tags/tcp" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">TCP</a>
-   </li>
-  
-   <li class="list">
-     <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B" class="link f5 grow no-underline br-pill ba ph3 pv2 mb2 dib black sans-serif">网络编程</a>
-   </li>
-  
 </ul>
-<div class="mt6">
-      
-      
-      </div>
-    </section>
-
-    <aside class="w-30-l mt6-l">
-
-
-
-
-  <div class="bg-light-gray pa3 nested-list-reset nested-copy-line-height nested-links">
-    <p class="f5 b mb3">Related</p>
-    <ul class="pa0 list">
-	   
-	     <li  class="mb2">
-          <a href="/posts/tcp-sliding-window/">TCP 的滑动窗口</a>
-        </li>
-	    
-	     <li  class="mb2">
-          <a href="/posts/tcp-status/">TCP 连接的流程与状态转换</a>
-        </li>
-	    
-	     <li  class="mb2">
-          <a href="/posts/tcp-connection/">TCP 的三次握手与四次挥手</a>
-        </li>
-	    
-	     <li  class="mb2">
-          <a href="/posts/syn-flood/">SYN Flood 攻击原理与 C 语言实现</a>
-        </li>
-	    
-	     <li  class="mb2">
-          <a href="/posts/macos-unpv1-env/">MacOS 搭建 UNPv1 编译环境</a>
-        </li>
-	    
-	     <li  class="mb2">
-          <a href="/posts/study-curl/">curl 学习</a>
-        </li>
-	    
-	     <li  class="mb2">
-          <a href="/posts/webbench-source-and-analysis/">WebBench 源码分析 [不推荐阅读]</a>
-        </li>
-	    
-	     <li  class="mb2">
-          <a href="/posts/tinyhttpd-source-and-analysis/">Tinyhttpd 源码及分析</a>
-        </li>
-	    
-    </ul>
-</div>
-
-</aside>
-
-  </article>
-
-    </main>
-    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
-  <div class="flex justify-between">
-  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="https://meik2333.com" >
-    &copy; 2019 MeiK&#39;s blog
-  </a>
-    <div>
-
-
-
-
-
-
-
-
-
-
-</div>
-  </div>
-</footer>
 
     
+      <code class="text-bold">Tags</code> 
+      
+        <a class="chip text-accent" href="https://meik2333.com/tags/tcp">TCP</a>
+      
+        <a class="chip text-accent" href="https://meik2333.com/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B">网络编程</a>
+      
+    
+  </section>
+  <div class="divider my-gap"></div>
+  <footer class="col-12 d-inline-block">
+    <span class="float-left">
+      <button class="btn btn-action btn-accent shadow s-circle" onclick="window.history.back();"><i class="fas fa-arrow-left"></i></button>
+    </span>
+    <span class="float-right">
+      <div class="text-right float-left mx-2">
+        <span class="text-dark"></span><br>
+        <span class="text-gray"></span>
+      </div>
+      <figure class="avatar avatar-lg">
+        <img id="profile">
+      </figure>
+    </span>
+  </footer>
+</article>
 
-  <script src="/dist/js/app.3fc0f988d21662902933.js"></script>
+    <footer class="container p-centered text-center my-gap">
+  
+
+  <small class="text-gray">
+  
+    © Copyright 2019 
+  
+  </small>
+</footer>
+
+  </div>
+  </section>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://meik2333.com/js/main.js"></script>
+<script src="https://meik2333.com/js/highlight.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
 
 
-  </body>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-107784973-4', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+
+</body>
 </html>
