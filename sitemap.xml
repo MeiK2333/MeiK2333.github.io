@@ -3,12 +3,17 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://meik2333.com/posts/dns-security/</loc>
-    <lastmod>2019-10-21T10:39:42+08:00</lastmod>
+    <loc>https://meik2333.com/about/</loc>
+    <lastmod>2019-10-22T18:46:47+08:00</lastmod>
   </url>
   
   <url>
     <loc>https://meik2333.com/</loc>
+    <lastmod>2019-10-22T18:46:47+08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://meik2333.com/posts/dns-security/</loc>
     <lastmod>2019-10-21T10:39:42+08:00</lastmod>
   </url>
   
