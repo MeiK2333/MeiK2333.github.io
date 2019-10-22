@@ -1,160 +1,278 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="x-ua-compatible" content="ie=edge,chrome=1">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  
-  
-  <meta name="generator" content="Hugo 0.58.3" />
+    <meta charset="utf-8">
+    <link crossorigin="anonymous" media="all"
+        integrity="sha512-4bmhxCob3U2WoK8HVl7UacoDdNejo+50BlGN9SdGtjXbsCQwp7uLtntLkL9a9CmgLPZ8L9lsOZL0ieINT9yHeA=="
+        rel="stylesheet"
+        href="https://github.githubassets.com/assets/frameworks-2fd1891c9e6292401a1a3de8bc3f747f.css" />
+    <link crossorigin="anonymous" media="all"
+        integrity="sha512-oF4BPgLoJ4I8H6vdTzR4cGdwAF4bC/bdeI7zsQ/xzUbUWc+JU6xeSbOxIgOyelZP+1ESc5qfwDKzYQfdDNlX5Q=="
+        rel="stylesheet" href="https://github.githubassets.com/assets/github-5238587550334d8b43fd71226c6de55c.css" />
+    <meta name="viewport" content="width=device-width">
 
-  <title>Tinyhttpd &middot; MeiK&#39;s blog</title>
+    <title>MeiK&#39;s blog</title>
 
-  <link rel="shortcut icon" href="https://meik2333.com/images/favicon.ico">
-  <link rel="stylesheet" href="https://meik2333.com/css/spectre.min.css">
-  <link rel="stylesheet" href="https://meik2333.com/css/style.css">
-  <link rel="stylesheet" href="https://meik2333.com/css/highlight.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css">
-  
-
-  
-
-  
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-	ga('create', 'UA-107784973-4', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
-
-  <meta property="og:title" content="Tinyhttpd" />
-<meta property="og:description" content="" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://meik2333.com/tags/tinyhttpd/" />
-
-<meta property="og:updated_time" content="2018-06-29T17:16:20+00:00" />
-
-  
-  <meta itemprop="name" content="Tinyhttpd">
-<meta itemprop="description" content="">
-
-
-  <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Tinyhttpd"/>
-<meta name="twitter:description" content=""/>
-
+    <meta name="description" content="">
+    <link rel="assets" href="https://github.githubassets.com/">
+    <link rel="mask-icon" href="https://github.githubassets.com/pinned-octocat.svg" color="#000000">
+    <link rel="icon" type="image/x-icon" class="js-site-favicon" href="https://meik2333.com/images/favicon.ico">
+    <meta name="theme-color" content="#1e2327">
 </head>
 
-<body onload="setPixelFont()">
-  <div class="container p-fixed" style="z-index:3">
-  <nav class="navbar m-2 p-2 s-rounded shadow bg-primary">
-    <section class="navbar-section">
-      <button class="btn btn-action btn-primary s-circle text-gray" id="pixelfont-toggle"><i class="fas fa-robot fa-lg"></i></button>
-    </section>
-    <section class="navbar-section">
-      
-        <a class="btn btn-primary" href='https://meik2333.com'>Home</a>
-      
-
-      
-
-      
-    </section>
-  </nav>
-</div>
-
-  <section class="container grid-md">
-  <div class="columns">
-    
-	<header class="container p-centered text-center mt-space">
-  <a class="avatar avatar-profile" href="https://meik2333.com/about">
-    <img id="profile">
-  </a>
-  <div class="my-2 py-2">
-    <h3> </h3>
-    <h5 class="text-gray text-italic"></h5>
-  </div>
-</header>
-
-
-    
-<div class="container my-gap">
-	<div class="timeline">
-
-
-  
-    
-    <div class="timeline-item">
-      <div class="timeline-left tooltip" data-tooltip="Year 2018">
-        <div class="timeline-icon icon-lg"><i class="far fa-calendar-check"></i></div>
-      </div>
-      <div class="timeline-content">
-        <div class="tile">
-          <div class="tile-content"><kbd class="tile-title h4">2018</kbd></div>
+<body class="env-production emoji-size-boost page-responsive page-profile">
+  <div class="position-relative js-header-wrapper ">
+    <span class="Progress progress-pjax-loader position-fixed width-full js-pjax-loader-bar">
+        <span class="progress-pjax-loader-bar top-0 left-0" style="width: 0%;"></span>
+    </span>
+    <header class="Header js-details-container Details flex-wrap flex-lg-nowrap p-responsive" role="banner">
+        <div class="Header-item d-none d-lg-flex">
+            <a class="Header-link" href="https://meik2333.com" aria-label="Homepage"
+                data-ga-click="Header, go to dashboard, icon:logo">
+                <svg class="octicon octicon-mark-github v-align-middle" height="32" viewBox="0 0 16 16" version="1.1"
+                    width="32" aria-hidden="true">
+                    <path fill-rule="evenodd"
+                        d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+                </svg>
+            </a>
         </div>
-      </div>
-    </div>
-  
-  <div class="timeline-item">
-    <div class="timeline-left tooltip" data-tooltip="June 2018">
-      <i class="timeline-icon"></i>
-    </div>
-    <div class="timeline-content">
-      <div class="divider my-2" data-content="June"></div>
-      <a class="tile s-rounded shadow my-gap p-2" href="https://meik2333.com/posts/tinyhttpd-source-and-analysis/" style="text-decoration:none">
-        <div class="tile-content">
-          <div class="tile-title h4">Tinyhttpd 源码及分析</div>
-          <div class="tile-subtitle text-dark"></div>
+        <div
+            class="Header-item Header-item--full flex-column flex-lg-row width-full flex-order-2 flex-lg-order-none mr-0 mr-lg-3 mt-3 mt-lg-0 Details-content--hidden">
+            <div class="header-search flex-self-stretch flex-lg-self-auto mr-0 mr-lg-3 mb-3 mb-lg-0 scoped-search site-scoped-search js-site-search position-relative js-jump-to"
+                role="combobox" aria-owns="jump-to-results" aria-label="Search or jump to" aria-haspopup="listbox"
+                aria-expanded="false">
+                <div class="position-relative">
+                </div>
+            </div>
         </div>
-      </a>
+        <div class="Header-item Header-item--full flex-justify-center d-lg-none position-relative">
+            <a class="Header-link" href="https://meik2333.com" aria-label="Homepage"
+                data-ga-click="Header, go to dashboard, icon:logo">
+                <svg class="octicon octicon-mark-github v-align-middle" height="32" viewBox="0 0 16 16" version="1.1"
+                    width="32" aria-hidden="true">
+                    <path fill-rule="evenodd"
+                        d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+                </svg>
+            </a>
+        </div>
+        <div class="Header-item position-relative mr-0 d-none d-lg-flex">
+            <details class="details-overlay details-reset">
+                <summary class="Header-link" aria-label="View profile and more"
+                    data-ga-click="Header, show menu, icon:avatar">
+                    <img alt="" class="avatar" src="https://meik2333.com/images/avatar.png" height="20" width="20">
+                </summary>
+            </details>
+        </div>
+    </header>
+</div>
+
+<div id="start-of-content" class="show-on-focus"></div>
+<div id="js-flash-container">
+</div>
+  
+<div class="application-main " data-commit-hovercards-enabled>
+    <main id="js-pjax-container" data-pjax-container>
+        <div class="container-xl clearfix px-3 mt-4">
+
+            <div class="h-card col-lg-3 col-md-4 col-12 float-md-left pr-md-3 pr-xl-6" itemscope
+    itemtype="http://schema.org/Person">
+    <div class="user-profile-sticky-bar js-user-profile-sticky-bar">
     </div>
-  </div>
+    <div class="clearfix mb-2">
+        <div class="float-left col-3 col-md-12 pr-3 pr-md-0">
+            <a itemprop="image" class="u-photo d-block position-relative" aria-hidden="true"
+                href="https://meik2333.com/images/avatar.png"><img alt="" width="260" height="260"
+                    class="avatar width-full height-full rounded-2" src="https://meik2333.com/images/avatar.png" /></a>
+        </div>
+        <div class="float-left col-9 col-md-12 pl-2 pl-md-0">
 
+            <div class="vcard-names-container pt-1 pt-md-3 pb-1 pb-md-3 js-sticky js-user-profile-sticky-fields">
+                <h1 class="vcard-names">
+                    <span class="p-name vcard-fullname d-block overflow-hidden"
+                        itemprop="name">MeiK</span>
+                    <span class="p-nickname vcard-username d-block"
+                        itemprop="additionalName">MeiK2333</span>
+                </h1>
+            </div>
+
+            <div class="user-profile-following-container js-user-profile-following-toggle mb-3">
+                <span class="user-following-container js-toggler-container js-social-container">
+                    <span class="follow">
+                        <input type="button" style="max-width: 100%" value="Follow"
+                            class="btn btn-block top-0 js-sticky js-user-profile-follow-button mb-2  js-toggler-target"
+                            title="Follow" onclick="window.open('https://github.com/MeiK2333')" />
+                    </span>
+                    <span class="unfollow">
+                        <input type="button" style="max-width: 100%" value="Unfollow"
+                            class="btn btn-block top-0 js-sticky js-user-profile-follow-button mb-2  js-toggler-target"
+                            title="Unfollow" onclick="window.open('https://github.com/MeiK2333')" />
+                    </span>
+                </span>
+            </div>
+
+            <div class="d-none d-md-block">
+                <div class="js-profile-editable-area">
+                    <div class="p-note user-profile-bio js-user-profile-bio">
+                        <div>In solitude, where we are least alone.</div>
+                    </div>
+                    <ul class="vcard-details mb-3">
+                        <li itemprop="email" aria-label="Email: jxn1024@icloud.com"
+                            class="vcard-detail pt-1 css-truncate css-truncate-target"><svg class="octicon octicon-mail"
+                                viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true">
+                                <path fill-rule="evenodd"
+                                    d="M0 4v8c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1H1c-.55 0-1 .45-1 1zm13 0L7 9 1 4h12zM1 5.5l4 3-4 3v-6zM2 12l3.5-3L7 10.5 8.5 9l3.5 3H2zm11-.5l-4-3 4-3v6z" />
+                            </svg>
+                            <a class="u-email " href="mailto:meik2333@gmail.com">meik2333@gmail.com</a>
+                        </li>
+                        <li itemprop="url" data-test-selector="profile-website-url"
+                            class="vcard-detail pt-1 css-truncate css-truncate-target"><svg class="octicon octicon-link"
+                                viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+                                <path fill-rule="evenodd"
+                                    d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+                                </path>
+                            </svg>
+                            <a rel="nofollow me" href="https://meik2333.com">https://meik2333.com</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-top py-3 clearfix hide-sm hide-md">
+                <h2 class="mb-1 h4">Organizations</h2>
+
+                <a class="avatar-group-item" data-hovercard-type="organization"
+                    href="https://github.com/MeiK2333">
+                    <img src="https://meik2333.com/images/github.png" class="avatar" width="35" height="35">
+                </a>
+                
+                <a class="avatar-group-item" data-hovercard-type="organization"
+                    href="https://twitter.com/MeiK2333">
+                    <img src="https://meik2333.com/images/twitter.png" class="avatar" width="35" height="35">
+                </a>
+                
+            </div>
+
+            <div data-test-selector="profile-sponsorships">
+            </div>
+        </div>
+    </div>
 </div>
 
- 	
+            
 
+
+
+<div class="col-lg-9 col-md-8 col-12 float-md-left pl-md-2">
+    <div class="UnderlineNav width-full user-profile-nav top-0 is-placeholder"
+        style="visibility: hidden; display: none; height: 56px;"></div>
+    <div class="UnderlineNav width-full user-profile-nav js-sticky top-0"
+        style="position: static; top: 0px; left: 330.5px; width: 911.5px;">
+        <nav class="UnderlineNav-body" data-pjax aria-label="User profile">
+            <a aria-current="page" class="UnderlineNav-item mr-0 mr-md-1 mr-lg-3 " href="https://meik2333.com">
+                Overview
+            </a>
+            <a class="UnderlineNav-item mr-0 mr-md-1 mr-lg-3 selected" href="https://meik2333.composts/">
+                Posts
+                <span class="Counter hide-lg hide-md hide-sm">
+                    52
+                </span>
+            </a>
+            <a class="UnderlineNav-item mr-0 mr-md-1 mr-lg-3 " href="https://meik2333.comabout/">
+                About
+            </a>
+        </nav>
+    </div>
+
+    <div class="position-relative">
+        <div id="user-repositories-list">
+            <ul data-filterable-for="your-repos-filter" data-filterable-type="substring">
+                
+                <li class="col-12 d-flex width-full py-4 border-bottom public fork">
+                    <div class="col-10 col-lg-9 d-inline-block">
+                        <div class="d-inline-block mb-1">
+                            <h3>
+                                <a href="/posts/tinyhttpd-source-and-analysis/">Tinyhttpd 源码及分析</a>
+                            </h3>
+                        </div>
+
+                        <div name="posts-post">
+                            <p>Tinyhttpd 是J. David Blackstone在1999年写的一个不到 500 行的超轻量型 Http Server，分析这个项目可以帮助我们理解服务器软件的本质。</p>
+                        </div>
+
+                        <div class="f6 text-gray mt-2">
+                            <span class="mr-3">
+                                <svg class="octicon octicon-law mr-1" viewBox="0 0 14 16" version="1.1" width="14"
+                                    height="16" aria-hidden="true">
+                                    <path fill-rule="evenodd"
+                                        d="M7 4c-.83 0-1.5-.67-1.5-1.5S6.17 1 7 1s1.5.67 1.5 1.5S7.83 4 7 4zm7 6c0 1.11-.89 2-2 2h-1c-1.11 0-2-.89-2-2l2-4h-1c-.55 0-1-.45-1-1H8v8c.42 0 1 .45 1 1h1c.42 0 1 .45 1 1H3c0-.55.58-1 1-1h1c0-.55.58-1 1-1h.03L6 5H5c0 .55-.45 1-1 1H3l2 4c0 1.11-.89 2-2 2H2c-1.11 0-2-.89-2-2l2-4H1V5h3c0-.55.45-1 1-1h4c.55 0 1 .45 1 1h3v1h-1l2 4zM2.5 7L1 10h3L2.5 7zM13 10l-1.5-3-1.5 3h3z">
+                                    </path>
+                                </svg>MIT License
+                            </span>
+                            Updated <relative-time datetime="2018-06-29" class="no-wrap"
+                                title="Modifyd at 2018/06/29">
+                                June 29, 2018</relative-time>
+                        </div>
+                    </div>
+                </li>
+                
+            </ul>
+            
+        </div>
+    </div>
 </div>
 
-    <footer class="container p-centered text-center my-gap">
-  
+    </main>
+</div>
 
-  <small class="text-gray">
-  
-    © Copyright 2019 
-  
-  </small>
-</footer>
+  <div class="footer container-lg width-full p-responsive" role="contentinfo">
+    <div
+        class="position-relative d-flex flex-row-reverse flex-lg-row flex-wrap flex-lg-nowrap flex-justify-center flex-lg-justify-between pt-6 pb-2 mt-6 f6 text-gray border-top border-gray-light ">
+        <ul
+            class="list-style-none d-flex flex-wrap col-12 col-lg-5 flex-justify-center flex-lg-justify-between mb-2 mb-lg-0">
+            <li class="mr-3 mr-lg-0">© 2019. Theme by <a href="https://github.com/MeiK2333/github-style"><span>github-style</span></a></li>
+        </ul>
 
-  </div>
-  </section>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script src="https://meik2333.com/js/main.js"></script>
-<script src="https://meik2333.com/js/highlight.js"></script>
-<script>hljs.initHighlightingOnLoad();</script>
+        <a aria-label="Homepage" title="MeiK&#39;s blog" class="footer-octicon d-none d-lg-block mx-lg-4"
+            href="https://meik2333.com">
+            <svg height="24" class="octicon octicon-mark-github" viewBox="0 0 16 16" version="1.1" width="24"
+                aria-hidden="true">
+                <path fill-rule="evenodd"
+                    d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+                </path>
+            </svg>
+        </a>
+        <ul
+            class="list-style-none d-flex flex-wrap col-12 col-lg-5 flex-justify-center flex-lg-justify-between mb-2 mb-lg-0">
+        </ul>
+    </div>
+    <div class="d-flex flex-justify-center pb-6">
+        <span class="f6 text-gray-light"></span>
+    </div>
+</div>
 
+<script crossorigin="anonymous"
+    integrity="sha512-P7QbxhTkfogU8wuMH3u9CEiNA9esk13jExiHBnpW+Kh9fKban2yNVEok9xzV2GqSuEU3ZbCKe0GooUfc6szm4g=="
+    type="application/javascript" src="https://github.githubassets.com/assets/frameworks-e0eb4964.js"></script>
 
-
-
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-	ga('create', 'UA-107784973-4', 'auto');
-	
-	ga('send', 'pageview');
-}
+<script crossorigin="anonymous" async="async"
+    integrity="sha512-UjV5G8yJkGcA9OW3TPPQx+Rk3uyOfOVmYEWLj7ADv81bEy8Jp9oDULYFdQxOxJq518DFlt0+dBqobwvarLrNgA=="
+    type="application/javascript" src="https://github.githubassets.com/assets/github-bootstrap-35e32afb.js"></script>
+<script>
+    let classs = ['pinned-item-desc', 'text-gray', 'text-small', 'd-block', 'mt-2', 'mb-3'];
+    const pinned_posts = document.getElementsByName('pinned-post');
+    for (let i = 0; i < pinned_posts.length; i++) {
+        for (let j = 0; j < classs.length; j++) {
+            pinned_posts[i].getElementsByTagName('p')[0].classList.add(classs[j]);
+        }
+    }
+    classs = [ 'd-inline-block', 'text-gray', 'mb-2', 'pr-4'];
+    const posts_posts = document.getElementsByName('posts-post');
+    for (let i = 0; i < posts_posts.length; i++) {
+        for (let j = 0; j < classs.length; j++) {
+            posts_posts[i].getElementsByTagName('p')[0].classList.add(classs[j]);
+        }
+    }
 </script>
-
-
 </body>
+
 </html>
