@@ -11,7 +11,7 @@
         rel="stylesheet" href="https://github.githubassets.com/assets/github-5238587550334d8b43fd71226c6de55c.css" />
     <meta name="viewport" content="width=device-width">
 
-    <title>MeiK&#39;s blog</title>
+    <title>教程 - MeiK&#39;s blog</title>
 
     <meta name="description" content="">
     <link rel="assets" href="https://github.githubassets.com/">
@@ -193,7 +193,7 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/posts/how-to-report-bugs-effectively/">（转）如何有效的报告 Bug</a>
+                                <a href="https://meik2333.com/posts/how-to-report-bugs-effectively/">（转）如何有效的报告 Bug</a>
                             </h3>
                         </div>
 
@@ -221,7 +221,7 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/posts/how-to-ask-questions-the-smart-way/">（转）提问的智慧</a>
+                                <a href="https://meik2333.com/posts/how-to-ask-questions-the-smart-way/">（转）提问的智慧</a>
                             </h3>
                         </div>
 
@@ -292,18 +292,20 @@
     const pinned_posts = document.getElementsByName('pinned-post');
     for (let i = 0; i < pinned_posts.length; i++) {
         for (let j = 0; j < classs.length; j++) {
-            try {
-                pinned_posts[i].getElementsByTagName('p')[0].classList.add(classs[j]);
-            } catch {}
+            const ps = pinned_posts[i].getElementsByTagName('p');
+            for (let k = 0; k < ps.length; k++) {
+                ps[k].classList.add(classs[j]);
+            }
         }
     }
     classs = [ 'd-inline-block', 'text-gray', 'mb-2', 'pr-4'];
     const posts_posts = document.getElementsByName('posts-post');
     for (let i = 0; i < posts_posts.length; i++) {
         for (let j = 0; j < classs.length; j++) {
-            try {
-                posts_posts[i].getElementsByTagName('p')[0].classList.add(classs[j]);
-            } catch {}
+            const ps = posts_posts[i].getElementsByTagName('p');
+            for (let k = 0; k < ps.length; k++) {
+                ps[k].classList.add(classs[j]);
+            }
         }
     }
 </script>

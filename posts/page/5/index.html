@@ -11,7 +11,7 @@
         rel="stylesheet" href="https://github.githubassets.com/assets/github-5238587550334d8b43fd71226c6de55c.css" />
     <meta name="viewport" content="width=device-width">
 
-    <title>MeiK&#39;s blog</title>
+    <title>Posts - MeiK&#39;s blog</title>
 
     <meta name="description" content="">
     <link rel="assets" href="https://github.githubassets.com/">
@@ -193,7 +193,7 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/posts/django-dynamically-changes-file-upload-path/">Django 动态更改文件上传路径</a>
+                                <a href="https://meik2333.com/posts/django-dynamically-changes-file-upload-path/">Django 动态更改文件上传路径</a>
                             </h3>
                         </div>
 
@@ -221,7 +221,7 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/posts/use-scanf-in-c/">C 语言中 scanf 函数的使用</a>
+                                <a href="https://meik2333.com/posts/use-scanf-in-c/">C 语言中 scanf 函数的使用</a>
                             </h3>
                         </div>
 
@@ -249,7 +249,7 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/posts/centos-setup-php5.2-apache-mysql/">CentOS 配置 PHP5.2 &#43; Apache &#43; MySQL</a>
+                                <a href="https://meik2333.com/posts/centos-setup-php5.2-apache-mysql/">CentOS 配置 PHP5.2 &#43; Apache &#43; MySQL</a>
                             </h3>
                         </div>
 
@@ -283,12 +283,12 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/posts/python-generates-dynamic-ascii-painting/">Python 生成动态字符画</a>
+                                <a href="https://meik2333.com/posts/python-generates-dynamic-ascii-painting/">Python 生成动态字符画</a>
                             </h3>
                         </div>
 
                         <div name="posts-post">
-                            <p><img src="/images/ascii/噫.jpg" alt="噫.jpg" /></p>
+                            <p><img src="/images/ascii/噫.jpg" width="100%" height="100%"></p>
                         </div>
 
                         <div class="f6 text-gray mt-2">
@@ -311,7 +311,7 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/posts/use-lets-encrypt/">CentOS 7 &#43; Nginx 配置 HTTPS （使用 Let&#39;s Encrypt ）</a>
+                                <a href="https://meik2333.com/posts/use-lets-encrypt/">CentOS 7 &#43; Nginx 配置 HTTPS （使用 Let&#39;s Encrypt ）</a>
                             </h3>
                         </div>
 
@@ -341,7 +341,7 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/posts/how-to-report-bugs-effectively/">（转）如何有效的报告 Bug</a>
+                                <a href="https://meik2333.com/posts/how-to-report-bugs-effectively/">（转）如何有效的报告 Bug</a>
                             </h3>
                         </div>
 
@@ -369,7 +369,7 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/posts/how-to-ask-questions-the-smart-way/">（转）提问的智慧</a>
+                                <a href="https://meik2333.com/posts/how-to-ask-questions-the-smart-way/">（转）提问的智慧</a>
                             </h3>
                         </div>
 
@@ -397,7 +397,7 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/posts/get-web-qqmusic-download-link/">通过网页 QQ 音乐获取音乐的下载地址</a>
+                                <a href="https://meik2333.com/posts/get-web-qqmusic-download-link/">通过网页 QQ 音乐获取音乐的下载地址</a>
                             </h3>
                         </div>
 
@@ -427,7 +427,7 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/posts/unit-testing-in-python/">Python 中的单元测试（ unittest 的基础用法）</a>
+                                <a href="https://meik2333.com/posts/unit-testing-in-python/">Python 中的单元测试（ unittest 的基础用法）</a>
                             </h3>
                         </div>
 
@@ -455,7 +455,7 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/posts/django-tutorial/">Django tutorial</a>
+                                <a href="https://meik2333.com/posts/django-tutorial/">Django tutorial</a>
                             </h3>
                         </div>
 
@@ -538,18 +538,20 @@
     const pinned_posts = document.getElementsByName('pinned-post');
     for (let i = 0; i < pinned_posts.length; i++) {
         for (let j = 0; j < classs.length; j++) {
-            try {
-                pinned_posts[i].getElementsByTagName('p')[0].classList.add(classs[j]);
-            } catch {}
+            const ps = pinned_posts[i].getElementsByTagName('p');
+            for (let k = 0; k < ps.length; k++) {
+                ps[k].classList.add(classs[j]);
+            }
         }
     }
     classs = [ 'd-inline-block', 'text-gray', 'mb-2', 'pr-4'];
     const posts_posts = document.getElementsByName('posts-post');
     for (let i = 0; i < posts_posts.length; i++) {
         for (let j = 0; j < classs.length; j++) {
-            try {
-                posts_posts[i].getElementsByTagName('p')[0].classList.add(classs[j]);
-            } catch {}
+            const ps = posts_posts[i].getElementsByTagName('p');
+            for (let k = 0; k < ps.length; k++) {
+                ps[k].classList.add(classs[j]);
+            }
         }
     }
 </script>

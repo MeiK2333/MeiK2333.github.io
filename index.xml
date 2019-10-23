@@ -26,7 +26,7 @@
       <pubDate>Mon, 21 Oct 2019 10:39:42 +0800</pubDate>
       
       <guid>https://meik2333.com/posts/dns-security/</guid>
-      <description></description>
+      <description>&lt;p&gt;浅谈 DNS 安全。&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -305,9 +305,7 @@
       <pubDate>Thu, 16 Aug 2018 20:28:25 +0000</pubDate>
       
       <guid>https://meik2333.com/posts/mmap/</guid>
-      <description>&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-C&#34; data-lang=&#34;C&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#include&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;sys/mman.h&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;
-&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;mmap&lt;/span&gt;(&lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;addr, size_t len, &lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; prot, &lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; flag, &lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; fd, off_t off);
-&lt;span style=&#34;color:#f92672&#34;&gt;//&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;若执行成功，&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;则返回映射区的起始地址；若出错，则返回&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;`&lt;/span&gt;MAP_FAILED&lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;`&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;。&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+      <description>&lt;p&gt;关于 mmap 映射的内存的释放问题。&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -450,7 +448,7 @@
       <pubDate>Mon, 19 Mar 2018 13:32:37 +0000</pubDate>
       
       <guid>https://meik2333.com/posts/python-generates-dynamic-ascii-painting/</guid>
-      <description>&lt;p&gt;&lt;img src=&#34;https://meik2333.com/images/ascii/噫.jpg&#34; alt=&#34;噫.jpg&#34; /&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;&lt;img src=&#34;https://meik2333.com/images/ascii/噫.jpg&#34; width=&#34;100%&#34; height=&#34;100%&#34;&gt;&lt;/p&gt;</description>
     </item>
     
     <item>

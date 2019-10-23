@@ -11,7 +11,7 @@
         rel="stylesheet" href="https://github.githubassets.com/assets/github-5238587550334d8b43fd71226c6de55c.css" />
     <meta name="viewport" content="width=device-width">
 
-    <title>MeiK&#39;s blog</title>
+    <title>Tags - MeiK&#39;s blog</title>
 
     <meta name="description" content="">
     <link rel="assets" href="https://github.githubassets.com/">
@@ -193,7 +193,7 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/tags/python/">Python</a>
+                                <a href="https://meik2333.com/tags/python/">Python</a>
                             </h3>
                         </div>
 
@@ -221,7 +221,7 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/tags/%E7%88%AC%E8%99%AB/">爬虫</a>
+                                <a href="https://meik2333.com/tags/%E7%88%AC%E8%99%AB/">爬虫</a>
                             </h3>
                         </div>
 
@@ -249,7 +249,7 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/tags/onlinejudge/">OnlineJudge</a>
+                                <a href="https://meik2333.com/tags/onlinejudge/">OnlineJudge</a>
                             </h3>
                         </div>
 
@@ -277,7 +277,7 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/tags/%E8%AF%84%E6%B5%8B%E5%A7%AC/">评测姬</a>
+                                <a href="https://meik2333.com/tags/%E8%AF%84%E6%B5%8B%E5%A7%AC/">评测姬</a>
                             </h3>
                         </div>
 
@@ -305,7 +305,7 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/tags/go/">Go</a>
+                                <a href="https://meik2333.com/tags/go/">Go</a>
                             </h3>
                         </div>
 
@@ -333,7 +333,7 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/tags/linux/">Linux</a>
+                                <a href="https://meik2333.com/tags/linux/">Linux</a>
                             </h3>
                         </div>
 
@@ -361,7 +361,7 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/tags/%E6%94%BB%E7%95%A5/">攻略</a>
+                                <a href="https://meik2333.com/tags/%E6%94%BB%E7%95%A5/">攻略</a>
                             </h3>
                         </div>
 
@@ -389,7 +389,7 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/tags/bug/">BUG</a>
+                                <a href="https://meik2333.com/tags/bug/">BUG</a>
                             </h3>
                         </div>
 
@@ -417,7 +417,7 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/tags/%E6%80%BB%E7%BB%93/">总结</a>
+                                <a href="https://meik2333.com/tags/%E6%80%BB%E7%BB%93/">总结</a>
                             </h3>
                         </div>
 
@@ -445,7 +445,7 @@
                     <div class="col-12 col-lg-12 d-inline-block">
                         <div class="d-inline-block mb-1">
                             <h3>
-                                <a href="/tags/windows-to-go/">Windows To Go</a>
+                                <a href="https://meik2333.com/tags/windows-to-go/">Windows To Go</a>
                             </h3>
                         </div>
 
@@ -527,18 +527,20 @@
     const pinned_posts = document.getElementsByName('pinned-post');
     for (let i = 0; i < pinned_posts.length; i++) {
         for (let j = 0; j < classs.length; j++) {
-            try {
-                pinned_posts[i].getElementsByTagName('p')[0].classList.add(classs[j]);
-            } catch {}
+            const ps = pinned_posts[i].getElementsByTagName('p');
+            for (let k = 0; k < ps.length; k++) {
+                ps[k].classList.add(classs[j]);
+            }
         }
     }
     classs = [ 'd-inline-block', 'text-gray', 'mb-2', 'pr-4'];
     const posts_posts = document.getElementsByName('posts-post');
     for (let i = 0; i < posts_posts.length; i++) {
         for (let j = 0; j < classs.length; j++) {
-            try {
-                posts_posts[i].getElementsByTagName('p')[0].classList.add(classs[j]);
-            } catch {}
+            const ps = posts_posts[i].getElementsByTagName('p');
+            for (let k = 0; k < ps.length; k++) {
+                ps[k].classList.add(classs[j]);
+            }
         }
     }
 </script>
