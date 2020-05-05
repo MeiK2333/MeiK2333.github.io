@@ -7,6 +7,8 @@
         href="https://meik2333.com/css/frameworks.css" />
     <link crossorigin="anonymous" media="all"
         rel="stylesheet" href="https://meik2333.com/css/github.css" />
+    <link crossorigin="anonymous" media="(prefers-color-scheme: dark)"
+        rel="stylesheet" href="https://meik2333.com/css/dark.css" />
     <meta name="viewport" content="width=device-width">
 
     <title>TCP 的拥塞控制 - MeiK&#39;s blog</title>
@@ -105,7 +107,7 @@ if (!doNotTrack) {
                                     2018-09-16</time-ago>
                                 <span class="file-info-divider"></span>
                                 Modifyed <time-ago datetime="2018-09-16" class="no-wrap"
-                                    title="Modifyed  at 2018/09/16">
+                                    title="Modified  at 2018/09/16">
                                     2018-09-16</time-ago>
                             </div>
                         </h1>
@@ -223,13 +225,21 @@ if (!doNotTrack) {
 </div>
 
 <div class="utterances"></div>
-<script src="https://utteranc.es/client.js"
-        repo="MeiK2333/MeiK2333.github.io"
-        issue-term="title"
-        theme="github-light"
-        crossorigin="anonymous"
-        async>
+
+<script>
+	this.systemThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    var systemTheme = this.systemThemeMediaQuery.matches ? 'dark' : 'light';
+	var utterancesTheme = systemTheme === 'dark' ? 'github-dark' : 'github-light';
+	var utterancesScript = document.createElement('script');
+	utterancesScript.src = 'https://utteranc.es/client.js';
+	utterancesScript.setAttribute('repo', 'MeiK2333\/MeiK2333.github.io');
+	utterancesScript.setAttribute('issue-term', 'title');
+	utterancesScript.setAttribute('theme', utterancesTheme);
+	utterancesScript.setAttribute('crossorigin', 'anonymous');
+	utterancesScript.setAttribute('async', '');
+	document.querySelector('.utterances').appendChild(utterancesScript);
 </script>
+<noscript>Please enable JavaScript to view the comments</noscript>
 
 
 
@@ -238,7 +248,7 @@ if (!doNotTrack) {
         class="position-relative d-flex flex-row-reverse flex-lg-row flex-wrap flex-lg-nowrap flex-justify-center flex-lg-justify-between pt-6 pb-2 mt-6 f6 text-gray border-top border-gray-light ">
         <ul
             class="list-style-none d-flex flex-wrap col-12 col-lg-5 flex-justify-center flex-lg-justify-between mb-2 mb-lg-0">
-            <li class="mr-3 mr-lg-0">© 2019. Theme by <a href="https://github.com/MeiK2333/github-style"><span>github-style</span></a></li>
+            <li class="mr-3 mr-lg-0"></a></li>
         </ul>
 
         <a aria-label="Homepage" title="MeiK&#39;s blog" class="footer-octicon d-none d-lg-block mx-lg-4"
@@ -286,6 +296,7 @@ if (!doNotTrack) {
         }
     }
 </script>
+
 </body>
 
 </html>
