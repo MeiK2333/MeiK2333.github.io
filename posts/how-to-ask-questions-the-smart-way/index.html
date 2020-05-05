@@ -863,8 +863,8 @@ I&rsquo;ll be glad to translate responses, if you only use one or the other.</p>
 <div class="utterances"></div>
 
 <script>
-	this.systemThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    var systemTheme = this.systemThemeMediaQuery.matches ? 'dark' : 'light';
+	var systemThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+	var systemTheme = systemThemeMediaQuery.matches ? 'dark' : 'light';
 	var utterancesTheme = systemTheme === 'dark' ? 'github-dark' : 'github-light';
 	var utterancesScript = document.createElement('script');
 	utterancesScript.src = 'https://utteranc.es/client.js';

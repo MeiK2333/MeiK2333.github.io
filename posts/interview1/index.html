@@ -543,8 +543,8 @@ LRU 算法需要的条件较多，因此为了减少复杂度，很多时候应�
 <div class="utterances"></div>
 
 <script>
-	this.systemThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    var systemTheme = this.systemThemeMediaQuery.matches ? 'dark' : 'light';
+	var systemThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+	var systemTheme = systemThemeMediaQuery.matches ? 'dark' : 'light';
 	var utterancesTheme = systemTheme === 'dark' ? 'github-dark' : 'github-light';
 	var utterancesScript = document.createElement('script');
 	utterancesScript.src = 'https://utteranc.es/client.js';

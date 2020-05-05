@@ -233,8 +233,8 @@ C/C++ 代码风格指导》</a>，里面有配置环境的方法与一些敲代�
 <div class="utterances"></div>
 
 <script>
-	this.systemThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    var systemTheme = this.systemThemeMediaQuery.matches ? 'dark' : 'light';
+	var systemThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+	var systemTheme = systemThemeMediaQuery.matches ? 'dark' : 'light';
 	var utterancesTheme = systemTheme === 'dark' ? 'github-dark' : 'github-light';
 	var utterancesScript = document.createElement('script');
 	utterancesScript.src = 'https://utteranc.es/client.js';

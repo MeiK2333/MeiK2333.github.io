@@ -372,8 +372,8 @@ curl http://httpbin.org/cookies/set/key/value<span style="color:#f92672">[</span
 <div class="utterances"></div>
 
 <script>
-	this.systemThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    var systemTheme = this.systemThemeMediaQuery.matches ? 'dark' : 'light';
+	var systemThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+	var systemTheme = systemThemeMediaQuery.matches ? 'dark' : 'light';
 	var utterancesTheme = systemTheme === 'dark' ? 'github-dark' : 'github-light';
 	var utterancesScript = document.createElement('script');
 	utterancesScript.src = 'https://utteranc.es/client.js';

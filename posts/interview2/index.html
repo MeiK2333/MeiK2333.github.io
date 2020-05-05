@@ -353,8 +353,8 @@ LT：水平触发，当有事件发生时，会持续通知。如果某个返回
 <div class="utterances"></div>
 
 <script>
-	this.systemThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    var systemTheme = this.systemThemeMediaQuery.matches ? 'dark' : 'light';
+	var systemThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+	var systemTheme = systemThemeMediaQuery.matches ? 'dark' : 'light';
 	var utterancesTheme = systemTheme === 'dark' ? 'github-dark' : 'github-light';
 	var utterancesScript = document.createElement('script');
 	utterancesScript.src = 'https://utteranc.es/client.js';
