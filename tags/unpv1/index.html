@@ -112,23 +112,6 @@ if (!doNotTrack) {
                 </h1>
             </div>
 
-            
-            <div class="user-profile-following-container js-user-profile-following-toggle mb-3">
-                <span class="user-following-container js-toggler-container js-social-container">
-                    <span class="follow">
-                        <input type="button" style="max-width: 100%" value="Follow"
-                            class="btn btn-block top-0 js-sticky js-user-profile-follow-button mb-2  js-toggler-target"
-                            title="Follow" onclick="window.location.href = 'https://github.com/MeiK2333'" />
-                    </span>
-                    <span class="unfollow">
-                        <input type="button" style="max-width: 100%" value="Unfollow"
-                            class="btn btn-block top-0 js-sticky js-user-profile-follow-button mb-2  js-toggler-target"
-                            title="Unfollow" onclick="window.location.href = 'https://github.com/MeiK2333'" />
-                    </span>
-                </span>
-            </div>
-            
-
             <div class="d-none d-md-block">
                 <div class="js-profile-editable-area">
                     <div class="p-note user-profile-bio js-user-profile-bio">
@@ -137,7 +120,7 @@ if (!doNotTrack) {
                     <ul class="vcard-details mb-3">
 
                         
-                        <li itemprop="email" aria-label="Email: jxn1024@icloud.com"
+                        <li itemprop="email" aria-label="Email: meik2333@gmail.com"
                             class="vcard-detail pt-1 css-truncate css-truncate-target"><svg class="octicon octicon-mail"
                                 viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true">
                                 <path fill-rule="evenodd"
@@ -235,7 +218,7 @@ if (!doNotTrack) {
                             </h3>
                         </div>
 
-                        <div name="posts-post">
+                        <div name="posts-post" class="text-gray mb-2 pr-4">
                             <p>SYN flood 或称 SYN 洪水、SYN 洪泛，是一种拒绝服务攻击，起因于攻击者发送一系列的 SYN 请求到目标系统。 —— <a href="https://zh.wikipedia.org/wiki/SYN_flood">维基百科</a></p>
                         </div>
 
@@ -255,7 +238,7 @@ if (!doNotTrack) {
                             </h3>
                         </div>
 
-                        <div name="posts-post">
+                        <div name="posts-post" class="text-gray mb-2 pr-4">
                             <p>为了能够编译运行 《UNIX 网络编程》（UNPv1）上的示例代码，需要编译 <code>libunp.a</code> 库文件，然后才可以正常编译书中的代码。</p>
 
 <p>关于如何编译《UNIX 环境高级编程》（APUE）的示例代码，可以参照<a href="https://github.com/MeiK2333/apue/tree/master/apue.3e">这里</a>。</p>
@@ -277,7 +260,7 @@ if (!doNotTrack) {
                             </h3>
                         </div>
 
-                        <div name="posts-post">
+                        <div name="posts-post" class="text-gray mb-2 pr-4">
                             <p>TCP 为一个连接定义了 11 种状态，并且规定了如何基于当前的状态及在该状态下接收的分节从一个状态转换到另一个状态。</p>
                         </div>
 
@@ -297,7 +280,7 @@ if (!doNotTrack) {
                             </h3>
                         </div>
 
-                        <div name="posts-post">
+                        <div name="posts-post" class="text-gray mb-2 pr-4">
                             <p>TCP 协议提供了可靠的传输，但是网络是不可靠的，TCP 也无法保证数据一定会被对方接收，这是不可能做到的。TCP 实际提供的是数据的可靠递送或故障的可靠通知。</p>
 
 <p>建立一个 TCP 连接需要进行三次握手，而终止一个 TCP 连接需要进行四次挥手。这篇博客就介绍一下关于 TCP 的三次握手与四次挥手与其他一些信息吧。</p>
@@ -352,28 +335,6 @@ if (!doNotTrack) {
 
 <script crossorigin="anonymous" async="async"
     type="application/javascript" src="https://meik2333.com/js/github-bootstrap.js"></script>
-<script>
-    let classs = ['pinned-item-desc', 'text-gray', 'text-small', 'd-block', 'mt-2', 'mb-3'];
-    const pinned_posts = document.getElementsByName('pinned-post');
-    for (let i = 0; i < pinned_posts.length; i++) {
-        for (let j = 0; j < classs.length; j++) {
-            const ps = pinned_posts[i].getElementsByTagName('p');
-            for (let k = 0; k < ps.length; k++) {
-                ps[k].classList.add(classs[j]);
-            }
-        }
-    }
-    classs = [ 'd-inline-block', 'text-gray', 'mb-2', 'pr-4'];
-    const posts_posts = document.getElementsByName('posts-post');
-    for (let i = 0; i < posts_posts.length; i++) {
-        for (let j = 0; j < classs.length; j++) {
-            const ps = posts_posts[i].getElementsByTagName('p');
-            for (let k = 0; k < ps.length; k++) {
-                ps[k].classList.add(classs[j]);
-            }
-        }
-    }
-</script>
 
 </body>
 

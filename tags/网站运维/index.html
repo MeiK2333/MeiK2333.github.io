@@ -112,23 +112,6 @@ if (!doNotTrack) {
                 </h1>
             </div>
 
-            
-            <div class="user-profile-following-container js-user-profile-following-toggle mb-3">
-                <span class="user-following-container js-toggler-container js-social-container">
-                    <span class="follow">
-                        <input type="button" style="max-width: 100%" value="Follow"
-                            class="btn btn-block top-0 js-sticky js-user-profile-follow-button mb-2  js-toggler-target"
-                            title="Follow" onclick="window.location.href = 'https://github.com/MeiK2333'" />
-                    </span>
-                    <span class="unfollow">
-                        <input type="button" style="max-width: 100%" value="Unfollow"
-                            class="btn btn-block top-0 js-sticky js-user-profile-follow-button mb-2  js-toggler-target"
-                            title="Unfollow" onclick="window.location.href = 'https://github.com/MeiK2333'" />
-                    </span>
-                </span>
-            </div>
-            
-
             <div class="d-none d-md-block">
                 <div class="js-profile-editable-area">
                     <div class="p-note user-profile-bio js-user-profile-bio">
@@ -137,7 +120,7 @@ if (!doNotTrack) {
                     <ul class="vcard-details mb-3">
 
                         
-                        <li itemprop="email" aria-label="Email: jxn1024@icloud.com"
+                        <li itemprop="email" aria-label="Email: meik2333@gmail.com"
                             class="vcard-detail pt-1 css-truncate css-truncate-target"><svg class="octicon octicon-mail"
                                 viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true">
                                 <path fill-rule="evenodd"
@@ -235,7 +218,7 @@ if (!doNotTrack) {
                             </h3>
                         </div>
 
-                        <div name="posts-post">
+                        <div name="posts-post" class="text-gray mb-2 pr-4">
                             <h2 id="原材料">原材料</h2>
 
 <ul>
@@ -261,7 +244,7 @@ if (!doNotTrack) {
                             </h3>
                         </div>
 
-                        <div name="posts-post">
+                        <div name="posts-post" class="text-gray mb-2 pr-4">
                             <p>谷歌浏览器自 17 年起标记非 HTTPS 的网站的密码输入为不安全的，从 18 年 7 月份起将所有非 HTTPS 的网站标记为不安全。在谷歌 14 年的<a href="https://webmasters.googleblog.com/2014/08/https-as-ranking-signal.html">这篇博客</a>中说明，谷歌搜索引擎将会提高 HTTPS 网站的权重。</p>
 
 <p>使用了 HTTPS 协议的网站不一定是安全的，但是不使用 HTTPS 的网站是很不安全的。在手机浏览器上访问一些 HTTP 的网站，经常会被插入运营商的广告；使用不安全的网络连接时，浏览内容也很容易被拦截。因此，网站升级为 HTTPS 是很有必要的。</p>
@@ -316,28 +299,6 @@ if (!doNotTrack) {
 
 <script crossorigin="anonymous" async="async"
     type="application/javascript" src="https://meik2333.com/js/github-bootstrap.js"></script>
-<script>
-    let classs = ['pinned-item-desc', 'text-gray', 'text-small', 'd-block', 'mt-2', 'mb-3'];
-    const pinned_posts = document.getElementsByName('pinned-post');
-    for (let i = 0; i < pinned_posts.length; i++) {
-        for (let j = 0; j < classs.length; j++) {
-            const ps = pinned_posts[i].getElementsByTagName('p');
-            for (let k = 0; k < ps.length; k++) {
-                ps[k].classList.add(classs[j]);
-            }
-        }
-    }
-    classs = [ 'd-inline-block', 'text-gray', 'mb-2', 'pr-4'];
-    const posts_posts = document.getElementsByName('posts-post');
-    for (let i = 0; i < posts_posts.length; i++) {
-        for (let j = 0; j < classs.length; j++) {
-            const ps = posts_posts[i].getElementsByTagName('p');
-            for (let k = 0; k < ps.length; k++) {
-                ps[k].classList.add(classs[j]);
-            }
-        }
-    }
-</script>
 
 </body>
 
