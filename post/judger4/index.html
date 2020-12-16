@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <script type="application/javascript" src='https://meik2333.com/js/theme-mode.js'></script>
+    <link rel="stylesheet" href='https://meik2333.com/css/frameworks.min.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/github.min.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <title>如何写一个评测姬 - 第四篇 - MeiK&#39;s blog</title>
+    <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
+    <meta name="theme-color" content="#1e2327">
+
+    
+    <meta name="description"
+  content="从零开始实现一个 OJ 评测姬。
+" />
+<meta name="keywords"
+  content='' />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="https://meik2333.com/post/judger4/" />
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="如何写一个评测姬 - 第四篇 - MeiK&#39;s blog" />
+<meta name="twitter:description"
+  content="从零开始实现一个 OJ 评测姬。
+" />
+<meta name="twitter:site" content="https://meik2333.com/" />
+<meta name="twitter:creator" content="" />
+<meta name="twitter:image"
+  content="https://meik2333.com/">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:title" content="如何写一个评测姬 - 第四篇 - MeiK&#39;s blog">
+<meta property="og:description"
+  content="从零开始实现一个 OJ 评测姬。
+" />
+<meta property="og:url" content="https://meik2333.com/post/judger4/" />
+<meta property="og:site_name" content="如何写一个评测姬 - 第四篇" />
+<meta property="og:image"
+  content="https://meik2333.com/">
+<meta property="og:image:width" content="2048">
+<meta property="og:image:height" content="1024">
+
+<meta property="article:published_time" content="2019-05-08 15:05:04 &#43;0000 UTC" />
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body>
+  <div style="position: relative">
+  <header class="Header js-details-container Details px-3 px-md-4 px-lg-5 flex-wrap flex-md-nowrap open Details--on">
+    <div class="Header-item mobile-none" style="margin-top: -4px; margin-bottom: -4px;">
+      <a class="Header-link" href="https://meik2333.com/">
+        <svg class="octicon" height="32" viewBox="0 0 16 16" version="1.1" width="32">
+          <path fill-rule="evenodd"
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+          </path>
+        </svg>
+      </a>
+    </div>
+    <div class="Header-item d-md-none">
+      <button class="Header-link btn-link js-details-target" type="button"
+        onclick="document.querySelector('#header-search').style.display = document.querySelector('#header-search').style.display == 'none'? 'block': 'none'">
+        <svg height="24" class="octicon octicon-three-bars" viewBox="0 0 16 16" version="1.1" width="24">
+          <path fill-rule="evenodd"
+            d="M1 2.75A.75.75 0 011.75 2h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 2.75zm0 5A.75.75 0 011.75 7h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 7.75zM1.75 12a.75.75 0 100 1.5h12.5a.75.75 0 100-1.5H1.75z">
+          </path>
+        </svg>
+      </button>
+    </div>
+    <div style="display: none;" id="header-search"
+      class="Header-item Header-item--full flex-column flex-md-row width-full flex-order-2 flex-md-order-none mr-0 mr-md-3 mt-3 mt-md-0 Details-content--hidden-not-important d-md-flex">
+      <div
+        class="Header-search header-search flex-auto js-site-search position-relative flex-self-stretch flex-md-self-auto mb-3 mb-md-0 mr-0 mr-md-3 scoped-search site-scoped-search js-jump-to">
+        <div class="position-relative">
+          <form target="_blank" action="https://www.google.com/search" accept-charset="UTF-8" method="get"
+            autocomplete="off">
+            <label
+              class="Header-search-label form-control input-sm header-search-wrapper p-0 js-chromeless-input-container header-search-wrapper-jump-to position-relative d-flex flex-justify-between flex-items-center">
+              <input type="text"
+                class="Header-search-input form-control input-sm header-search-input jump-to-field js-jump-to-field js-site-search-focus js-site-search-field is-clearable"
+                name="q" value="" placeholder="Search" autocomplete="off">
+              <input type="hidden" name="q" value="site:https://meik2333.com/">
+            </label>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="Header-item Header-item--full flex-justify-center d-md-none position-relative">
+      <a class="Header-link " href="https://meik2333.com/">
+        <svg class="octicon octicon-mark-github v-align-middle" height="32" viewBox="0 0 16 16" version="1.1"
+          width="32">
+          <path fill-rule="evenodd"
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+          </path>
+        </svg>
+      </a>
+    </div>
+    <div class="Header-item" style="margin-right: 0;">
+      <a href="javascript:void(0)" class="Header-link no-select" onclick="switchTheme()">
+        <svg style="fill: var(--color-profile-color-modes-toggle-moon);" class="no-select" viewBox="0 0 16 16"
+          version="1.1" width="16" height="16">
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M4.52208 7.71754C7.5782 7.71754 10.0557 5.24006 10.0557 2.18394C10.0557 1.93498 10.0392 1.68986 10.0074 1.44961C9.95801 1.07727 10.3495 0.771159 10.6474 0.99992C12.1153 2.12716 13.0615 3.89999 13.0615 5.89383C13.0615 9.29958 10.3006 12.0605 6.89485 12.0605C3.95334 12.0605 1.49286 10.001 0.876728 7.24527C0.794841 6.87902 1.23668 6.65289 1.55321 6.85451C2.41106 7.40095 3.4296 7.71754 4.52208 7.71754Z">
+          </path>
+        </svg>
+      </a>
+    </div>
+  </header>
+</div>
+  
+<div>
+  <main>
+    <div class="gisthead pagehead bg-gray-light pb-0 pt-3 mb-4">
+      <div class="px-0">
+        <div class="mb-3 d-flex px-3 px-md-3 px-lg-5">
+          <div class="flex-auto min-width-0 width-fit mr-3">
+            <div class="d-flex">
+              <div class="d-none d-md-block">
+                <a class="avatar mr-2 flex-shrink-0" href="https://meik2333.com/">
+                  <img class=" avatar-user"
+                    src="https://meik2333.com/images/avatar.png"
+                    width="32" height="32"></a>
+              </div>
+              <div class="d-flex flex-column">
+                <h1 class="break-word f3 text-normal mb-md-0 mb-1">
+                  <span class="author">
+                    <a href="https://meik2333.com/">MeiK</a></span><span
+                    class="path-divider">/</span><strong class="css-truncate-target mr-1" style="max-width: 410px"><a
+                      href="https://meik2333.com/post/judger4/">如何写一个评测姬 - 第四篇</a></strong>
+                </h1>
+                <div class="note m-0">
+                  Created <relative-time datetime="Wed, 08 May 2019 15:05:04 &#43;0000"
+                    class="no-wrap">
+                    Wed, 08 May 2019 15:05:04 &#43;0000</relative-time>
+
+                  
+                  <span class="file-info-divider"></span>
+                  Modified <relative-time datetime="Fri, 11 Oct 2019 17:36:59 &#43;0800"
+                    class="no-wrap">
+                    Fri, 11 Oct 2019 17:36:59 &#43;0800</relative-time>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-lg px-3 new-discussion-timeline">
+      <div class="repository-content gist-content">
+        <div>
+          <div class="js-gist-file-update-container js-task-list-container file-box">
+            <div id="file-pytest" class="file my-2">
+              <div class="file-header d-flex flex-md-items-center flex-items-start">
+                <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
+                  <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
+                    1264 Words
+                    
+
+                  </div>
+                  <div class="file-actions flex-order-2 pt-0">
+                    
+                    
+                    <a class="muted-link mr-3" href="/tags/onlinejudge">
+                      <svg class="octicon octicon-tag" viewBox="0 0 16 16" version="1.1" width="16" height="16">
+                        <path fill-rule="evenodd"
+                          d="M2.5 7.775V2.75a.25.25 0 01.25-.25h5.025a.25.25 0 01.177.073l6.25 6.25a.25.25 0 010 .354l-5.025 5.025a.25.25 0 01-.354 0l-6.25-6.25a.25.25 0 01-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.75 1.75 0 011 7.775zM6 5a1 1 0 100 2 1 1 0 000-2z">
+                        </path>
+                      </svg>
+                      OnlineJudge
+                    </a>
+                    
+                    <a class="muted-link mr-3" href="/tags/%E8%AF%84%E6%B5%8B%E5%A7%AC">
+                      <svg class="octicon octicon-tag" viewBox="0 0 16 16" version="1.1" width="16" height="16">
+                        <path fill-rule="evenodd"
+                          d="M2.5 7.775V2.75a.25.25 0 01.25-.25h5.025a.25.25 0 01.177.073l6.25 6.25a.25.25 0 010 .354l-5.025 5.025a.25.25 0 01-.354 0l-6.25-6.25a.25.25 0 01-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.75 1.75 0 011 7.775zM6 5a1 1 0 100 2 1 1 0 000-2z">
+                        </path>
+                      </svg>
+                      评测姬
+                    </a>
+                    
+                    
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="Box-body px-5 pb-5">
+                <article class="markdown-body entry-content container-lg"><p>从零开始实现一个 OJ 评测姬。</p>
+
+<p>本篇讲一下如何防止评测姬因用户程序的异常而崩溃。首先，我们来看看用户程序都会出现什么异常，然后再来考虑如何解决这些异常。</p>
+
+<h2 id="解决过多资源占用">解决过多资源占用</h2>
+
+<p>用户可能因为失误而提交了占用过多资源的代码，比如死循环、占用过多内存、输出过多等。为了解决这些问题，我们需要限制用户程序的时间、内存以及输出数据的大小。</p>
+
+<p>Linux 有系统函数可以解决这个问题：<a href="https://linux.die.net/man/3/setrlimit"><code>setrlimit</code></a>。这个函数可以限制程序的 CPU 时间、内存占用、输出数据等，用法大致如下：</p>
+
+<pre><code class="language-c">#include &lt;sys/resource.h&gt;
+int main() {
+    struct rlimit rl;
+    rl.rlim_cur = rl.rlim_max = 1;
+    setrlimit(RLIMIT_CPU, &amp;rl);
+    while (1) {
+    }
+}
+</code></pre>
+
+<p>执行：</p>
+
+<pre><code class="language-bash">$ gcc main.c
+$ time ./a.out 
+[2]    3057 cpu limit exceeded  ./a.out
+./a.out  0.98s user 0.02s system 96% cpu 1.034 total
+</code></pre>
+
+<p>可以看到，虽然我们在代码中写了个死循环，但是这个程序只运行一秒就结束了。<code>setrlimit</code> 可以对进程添加资源限制，并在超出限制时触发信号，父进程可以捕获这个信号。同时 <code>exec</code> 会继承这些限制，因此可以使用与流重定向类似的方法来添加资源限制。</p>
+
+<p>有关限制的实际代码，可以查看 <a href="https://github.com/MeiK2333/ZeroJudger/blob/master/limit/main.c">https://github.com/MeiK2333/ZeroJudger/blob/master/limit/main.c</a>。</p>
+
+<h2 id="解决恶意攻击">解决恶意攻击</h2>
+
+<p>不同于用户不小心提交的占用资源过多的代码，有些同学会故意提交一些恶意攻击评测姬的代码，俗称“卡评测”。对于这些恶意攻击，我们也需要做好防备。</p>
+
+<p>简单起见，我们的评测姬不对恶意攻击做防范，仅对用户无意间造成的资源过度占用做限制。</p>
+
+<p>常用的恶意攻击的方式我之前写过博客，后来我注销了 CSDN 账号，博客也没了，这里就重新写一遍吧。</p>
+
+<h3 id="include-攻击">include 攻击</h3>
+
+<p>利用 OJ 会返回编译错误的特点，使用 C/C++ 语言使用 <code>#include</code> 来导入一个敏感的文件，然后通过编译错误的信息来获得其中敏感的数据。</p>
+
+<pre><code class="language-bash">$ echo 'password' &gt; password.txt
+$ echo '#include &lt;password.txt&gt;' &gt; main.c 
+$ gcc main.c 
+main.c:1:10: error: 'password.txt' file not found with &lt;angled&gt; include; use &quot;quotes&quot; instead
+#include &lt;password.txt&gt;
+         ^~~~~~~~~~~~~~
+         &quot;password.txt&quot;
+In file included from main.c:1:
+./password.txt:1:1: error: unknown type name 'password'
+password
+^
+main.c:1:24: error: expected identifier or '('
+#include &lt;password.txt&gt;
+                       ^
+3 errors generated.
+</code></pre>
+
+<p>解决方案为配置好评测用户权限，使用低权限的用户进行评测，以防止此类攻击。同时可以考虑使用 Docker 等进行评测，Docker 环境内不放任何敏感的数据。</p>
+
+<h3 id="编译超时-编译产生巨大文件-编译产生巨量错误信息">编译超时 &amp;&amp; 编译产生巨大文件 &amp;&amp; 编译产生巨量错误信息</h3>
+
+<ul>
+<li><p>编译超时</p>
+
+<pre><code class="language-c">#include &lt;/dev/random&gt;或者#include &lt;/dev/tty&gt; //(Linux)
+#include &lt;CON&gt; //(Windows)
+</code></pre></li>
+
+<li><p>编译产生巨大文件</p>
+
+<pre><code class="language-c">main[-1u]={1};
+</code></pre></li>
+
+<li><p>编译产生巨量错误信息</p></li>
+</ul>
+
+<p>这几种攻击方式并不能让攻击者获得什么数据或权限，只是单纯的会卡住评测。但有人就是这么无聊的……</p>
+
+<p>解决方案也很简单，就是像限制用户程序资源占用一样限制编译时的资源占用。</p>
+
+<h3 id="shell-攻击-fork-炸弹-其他系统调用攻击-网络模块攻击">shell 攻击 &amp;&amp; fork 炸弹 &amp;&amp; 其他系统调用攻击 &amp;&amp; 网络模块攻击</h3>
+
+<p>shell 攻击：</p>
+
+<pre><code class="language-c">system(&quot;reboot&quot;);
+</code></pre>
+
+<p><code>fork</code> 炸弹：</p>
+
+<pre><code class="language-c">while (1) {
+    fork();
+}
+</code></pre>
+
+<p>网络模块攻击：如果评测姬没有限制联网的话，攻击的程序可以通过网络做到很多的攻击方式，程序可能会收集很多运行时评测姬和服务器的信息，然后提交到某处。</p>
+
+<p>这几种攻击方式，如果只是简单的禁用 <code>system</code> 和 <code>fork</code> 等这些函数是没有用的，因为 C/C++ 的宏可以轻易的绕过这些限制。可以考虑在系统调用的层面进行限制，大多开源的评测机都是通过限制系统调用来保证评测安全的。</p>
+
+<p>限制系统调用，可以使用 <code>ptrace</code> 来自行限制，也可以使用开源库 <a href="https://github.com/seccomp/libseccomp">seccomp</a> 来进行限制。</p>
+
+<h2 id="总结">总结</h2>
+
+<p>本篇我们介绍了常见的攻击手段与防范手段，这样我们的评测姬就会有一定的安全性保障。下一篇我们将介绍一下如何获取用户程序运行占用的资源。</p></article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+  <div class="footer container-xl width-full p-responsive">
+  <div
+    class="position-relative d-flex flex-row-reverse flex-lg-row flex-wrap flex-lg-nowrap flex-justify-center flex-lg-justify-between flex-sm-items-center pt-6 pb-2 mt-6 f6 text-gray border-top border-gray-light ">
+    <a aria-label="Homepage" title="GitHub" class="footer-octicon d-none d-lg-block mr-lg-4" href="https://meik2333.com/">
+      <svg height="24" class="octicon octicon-mark-github" viewBox="0 0 16 16" version="1.1" width="24">
+        <path fill-rule="evenodd"
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+        </path>
+      </svg>
+    </a>
+    <ul class="list-style-none d-flex flex-wrap col-12 flex-justify-center flex-lg-justify-between mb-2 mb-lg-0">
+      
+      <li class="mr-3 mr-lg-0">Theme by <a href='https://github.com/MeiK2333/github-style'>github-style</a></li>
+      
+    </ul>
+  </div>
+  <div class="d-flex flex-justify-center pb-6">
+    <span class="f6 text-gray-light"></span>
+  </div>
+
+
+</div>
+</body>
+
+<script type="application/javascript" src="https://meik2333.com/js/github-style.js"></script>
+
+
+
+</html>

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <script type="application/javascript" src='https://meik2333.com/js/theme-mode.js'></script>
+    <link rel="stylesheet" href='https://meik2333.com/css/frameworks.min.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/github.min.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <title>如何写一个爬虫 - 第二篇 - MeiK&#39;s blog</title>
+    <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
+    <meta name="theme-color" content="#1e2327">
+
+    
+    <meta name="description"
+  content="从零开始实现一个爬虫。
+" />
+<meta name="keywords"
+  content='' />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="https://meik2333.com/post/crawler2/" />
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="如何写一个爬虫 - 第二篇 - MeiK&#39;s blog" />
+<meta name="twitter:description"
+  content="从零开始实现一个爬虫。
+" />
+<meta name="twitter:site" content="https://meik2333.com/" />
+<meta name="twitter:creator" content="" />
+<meta name="twitter:image"
+  content="https://meik2333.com/">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:title" content="如何写一个爬虫 - 第二篇 - MeiK&#39;s blog">
+<meta property="og:description"
+  content="从零开始实现一个爬虫。
+" />
+<meta property="og:url" content="https://meik2333.com/post/crawler2/" />
+<meta property="og:site_name" content="如何写一个爬虫 - 第二篇" />
+<meta property="og:image"
+  content="https://meik2333.com/">
+<meta property="og:image:width" content="2048">
+<meta property="og:image:height" content="1024">
+
+<meta property="article:published_time" content="2019-08-05 20:56:35 &#43;0000 UTC" />
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body>
+  <div style="position: relative">
+  <header class="Header js-details-container Details px-3 px-md-4 px-lg-5 flex-wrap flex-md-nowrap open Details--on">
+    <div class="Header-item mobile-none" style="margin-top: -4px; margin-bottom: -4px;">
+      <a class="Header-link" href="https://meik2333.com/">
+        <svg class="octicon" height="32" viewBox="0 0 16 16" version="1.1" width="32">
+          <path fill-rule="evenodd"
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+          </path>
+        </svg>
+      </a>
+    </div>
+    <div class="Header-item d-md-none">
+      <button class="Header-link btn-link js-details-target" type="button"
+        onclick="document.querySelector('#header-search').style.display = document.querySelector('#header-search').style.display == 'none'? 'block': 'none'">
+        <svg height="24" class="octicon octicon-three-bars" viewBox="0 0 16 16" version="1.1" width="24">
+          <path fill-rule="evenodd"
+            d="M1 2.75A.75.75 0 011.75 2h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 2.75zm0 5A.75.75 0 011.75 7h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 7.75zM1.75 12a.75.75 0 100 1.5h12.5a.75.75 0 100-1.5H1.75z">
+          </path>
+        </svg>
+      </button>
+    </div>
+    <div style="display: none;" id="header-search"
+      class="Header-item Header-item--full flex-column flex-md-row width-full flex-order-2 flex-md-order-none mr-0 mr-md-3 mt-3 mt-md-0 Details-content--hidden-not-important d-md-flex">
+      <div
+        class="Header-search header-search flex-auto js-site-search position-relative flex-self-stretch flex-md-self-auto mb-3 mb-md-0 mr-0 mr-md-3 scoped-search site-scoped-search js-jump-to">
+        <div class="position-relative">
+          <form target="_blank" action="https://www.google.com/search" accept-charset="UTF-8" method="get"
+            autocomplete="off">
+            <label
+              class="Header-search-label form-control input-sm header-search-wrapper p-0 js-chromeless-input-container header-search-wrapper-jump-to position-relative d-flex flex-justify-between flex-items-center">
+              <input type="text"
+                class="Header-search-input form-control input-sm header-search-input jump-to-field js-jump-to-field js-site-search-focus js-site-search-field is-clearable"
+                name="q" value="" placeholder="Search" autocomplete="off">
+              <input type="hidden" name="q" value="site:https://meik2333.com/">
+            </label>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="Header-item Header-item--full flex-justify-center d-md-none position-relative">
+      <a class="Header-link " href="https://meik2333.com/">
+        <svg class="octicon octicon-mark-github v-align-middle" height="32" viewBox="0 0 16 16" version="1.1"
+          width="32">
+          <path fill-rule="evenodd"
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+          </path>
+        </svg>
+      </a>
+    </div>
+    <div class="Header-item" style="margin-right: 0;">
+      <a href="javascript:void(0)" class="Header-link no-select" onclick="switchTheme()">
+        <svg style="fill: var(--color-profile-color-modes-toggle-moon);" class="no-select" viewBox="0 0 16 16"
+          version="1.1" width="16" height="16">
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M4.52208 7.71754C7.5782 7.71754 10.0557 5.24006 10.0557 2.18394C10.0557 1.93498 10.0392 1.68986 10.0074 1.44961C9.95801 1.07727 10.3495 0.771159 10.6474 0.99992C12.1153 2.12716 13.0615 3.89999 13.0615 5.89383C13.0615 9.29958 10.3006 12.0605 6.89485 12.0605C3.95334 12.0605 1.49286 10.001 0.876728 7.24527C0.794841 6.87902 1.23668 6.65289 1.55321 6.85451C2.41106 7.40095 3.4296 7.71754 4.52208 7.71754Z">
+          </path>
+        </svg>
+      </a>
+    </div>
+  </header>
+</div>
+  
+<div>
+  <main>
+    <div class="gisthead pagehead bg-gray-light pb-0 pt-3 mb-4">
+      <div class="px-0">
+        <div class="mb-3 d-flex px-3 px-md-3 px-lg-5">
+          <div class="flex-auto min-width-0 width-fit mr-3">
+            <div class="d-flex">
+              <div class="d-none d-md-block">
+                <a class="avatar mr-2 flex-shrink-0" href="https://meik2333.com/">
+                  <img class=" avatar-user"
+                    src="https://meik2333.com/images/avatar.png"
+                    width="32" height="32"></a>
+              </div>
+              <div class="d-flex flex-column">
+                <h1 class="break-word f3 text-normal mb-md-0 mb-1">
+                  <span class="author">
+                    <a href="https://meik2333.com/">MeiK</a></span><span
+                    class="path-divider">/</span><strong class="css-truncate-target mr-1" style="max-width: 410px"><a
+                      href="https://meik2333.com/post/crawler2/">如何写一个爬虫 - 第二篇</a></strong>
+                </h1>
+                <div class="note m-0">
+                  Created <relative-time datetime="Mon, 05 Aug 2019 20:56:35 &#43;0000"
+                    class="no-wrap">
+                    Mon, 05 Aug 2019 20:56:35 &#43;0000</relative-time>
+
+                  
+                  <span class="file-info-divider"></span>
+                  Modified <relative-time datetime="Fri, 11 Oct 2019 17:47:14 &#43;0800"
+                    class="no-wrap">
+                    Fri, 11 Oct 2019 17:47:14 &#43;0800</relative-time>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-lg px-3 new-discussion-timeline">
+      <div class="repository-content gist-content">
+        <div>
+          <div class="js-gist-file-update-container js-task-list-container file-box">
+            <div id="file-pytest" class="file my-2">
+              <div class="file-header d-flex flex-md-items-center flex-items-start">
+                <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
+                  <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
+                    2770 Words
+                    
+
+                  </div>
+                  <div class="file-actions flex-order-2 pt-0">
+                    
+                    
+                    <a class="muted-link mr-3" href="/tags/%E7%88%AC%E8%99%AB">
+                      <svg class="octicon octicon-tag" viewBox="0 0 16 16" version="1.1" width="16" height="16">
+                        <path fill-rule="evenodd"
+                          d="M2.5 7.775V2.75a.25.25 0 01.25-.25h5.025a.25.25 0 01.177.073l6.25 6.25a.25.25 0 010 .354l-5.025 5.025a.25.25 0 01-.354 0l-6.25-6.25a.25.25 0 01-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.75 1.75 0 011 7.775zM6 5a1 1 0 100 2 1 1 0 000-2z">
+                        </path>
+                      </svg>
+                      爬虫
+                    </a>
+                    
+                    <a class="muted-link mr-3" href="/tags/python">
+                      <svg class="octicon octicon-tag" viewBox="0 0 16 16" version="1.1" width="16" height="16">
+                        <path fill-rule="evenodd"
+                          d="M2.5 7.775V2.75a.25.25 0 01.25-.25h5.025a.25.25 0 01.177.073l6.25 6.25a.25.25 0 010 .354l-5.025 5.025a.25.25 0 01-.354 0l-6.25-6.25a.25.25 0 01-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.75 1.75 0 011 7.775zM6 5a1 1 0 100 2 1 1 0 000-2z">
+                        </path>
+                      </svg>
+                      Python
+                    </a>
+                    
+                    
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="Box-body px-5 pb-5">
+                <article class="markdown-body entry-content container-lg"><p>从零开始实现一个爬虫。</p>
+
+<blockquote>
+<p>让我大吃一惊的是，我离开大学的时候就被告知，说我已经学过航海学了！——得了，我只要到港口去兜个圈，管保学到更多的航海知识。&mdash;&mdash;《瓦尔登湖》 - 亨利·大卫·梭罗</p>
+</blockquote>
+
+<p>上一篇中我们实现了一个 <code>fetch</code> 函数，这个函数接受一个 <code>url</code> 参数，并返回请求的响应体。在这一章里，我们将拓展这个函数的功能，并将其打包为可安装的库。</p>
+
+<h2 id="改造-fetch-函数">改造 <code>fetch</code> 函数</h2>
+
+<h3 id="定义函数签名">定义函数签名</h3>
+
+<p>上一章中我们大概介绍了 HTTP 的格式，现在我们来对其中每一部分的格式与规范进行解读。</p>
+
+<pre><code>[method] [path] [协议版本]
+[header 字段]: [header 值]
+...
+[header 字段]: [header 值]
+
+[数据]
+</code></pre>
+
+<p>在 HTTP 的请求格式中，除了协议版本外，我们有 method 、 path 、 header 字段和数据四部分可以自定义，我们就来将这四部分作为我们新的函数的参数。</p>
+
+<p>我们首先来分别看一看这四部分每一部分的定义：</p>
+
+<p><strong><code>method</code></strong></p>
+
+<p>HTTP 定义的请求方法，目前有 <code>GET</code> 、 <code>HEAD</code> 、 <code>POST</code> 、 <code>PUT</code> 、 <code>DELETE</code> 、 <code>CONNECT</code> 、 <code>OPTIONS</code> 、<code>TRACE</code>  和 <code>PATCH</code> 九种，在 <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods">MDN</a> 中可以查看其详细定义，其中最常用的是 <code>GET</code> 与 <code>POST</code> 。格式为字符串（Python 中的 <code>str</code> ）。</p>
+
+<p><strong><code>path</code></strong></p>
+
+<p>想要知道 <code>path</code> 是什么，就要先知道 URL 的格式定义（来自<a href="https://en.wikipedia.org/wiki/URL">维基百科</a>）：</p>
+
+<pre><code>URI = scheme:[//authority]path[?query][#fragment]
+authority = [userinfo@]host[:port]
+</code></pre>
+
+<p>（关于这里为什么是 URI 而非 URL ，可以参照<a href="https://stackoverflow.com/questions/176264/what-is-the-difference-between-a-uri-a-url-and-a-urn">这个问题</a>。简而言之， URL 是 URI 的子集。）</p>
+
+<p>将其展开并去掉不常见的部分后，我们将其简化为下面这样：</p>
+
+<pre><code>URL = scheme://host[:port]path[?query][#fragment]
+</code></pre>
+
+<ul>
+<li>scheme: 连接服务器的协议，在网站的请求中，一般为 http 与 https 其中一个</li>
+<li>host: 服务器的域，可能是域名或者 IP ，如果是域名的话，在连接时会首先将域名转化为 IP</li>
+<li>port: 服务器提供服务的端口， HTTP 默认为 80 ， HTTPS 默认为 443</li>
+<li>path: 在早期 HTTP 世界里，这个字段代表了要访问的资源的定位。现在它的具体含义由服务器端定义</li>
+<li>query: HTTP GET 附带的查询参数，一般格式为 <code>key=value</code> 这样的键值对，但与 <code>path</code> 类似，它具体如何解释还是要看服务器的定义</li>
+<li>fragment: 常用于页内资源定位</li>
+</ul>
+
+<p>一个常见的 URL 可能类似这样： <code>https://httpbin.org/get?key=value#1</code> ，需要注意的是， <code>#</code> 后的部分被称为 hash ，常见的作用是定位页面内的资源，一般来说不会被发送到服务器，仅在浏览器端生效。我们可以使用 <code>curl</code> 进行验证：</p>
+
+<pre><code class="language-curl">$ curl 'https://httpbin.org/get?key=value#1' -v
+......
+&gt; GET /get?key=value HTTP/1.1
+&gt; Host: httpbin.org
+&gt; User-Agent: curl/7.54.0
+&gt; Accept: */*
+&gt;
+......
+{
+  &quot;args&quot;: {
+    &quot;key&quot;: &quot;value&quot;
+  },
+  &quot;headers&quot;: {
+    &quot;Accept&quot;: &quot;*/*&quot;,
+    &quot;Host&quot;: &quot;httpbin.org&quot;,
+    &quot;User-Agent&quot;: &quot;curl/7.54.0&quot;
+  },
+  &quot;origin&quot;: &quot;36.110.78.251, 36.110.78.251&quot;,
+  &quot;url&quot;: &quot;https://httpbin.org/get?key=value&quot;
+}
+* Connection #0 to host httpbin.org left intact
+</code></pre>
+
+<p>可以看到， <code>#</code> 及其之后的部分并没有被发送到服务器，而 <code>key=value</code> 被解析为了键值对。</p>
+
+<p>因此， <code>fragment</code> 部分不在我们的考虑范围内，我们要发送的 <code>path</code> 实际上是这里的 <code>path</code> 加上可选的查询字符串 <code>[?query]</code> ，在上面的例子里就是 <code>/get?key=value</code> 。其格式为字符串。</p>
+
+<p><strong><code>header</code></strong></p>
+
+<p>从上一章中可以看出， <code>header</code> 的格式为键值对——对应到 Python 里面，就是字典（ <code>dict</code> ）。</p>
+
+<p>一个典型的 <code>header</code> 可能长这个样：</p>
+
+<pre><code>User-Agent: ZeroCrawler
+</code></pre>
+
+<p><strong><code>data</code></strong></p>
+
+<p>数据段（ <code>data</code> ）的格式为字符串，也是 HTTP 协议所规定的。根据 <code>header</code> 的不同，数据段有多种不同的解析方式，但我们先不考虑那么多，仅以字符串来表示它。</p>
+
+<p>因此，为了能够最大程度的自定义我们的请求，我们的函数签名定义为下面这样：</p>
+
+<pre><code class="language-python">def fetch(
+    method: str, 
+    url: str, 
+    params: dict = None, 
+    headers: dict = None
+    data: str = None, 
+) -&gt; str:
+</code></pre>
+
+<h3 id="填充函数内容">填充函数内容</h3>
+
+<p>函数签名已经确定了，要填充其内容就比较简单了。我们要做的就是将每个参数填充到其应该在的位置。填充完的函数如下：</p>
+
+<pre><code class="language-python">def fetch(
+        method: str, url: str, params: dict = None, data: str = None, headers: dict = None
+) -&gt; str:
+    if url.startswith(&quot;http://&quot;) is False:
+        raise ValueError(&quot;url must start with `http://`&quot;)
+
+    _tmp = url[7:].split(&quot;/&quot;, 1)
+    if len(_tmp) &gt; 1:
+        host = _tmp[0]
+        path = &quot;/&quot; + _tmp[1]
+    else:
+        host = _tmp[0]
+        path = &quot;/&quot;
+
+    method = method.upper()
+    params = {} if params is None else params
+    headers = {} if headers is None else headers
+
+    params_str = &quot;?&quot; if params else &quot;&quot;
+    param_count = 0
+    for key, value in params.items():
+        if param_count != 0:
+            params_str += '&amp;'
+        params_str += f&quot;{key}={value}&quot;
+        param_count += 1
+
+    request_list = [f&quot;{method} {path}{params_str} HTTP/1.0&quot;, f&quot;Host: {host}&quot;]
+    for key, value in headers.items():
+        request_list.append(f&quot;{key}: {value}&quot;)
+
+    if data is not None:
+        request_list.append(f'Content-Length: {len(data)}')
+        request_list.append('')  # 空行，以分割header域与data域
+        request_list.append(data)
+    request_list.append(&quot;\r\n&quot;)
+
+    request = &quot;\r\n&quot;.join(request_list)
+
+    sock = socket.socket()
+    sock.connect((host, 80))
+    sock.send(request.encode(&quot;ascii&quot;))
+
+    response = b&quot;&quot;
+    chunk = sock.recv(4096)
+    while chunk:
+        response += chunk
+        chunk = sock.recv(4096)
+
+    sock.close()
+
+    return response.decode()
+</code></pre>
+
+<p>4 - 13 行中，我们从 URL 中分割出 <code>host</code> ，因为我们的函数还不支持 https ，因此我们对非 http 的请求抛出异常。</p>
+
+<p>15 - 17 行，我们为可选的参数分配默认值，如果这些参数没有提供的话，则使用默认的策略填充。</p>
+
+<p>19 - 25 行，我们将 <code>path</code> 中的 <code>query</code> 拼接起来，以便后面将其添加到 <code>path</code> 后面。</p>
+
+<p>27 - 29 行，我们将 <code>header</code> 键值对加入请求中。</p>
+
+<p>31 - 35 行，我们将可能存在的 <code>data</code> 添加到请求里。</p>
+
+<p>往后的操作与我们上一章中所做的一样：开启 TCP 连接、发送请求、接收响应直到连接关闭。</p>
+
+<p>试用一下我们的程序：</p>
+
+<pre><code class="language-python">&gt;&gt;&gt; from ZeroCrawler import fetch
+&gt;&gt;&gt; resp = fetch('get', 'http://httpbin.org/get')
+&gt;&gt;&gt; resp
+'HTTP/1.1 200 OK\r\nAccess-Control-Allow-Credentials: true\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json\r\nDate: Tue, 30 Jul 2019 12:19:26 GMT\r\nReferrer-Policy: no-referrer-when-downgrade\r\nServer: nginx\r\nX-Content-Type-Options: nosniff\r\nX-Frame-Options: DENY\r\nX-XSS-Protection: 1; mode=block\r\nContent-Length: 146\r\nConnection: Close\r\n\r\n{\n  &quot;args&quot;: {}, \n  &quot;headers&quot;: {\n    &quot;Host&quot;: &quot;httpbin.org&quot;\n  }, \n  &quot;origin&quot;: &quot;36.110.78.251, 36.110.78.251&quot;, \n  &quot;url&quot;: &quot;https://httpbin.org/get&quot;\n}\n'
+</code></pre>
+
+<h2 id="创建一个可安装的库">创建一个可安装的库</h2>
+
+<p>至此，我们的函数已经能够有一定的可用性与灵活性了，现在我们要让其他人来使用我们的函数。</p>
+
+<p>如果我们的程序的用户需要通过复制代码到自己项目内的方式来使用，那未免过于原始了。我们可以将程序打包为一个包，用户可以很方便的安装我们的程序。</p>
+
+<p>官网有打包程序的文档： <a href="https://packaging.python.org/tutorials/packaging-projects/">Packaging Python Projects</a>，按照官网的指导，我们首先创建一个文件 <code>setup.py</code> ，写入如下内容：</p>
+
+<pre><code class="language-python">import setuptools
+
+with open(&quot;README.md&quot;, &quot;r&quot;) as fh:
+    long_description = fh.read()
+
+setuptools.setup(
+    name=&quot;ZeroCrawler&quot;,
+    version=&quot;0.0.2&quot;,
+    author=&quot;MeiK2333&quot;,
+    author_email=&quot;meik2333@gmail.com&quot;,
+    description=&quot;A small example package&quot;,
+    long_description=long_description,
+    long_description_content_type=&quot;text/markdown&quot;,
+    url=&quot;https://github.com/MeiK2333/ZeroCrawler&quot;,
+    packages=setuptools.find_packages(),
+)
+</code></pre>
+
+<p>这样就完成了，我们可以直接安装或使用 pip 安装：</p>
+
+<pre><code class="language-bash">$ python setup.py install  # or pip install .
+Processing /Users/meik/ZeroCrawler
+Installing collected packages: ZeroCrawler
+  Running setup.py install for ZeroCrawler ... done
+Successfully installed ZeroCrawler-0.0.2
+</code></pre>
+
+<p>我们可以验证一下是否安装成功，我们切换到其他目录下，然后输出一下 <code>ZeroCrawler</code> 的位置：</p>
+
+<pre><code class="language-shell">$ python -c 'import ZeroCrawler; print(ZeroCrawler.__path__)'  # 此时引入的 ZeroCrawler 是我们正在开发的版本
+['/Users/meik/ZeroCrawler/ZeroCrawler']
+$ cd ~
+$ python -c 'import ZeroCrawler; print(ZeroCrawler.__path__)'  # 此时引入的是我们安装的版本
+['/Users/meik/ZeroCrawler/venv/lib/python3.6/site-packages/ZeroCrawler']
+</code></pre>
+
+<p>可以看到， <code>ZeroCrawler</code> 库已经被安装到我们的系统里了，我们可以在其他项目中使用它。</p>
+
+<p>如果想要更多的用户可以使用我们的项目（此时已经可以被称为库了），我们可以将项目提交到 GitHub 或者 <a href="https://pypi.org/">pypi</a> ， pip 可以直接安装 GitHub 或者 pypi 上公开的库。</p>
+
+<h2 id="添加测试">添加测试</h2>
+
+<p>添加了 <code>setup.py</code> 之后，我们的项目已经可以称之为一个库了，但距离成为一个有诚意的库还差一点，这一点就是测试。</p>
+
+<p>测试的好处很多，提高代码质量、多人协作更加放心、可以作为使用指南等等，此处不做详解。我们只关心如何为我们的框架添加测试。</p>
+
+<p>Python 的测试框架有很多，其中最常用的就是 unittest ，我以前写过一篇博客来介绍其基本用法：<a href="https://meik2333.com/2018/02/23/Python-%E4%B8%AD%E7%9A%84%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%EF%BC%88-unittest-%E7%9A%84%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95%EF%BC%89/">《Python 中的单元测试（ unittest 的基础用法）》</a>。</p>
+
+<p>我们要测试的 <code>fetch</code> 函数返回值是响应的全部内容，不方便进行解析测试，因此我们创建了一个获取响应 <code>data</code> 的助手函数。</p>
+
+<p>创建文件 <code>ZeroCrawler/utils.py</code> ，写入如下内容：</p>
+
+<pre><code class="language-python">def get_body_by_response(response):
+    &quot;&quot;&quot; 从返回的响应中获得数据正文 &quot;&quot;&quot;
+    return response.split('\r\n\r\n', 1)[1]
+</code></pre>
+
+<p>然后我们开始写测试，创建文件 <code>tests/test_fetch.py</code> ，写入如下内容：</p>
+
+<pre><code class="language-python">import json
+import unittest
+
+from ZeroCrawler import fetch
+from ZeroCrawler.utils import get_body_by_response
+
+
+class TestFetch(unittest.TestCase):
+    def test_fetch(self):
+        resp = fetch(&quot;get&quot;, &quot;http://httpbin.org/get&quot;)
+        self.assertTrue(resp.startswith(&quot;HTTP/1.1 200 OK&quot;))
+
+    def test_fetch_params(self):
+        params = {&quot;key1&quot;: &quot;value1&quot;, &quot;key2&quot;: &quot;value2&quot;}
+        resp = fetch(&quot;get&quot;, &quot;http://httpbin.org/get&quot;, params=params)
+        data = get_body_by_response(resp)
+        data = json.loads(data)
+        args = data.get(&quot;args&quot;)
+        for key, value in params.items():
+            self.assertTrue(key in args.keys())
+            self.assertEqual(value, args[key])
+
+    def test_fetch_headers(self):
+        headers = {&quot;User-Agent&quot;: &quot;ZeroCrawler&quot;}
+        resp = fetch(&quot;get&quot;, &quot;http://httpbin.org/get&quot;, headers=headers)
+        data = get_body_by_response(resp)
+        data = json.loads(data)
+        resp_headers = data.get(&quot;headers&quot;)
+        for key, value in headers.items():
+            self.assertTrue(key in resp_headers.keys())
+            self.assertEqual(value, resp_headers[key])
+
+    def test_fetch_method(self):
+        methods = [&quot;get&quot;, &quot;post&quot;, &quot;put&quot;, &quot;delete&quot;, &quot;patch&quot;]
+        for method in methods:
+            resp = fetch(method, f&quot;http://httpbin.org/{method}&quot;)
+            data = get_body_by_response(resp)
+            data = json.loads(data)
+            url = data.get(&quot;url&quot;)
+            self.assertTrue(url.endswith(f&quot;httpbin.org/{method}&quot;))
+
+    def test_fetch_data(self):
+        data = &quot;Hello World!&quot;
+        resp = fetch(&quot;post&quot;, &quot;http://httpbin.org/post&quot;, data=data)
+        resp_data = get_body_by_response(resp)
+        resp_data = json.loads(resp_data)
+        self.assertEqual(resp_data[&quot;data&quot;], data)
+
+
+if __name__ == &quot;__main__&quot;:
+    unittest.main()
+</code></pre>
+
+<p>这五组测试分别测试了我们函数的五个参数，写明了进行的操作和应该出现的结果。运行它：</p>
+
+<pre><code class="language-shell">$ python -m unittest tests/test_*.py
+......
+----------------------------------------------------------------------
+Ran 5 tests in 27.590s
+
+OK
+</code></pre>
+
+<p>之后如果我们修改了项目，只要测试能通过，就代表我们现在已有的功能没有被破坏（当然，前提是有全面且合理的测试用例）。</p>
+
+<p>至此，我们的项目结构如下所示：</p>
+
+<pre><code>ZeroCrawler
+    |
+    |------ ZeroCrawler
+    |         |-------- __init__.py
+    |         |-------- fetch.py
+    |         |-------- utils.py
+    |      
+    |------ tests
+    |         |-------- test_fetch.p
+    |
+    |------ setup.py
+</code></pre>
+
+<h2 id="总结">总结</h2>
+
+<p>这一章里，我们提高了我们框架的泛用性，并用我们的框架创建了一个可安装的库。我们的框架有了走向世界的基础。</p>
+
+<p>本章的代码在 GitHub: <a href="https://github.com/MeiK2333/ZeroCrawler/tree/96f62b98bd93b3d384e846b4b5b53b1e593e3d5c">ZeroCrawler Version 0.0.2</a> 中，可以尝试 <code>fork</code> 它并自己进行修改。</p>
+
+<p>我们的框架仅仅有个雏形，还有很多不足，比如意大利面条式的代码、没有对请求与响应内容的解析、用法并不友好等。这些问题我们会在后面的章节里一一改正，如果你认为我写的有什么不足之处，请在博客评论处或者 GitHub Issues 告诉我。我们下期再见。</p></article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+  <div class="footer container-xl width-full p-responsive">
+  <div
+    class="position-relative d-flex flex-row-reverse flex-lg-row flex-wrap flex-lg-nowrap flex-justify-center flex-lg-justify-between flex-sm-items-center pt-6 pb-2 mt-6 f6 text-gray border-top border-gray-light ">
+    <a aria-label="Homepage" title="GitHub" class="footer-octicon d-none d-lg-block mr-lg-4" href="https://meik2333.com/">
+      <svg height="24" class="octicon octicon-mark-github" viewBox="0 0 16 16" version="1.1" width="24">
+        <path fill-rule="evenodd"
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+        </path>
+      </svg>
+    </a>
+    <ul class="list-style-none d-flex flex-wrap col-12 flex-justify-center flex-lg-justify-between mb-2 mb-lg-0">
+      
+      <li class="mr-3 mr-lg-0">Theme by <a href='https://github.com/MeiK2333/github-style'>github-style</a></li>
+      
+    </ul>
+  </div>
+  <div class="d-flex flex-justify-center pb-6">
+    <span class="f6 text-gray-light"></span>
+  </div>
+
+
+</div>
+</body>
+
+<script type="application/javascript" src="https://meik2333.com/js/github-style.js"></script>
+
+
+
+</html>

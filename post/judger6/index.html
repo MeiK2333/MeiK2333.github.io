@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <script type="application/javascript" src='https://meik2333.com/js/theme-mode.js'></script>
+    <link rel="stylesheet" href='https://meik2333.com/css/frameworks.min.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/github.min.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <title>如何写一个评测姬 - 第六篇 - MeiK&#39;s blog</title>
+    <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
+    <meta name="theme-color" content="#1e2327">
+
+    
+    <meta name="description"
+  content="从零开始实现一个 OJ 评测姬。
+" />
+<meta name="keywords"
+  content='' />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="https://meik2333.com/post/judger6/" />
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="如何写一个评测姬 - 第六篇 - MeiK&#39;s blog" />
+<meta name="twitter:description"
+  content="从零开始实现一个 OJ 评测姬。
+" />
+<meta name="twitter:site" content="https://meik2333.com/" />
+<meta name="twitter:creator" content="" />
+<meta name="twitter:image"
+  content="https://meik2333.com/">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:title" content="如何写一个评测姬 - 第六篇 - MeiK&#39;s blog">
+<meta property="og:description"
+  content="从零开始实现一个 OJ 评测姬。
+" />
+<meta property="og:url" content="https://meik2333.com/post/judger6/" />
+<meta property="og:site_name" content="如何写一个评测姬 - 第六篇" />
+<meta property="og:image"
+  content="https://meik2333.com/">
+<meta property="og:image:width" content="2048">
+<meta property="og:image:height" content="1024">
+
+<meta property="article:published_time" content="2019-07-29 20:38:02 &#43;0000 UTC" />
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body>
+  <div style="position: relative">
+  <header class="Header js-details-container Details px-3 px-md-4 px-lg-5 flex-wrap flex-md-nowrap open Details--on">
+    <div class="Header-item mobile-none" style="margin-top: -4px; margin-bottom: -4px;">
+      <a class="Header-link" href="https://meik2333.com/">
+        <svg class="octicon" height="32" viewBox="0 0 16 16" version="1.1" width="32">
+          <path fill-rule="evenodd"
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+          </path>
+        </svg>
+      </a>
+    </div>
+    <div class="Header-item d-md-none">
+      <button class="Header-link btn-link js-details-target" type="button"
+        onclick="document.querySelector('#header-search').style.display = document.querySelector('#header-search').style.display == 'none'? 'block': 'none'">
+        <svg height="24" class="octicon octicon-three-bars" viewBox="0 0 16 16" version="1.1" width="24">
+          <path fill-rule="evenodd"
+            d="M1 2.75A.75.75 0 011.75 2h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 2.75zm0 5A.75.75 0 011.75 7h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 7.75zM1.75 12a.75.75 0 100 1.5h12.5a.75.75 0 100-1.5H1.75z">
+          </path>
+        </svg>
+      </button>
+    </div>
+    <div style="display: none;" id="header-search"
+      class="Header-item Header-item--full flex-column flex-md-row width-full flex-order-2 flex-md-order-none mr-0 mr-md-3 mt-3 mt-md-0 Details-content--hidden-not-important d-md-flex">
+      <div
+        class="Header-search header-search flex-auto js-site-search position-relative flex-self-stretch flex-md-self-auto mb-3 mb-md-0 mr-0 mr-md-3 scoped-search site-scoped-search js-jump-to">
+        <div class="position-relative">
+          <form target="_blank" action="https://www.google.com/search" accept-charset="UTF-8" method="get"
+            autocomplete="off">
+            <label
+              class="Header-search-label form-control input-sm header-search-wrapper p-0 js-chromeless-input-container header-search-wrapper-jump-to position-relative d-flex flex-justify-between flex-items-center">
+              <input type="text"
+                class="Header-search-input form-control input-sm header-search-input jump-to-field js-jump-to-field js-site-search-focus js-site-search-field is-clearable"
+                name="q" value="" placeholder="Search" autocomplete="off">
+              <input type="hidden" name="q" value="site:https://meik2333.com/">
+            </label>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="Header-item Header-item--full flex-justify-center d-md-none position-relative">
+      <a class="Header-link " href="https://meik2333.com/">
+        <svg class="octicon octicon-mark-github v-align-middle" height="32" viewBox="0 0 16 16" version="1.1"
+          width="32">
+          <path fill-rule="evenodd"
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+          </path>
+        </svg>
+      </a>
+    </div>
+    <div class="Header-item" style="margin-right: 0;">
+      <a href="javascript:void(0)" class="Header-link no-select" onclick="switchTheme()">
+        <svg style="fill: var(--color-profile-color-modes-toggle-moon);" class="no-select" viewBox="0 0 16 16"
+          version="1.1" width="16" height="16">
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M4.52208 7.71754C7.5782 7.71754 10.0557 5.24006 10.0557 2.18394C10.0557 1.93498 10.0392 1.68986 10.0074 1.44961C9.95801 1.07727 10.3495 0.771159 10.6474 0.99992C12.1153 2.12716 13.0615 3.89999 13.0615 5.89383C13.0615 9.29958 10.3006 12.0605 6.89485 12.0605C3.95334 12.0605 1.49286 10.001 0.876728 7.24527C0.794841 6.87902 1.23668 6.65289 1.55321 6.85451C2.41106 7.40095 3.4296 7.71754 4.52208 7.71754Z">
+          </path>
+        </svg>
+      </a>
+    </div>
+  </header>
+</div>
+  
+<div>
+  <main>
+    <div class="gisthead pagehead bg-gray-light pb-0 pt-3 mb-4">
+      <div class="px-0">
+        <div class="mb-3 d-flex px-3 px-md-3 px-lg-5">
+          <div class="flex-auto min-width-0 width-fit mr-3">
+            <div class="d-flex">
+              <div class="d-none d-md-block">
+                <a class="avatar mr-2 flex-shrink-0" href="https://meik2333.com/">
+                  <img class=" avatar-user"
+                    src="https://meik2333.com/images/avatar.png"
+                    width="32" height="32"></a>
+              </div>
+              <div class="d-flex flex-column">
+                <h1 class="break-word f3 text-normal mb-md-0 mb-1">
+                  <span class="author">
+                    <a href="https://meik2333.com/">MeiK</a></span><span
+                    class="path-divider">/</span><strong class="css-truncate-target mr-1" style="max-width: 410px"><a
+                      href="https://meik2333.com/post/judger6/">如何写一个评测姬 - 第六篇</a></strong>
+                </h1>
+                <div class="note m-0">
+                  Created <relative-time datetime="Mon, 29 Jul 2019 20:38:02 &#43;0000"
+                    class="no-wrap">
+                    Mon, 29 Jul 2019 20:38:02 &#43;0000</relative-time>
+
+                  
+                  <span class="file-info-divider"></span>
+                  Modified <relative-time datetime="Fri, 11 Oct 2019 17:37:43 &#43;0800"
+                    class="no-wrap">
+                    Fri, 11 Oct 2019 17:37:43 &#43;0800</relative-time>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-lg px-3 new-discussion-timeline">
+      <div class="repository-content gist-content">
+        <div>
+          <div class="js-gist-file-update-container js-task-list-container file-box">
+            <div id="file-pytest" class="file my-2">
+              <div class="file-header d-flex flex-md-items-center flex-items-start">
+                <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
+                  <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
+                    848 Words
+                    
+
+                  </div>
+                  <div class="file-actions flex-order-2 pt-0">
+                    
+                    
+                    <a class="muted-link mr-3" href="/tags/onlinejudge">
+                      <svg class="octicon octicon-tag" viewBox="0 0 16 16" version="1.1" width="16" height="16">
+                        <path fill-rule="evenodd"
+                          d="M2.5 7.775V2.75a.25.25 0 01.25-.25h5.025a.25.25 0 01.177.073l6.25 6.25a.25.25 0 010 .354l-5.025 5.025a.25.25 0 01-.354 0l-6.25-6.25a.25.25 0 01-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.75 1.75 0 011 7.775zM6 5a1 1 0 100 2 1 1 0 000-2z">
+                        </path>
+                      </svg>
+                      OnlineJudge
+                    </a>
+                    
+                    <a class="muted-link mr-3" href="/tags/%E8%AF%84%E6%B5%8B%E5%A7%AC">
+                      <svg class="octicon octicon-tag" viewBox="0 0 16 16" version="1.1" width="16" height="16">
+                        <path fill-rule="evenodd"
+                          d="M2.5 7.775V2.75a.25.25 0 01.25-.25h5.025a.25.25 0 01.177.073l6.25 6.25a.25.25 0 010 .354l-5.025 5.025a.25.25 0 01-.354 0l-6.25-6.25a.25.25 0 01-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.75 1.75 0 011 7.775zM6 5a1 1 0 100 2 1 1 0 000-2z">
+                        </path>
+                      </svg>
+                      评测姬
+                    </a>
+                    
+                    
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="Box-body px-5 pb-5">
+                <article class="markdown-body entry-content container-lg"><p>从零开始实现一个 OJ 评测姬。</p>
+
+<p>在前五篇里，我们介绍了写一个评测姬所需的基本的原理。在这篇文章里，我们将整合前五篇所将的知识，完成一个完整可用的评测姬。</p>
+
+<h2 id="整体流程">整体流程</h2>
+
+<p>简单起见，我们不考虑 OJ 的其他部分，如网站、数据库等。我们的评测姬将通过命令行进行调用、通过命令行提供参数、并将评测的结果写到控制台。下面是我们评测姬的整体流程。</p>
+
+<p><img src="/images/judger6/judger.png" alt="" /></p>
+
+<h2 id="解析命令行参数">解析命令行参数</h2>
+
+<p>因为除了解析命令行参数外，其他的部分我们前面的文章中已经进行了讲解。因此这里只介绍一下如何解析命令行参数。</p>
+
+<p>在 Linux 中，有函数 <code>getopt</code> 可以提供命令行参数解析功能。在 macOS 中用 <code>gcc</code> 编译器也可以使用这个函数。 <code>getopt</code> 的使用方法可以参照<a href="http://man7.org/linux/man-pages/man3/getopt.3.html">文档</a>。</p>
+
+<h2 id="万事俱备">万事俱备</h2>
+
+<p>至此，我们已经介绍了我们要写的评测姬所需的全部技术，只要将其组装起来即可。</p>
+
+<p><a href="https://github.com/MeiK2333/ZeroJudger/tree/master/ZeroJudger">https://github.com/MeiK2333/ZeroJudger/tree/master/ZeroJudger</a></p>
+
+<p>这是我实现的一个完整的评测姬，感兴趣的同学可以参照一下。这个评测姬实现了资源限制、流重定向、答案对比评测等功能，如果能够看懂这个评测姬的代码，应该也就具备了自己写一个评测姬的能力。</p>
+
+<h2 id="还差点什么">还差点什么？</h2>
+
+<p>如果你看了我写的评测姬的话，就会发现，我的评测姬里面没有任何关于安全方面的限制。这是我有意而为之，原因有以下三点：</p>
+
+<p>第一点，安全方面的限制，不同的评测姬实现不同，我也不能保证我写的能有多么大的参考意义。</p>
+
+<p>第二点，安全方面限制需要过多的介入系统调用，使用很多第三方方案，也与本系列“从零开始”的初衷相悖。</p>
+
+<p>第三点，也是最重要的一点：我认为现有的评测姬的安全限制多数不够好用。基于系统调用限制的评测姬容易误伤，而不做限制的评测姬又容易被攻击。我的想法是，现在 Docker 等容器技术已经很成熟了，完全可以用 Docker 等方案来代替自己写的安全限制，自己只需要写评测流程即可。依托成熟方案，既有更好的保障，也更加简单不易出错。</p>
+
+<h2 id="总结">总结</h2>
+
+<p>从四月份的第一篇，到现在七月底的第六篇，拖了三个月的系列博客终于是完结了。</p>
+
+<p><img src="/images/judger6/gugugu.jpg" alt="" /></p>
+
+<p>虽然到目前为止，如何写评测姬系列博客的访问量 &lt;= 10（第五篇一共是 9 个访问），其中大部分还是机器人，但写这系列过程还是挺有意思的。尤其是每过一阵子回头来看自己的博客，感觉自己写的哪哪都是问题……嗯……加油共勉吧！</p></article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+  <div class="footer container-xl width-full p-responsive">
+  <div
+    class="position-relative d-flex flex-row-reverse flex-lg-row flex-wrap flex-lg-nowrap flex-justify-center flex-lg-justify-between flex-sm-items-center pt-6 pb-2 mt-6 f6 text-gray border-top border-gray-light ">
+    <a aria-label="Homepage" title="GitHub" class="footer-octicon d-none d-lg-block mr-lg-4" href="https://meik2333.com/">
+      <svg height="24" class="octicon octicon-mark-github" viewBox="0 0 16 16" version="1.1" width="24">
+        <path fill-rule="evenodd"
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+        </path>
+      </svg>
+    </a>
+    <ul class="list-style-none d-flex flex-wrap col-12 flex-justify-center flex-lg-justify-between mb-2 mb-lg-0">
+      
+      <li class="mr-3 mr-lg-0">Theme by <a href='https://github.com/MeiK2333/github-style'>github-style</a></li>
+      
+    </ul>
+  </div>
+  <div class="d-flex flex-justify-center pb-6">
+    <span class="f6 text-gray-light"></span>
+  </div>
+
+
+</div>
+</body>
+
+<script type="application/javascript" src="https://meik2333.com/js/github-style.js"></script>
+
+
+
+</html>

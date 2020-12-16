@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <script type="application/javascript" src='https://meik2333.com/js/theme-mode.js'></script>
+    <link rel="stylesheet" href='https://meik2333.com/css/frameworks.min.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/github.min.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <title>Django Model field reference - Field options - MeiK&#39;s blog</title>
+    <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
+    <meta name="theme-color" content="#1e2327">
+
+    
+    <meta name="description"
+  content="翻译自官方文档，django 中模型字段可用的参数及其含义。
+" />
+<meta name="keywords"
+  content='' />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="https://meik2333.com/post/django-model-field-reference-field-options/" />
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Django Model field reference - Field options - MeiK&#39;s blog" />
+<meta name="twitter:description"
+  content="翻译自官方文档，django 中模型字段可用的参数及其含义。
+" />
+<meta name="twitter:site" content="https://meik2333.com/" />
+<meta name="twitter:creator" content="" />
+<meta name="twitter:image"
+  content="https://meik2333.com/">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Django Model field reference - Field options - MeiK&#39;s blog">
+<meta property="og:description"
+  content="翻译自官方文档，django 中模型字段可用的参数及其含义。
+" />
+<meta property="og:url" content="https://meik2333.com/post/django-model-field-reference-field-options/" />
+<meta property="og:site_name" content="Django Model field reference - Field options" />
+<meta property="og:image"
+  content="https://meik2333.com/">
+<meta property="og:image:width" content="2048">
+<meta property="og:image:height" content="1024">
+
+<meta property="article:published_time" content="2018-02-22 00:00:01 &#43;0000 UTC" />
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body>
+  <div style="position: relative">
+  <header class="Header js-details-container Details px-3 px-md-4 px-lg-5 flex-wrap flex-md-nowrap open Details--on">
+    <div class="Header-item mobile-none" style="margin-top: -4px; margin-bottom: -4px;">
+      <a class="Header-link" href="https://meik2333.com/">
+        <svg class="octicon" height="32" viewBox="0 0 16 16" version="1.1" width="32">
+          <path fill-rule="evenodd"
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+          </path>
+        </svg>
+      </a>
+    </div>
+    <div class="Header-item d-md-none">
+      <button class="Header-link btn-link js-details-target" type="button"
+        onclick="document.querySelector('#header-search').style.display = document.querySelector('#header-search').style.display == 'none'? 'block': 'none'">
+        <svg height="24" class="octicon octicon-three-bars" viewBox="0 0 16 16" version="1.1" width="24">
+          <path fill-rule="evenodd"
+            d="M1 2.75A.75.75 0 011.75 2h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 2.75zm0 5A.75.75 0 011.75 7h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 7.75zM1.75 12a.75.75 0 100 1.5h12.5a.75.75 0 100-1.5H1.75z">
+          </path>
+        </svg>
+      </button>
+    </div>
+    <div style="display: none;" id="header-search"
+      class="Header-item Header-item--full flex-column flex-md-row width-full flex-order-2 flex-md-order-none mr-0 mr-md-3 mt-3 mt-md-0 Details-content--hidden-not-important d-md-flex">
+      <div
+        class="Header-search header-search flex-auto js-site-search position-relative flex-self-stretch flex-md-self-auto mb-3 mb-md-0 mr-0 mr-md-3 scoped-search site-scoped-search js-jump-to">
+        <div class="position-relative">
+          <form target="_blank" action="https://www.google.com/search" accept-charset="UTF-8" method="get"
+            autocomplete="off">
+            <label
+              class="Header-search-label form-control input-sm header-search-wrapper p-0 js-chromeless-input-container header-search-wrapper-jump-to position-relative d-flex flex-justify-between flex-items-center">
+              <input type="text"
+                class="Header-search-input form-control input-sm header-search-input jump-to-field js-jump-to-field js-site-search-focus js-site-search-field is-clearable"
+                name="q" value="" placeholder="Search" autocomplete="off">
+              <input type="hidden" name="q" value="site:https://meik2333.com/">
+            </label>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="Header-item Header-item--full flex-justify-center d-md-none position-relative">
+      <a class="Header-link " href="https://meik2333.com/">
+        <svg class="octicon octicon-mark-github v-align-middle" height="32" viewBox="0 0 16 16" version="1.1"
+          width="32">
+          <path fill-rule="evenodd"
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+          </path>
+        </svg>
+      </a>
+    </div>
+    <div class="Header-item" style="margin-right: 0;">
+      <a href="javascript:void(0)" class="Header-link no-select" onclick="switchTheme()">
+        <svg style="fill: var(--color-profile-color-modes-toggle-moon);" class="no-select" viewBox="0 0 16 16"
+          version="1.1" width="16" height="16">
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M4.52208 7.71754C7.5782 7.71754 10.0557 5.24006 10.0557 2.18394C10.0557 1.93498 10.0392 1.68986 10.0074 1.44961C9.95801 1.07727 10.3495 0.771159 10.6474 0.99992C12.1153 2.12716 13.0615 3.89999 13.0615 5.89383C13.0615 9.29958 10.3006 12.0605 6.89485 12.0605C3.95334 12.0605 1.49286 10.001 0.876728 7.24527C0.794841 6.87902 1.23668 6.65289 1.55321 6.85451C2.41106 7.40095 3.4296 7.71754 4.52208 7.71754Z">
+          </path>
+        </svg>
+      </a>
+    </div>
+  </header>
+</div>
+  
+<div>
+  <main>
+    <div class="gisthead pagehead bg-gray-light pb-0 pt-3 mb-4">
+      <div class="px-0">
+        <div class="mb-3 d-flex px-3 px-md-3 px-lg-5">
+          <div class="flex-auto min-width-0 width-fit mr-3">
+            <div class="d-flex">
+              <div class="d-none d-md-block">
+                <a class="avatar mr-2 flex-shrink-0" href="https://meik2333.com/">
+                  <img class=" avatar-user"
+                    src="https://meik2333.com/images/avatar.png"
+                    width="32" height="32"></a>
+              </div>
+              <div class="d-flex flex-column">
+                <h1 class="break-word f3 text-normal mb-md-0 mb-1">
+                  <span class="author">
+                    <a href="https://meik2333.com/">MeiK</a></span><span
+                    class="path-divider">/</span><strong class="css-truncate-target mr-1" style="max-width: 410px"><a
+                      href="https://meik2333.com/post/django-model-field-reference-field-options/">Django Model field reference - Field options</a></strong>
+                </h1>
+                <div class="note m-0">
+                  Created <relative-time datetime="Thu, 22 Feb 2018 00:00:01 &#43;0000"
+                    class="no-wrap">
+                    Thu, 22 Feb 2018 00:00:01 &#43;0000</relative-time>
+
+                  
+                  <span class="file-info-divider"></span>
+                  Modified <relative-time datetime="Fri, 11 Oct 2019 16:25:43 &#43;0800"
+                    class="no-wrap">
+                    Fri, 11 Oct 2019 16:25:43 &#43;0800</relative-time>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-lg px-3 new-discussion-timeline">
+      <div class="repository-content gist-content">
+        <div>
+          <div class="js-gist-file-update-container js-task-list-container file-box">
+            <div id="file-pytest" class="file my-2">
+              <div class="file-header d-flex flex-md-items-center flex-items-start">
+                <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
+                  <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
+                    2584 Words
+                    
+
+                  </div>
+                  <div class="file-actions flex-order-2 pt-0">
+                    
+                    
+                    <a class="muted-link mr-3" href="/tags/python">
+                      <svg class="octicon octicon-tag" viewBox="0 0 16 16" version="1.1" width="16" height="16">
+                        <path fill-rule="evenodd"
+                          d="M2.5 7.775V2.75a.25.25 0 01.25-.25h5.025a.25.25 0 01.177.073l6.25 6.25a.25.25 0 010 .354l-5.025 5.025a.25.25 0 01-.354 0l-6.25-6.25a.25.25 0 01-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.75 1.75 0 011 7.775zM6 5a1 1 0 100 2 1 1 0 000-2z">
+                        </path>
+                      </svg>
+                      Python
+                    </a>
+                    
+                    <a class="muted-link mr-3" href="/tags/django">
+                      <svg class="octicon octicon-tag" viewBox="0 0 16 16" version="1.1" width="16" height="16">
+                        <path fill-rule="evenodd"
+                          d="M2.5 7.775V2.75a.25.25 0 01.25-.25h5.025a.25.25 0 01.177.073l6.25 6.25a.25.25 0 010 .354l-5.025 5.025a.25.25 0 01-.354 0l-6.25-6.25a.25.25 0 01-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.75 1.75 0 011 7.775zM6 5a1 1 0 100 2 1 1 0 000-2z">
+                        </path>
+                      </svg>
+                      Django
+                    </a>
+                    
+                    
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="Box-body px-5 pb-5">
+                <article class="markdown-body entry-content container-lg"><p>翻译自<a href="https://docs.djangoproject.com/en/2.0/ref/models/fields/">官方文档</a>，django 中模型字段可用的参数及其含义。</p>
+
+<p>以下参数适用于所有字段类型，全部都是可选的。</p>
+
+<h1 id="null">null</h1>
+
+<h2 id="field-null">Field.null</h2>
+
+<p>如果此项为 True ， django 将在数据库中以 NULL 来存储空值，默认为 False 。</p>
+
+<p>避免在基于字符串的字段中使用 null ，如 CharField 和 TextField 。如果一个基于字符串的字段有 null=True ，则意味这它的“无数据”有两个可能的值： NULL 和空字符串。在大多数情况下，为“无数据”提供两个可能的值是多余的， django 的约定是使用空字符串，而不是 NULL 。有一个例外：当一个 CharField 字段有 unique=True 和 blank=True 的设置时， null=True 需要被设置以防止使用空值保存多个对象是出现的唯一约束。</p>
+
+<p>对于基于字符串的字段和非基于字符串的字段，还需要设置 blank=True 来选择是否允许表单中的空值，因为 null 参数仅影响数据库的存储。</p>
+
+<p>如果您想要使 BooleanField 字段接受 null ，则需要使用 NullBooleanField 字段来代替。</p>
+
+<hr />
+
+<h1 id="blank">blank</h1>
+
+<h2 id="field-blank">Field.blank</h2>
+
+<p>如果此选项为 True ，该字段被允许为空白，默认为 False 。</p>
+
+<p>请注意，这与 null 不同。 null 只与数据库相关，而 blank 是和验证相关的，如果一个字段中的 blank=True ，表单验证将允许输入一个空值，否则，该字段的值是必须的。</p>
+
+<hr />
+
+<h1 id="choices">choices</h1>
+
+<h2 id="field-choices">Field.choices</h2>
+
+<p>一个可迭代的对象（比如列表或者元组），迭代的项是包括两个项目。例如 [(A, B), (A, B) &hellip;] 。如果给定了此设置，则其对应的默认的表单部件是一个选择框与这些选项，而不是普通的文本字段。</p>
+
+<p>每个元组的第一个元素是要在模型上设置的实际的值，第二个元素是可读的一个名称。例如：</p>
+
+<pre><code class="language-python">YEAR_IN_SCHOOL_CHOICES = (
+    ('FR', 'Freshman'),
+    ('SO', 'Sophomore'),
+    ('JR', 'Junior'),
+    ('SR', 'Senior'),
+)
+</code></pre>
+
+<p>最好在模型类中定义选项，并为每个值定义一个适当命名的常量：</p>
+
+<pre><code class="language-python">from django.db import models
+
+class Student(models.Model):
+    FRESHMAN = 'FR'
+    SOPHOMORE = 'SO'
+    JUNIOR = 'JR'
+    SENIOR = 'SR'
+    YEAR_IN_SCHOOL_CHOICES = (
+        (FRESHMAN, 'Freshman'),
+        (SOPHOMORE, 'Sophomore'),
+        (JUNIOR, 'Junior'),
+        (SENIOR, 'Senior'),
+    )
+    year_in_school = models.CharField(
+        max_length=2,
+        choices=YEAR_IN_SCHOOL_CHOICES,
+        default=FRESHMAN,
+    )
+
+    def is_upperclass(self):
+        return self.year_in_school in (self.JUNIOR, self.SENIOR)
+</code></pre>
+
+<p>尽管可以在模型类之外定义一个选择列表并且引用它，但在模型类中定义将是的这些信息与类相关联，并且容易引用。</p>
+
+<p>您还可以像下面这样定义它：</p>
+
+<pre><code class="language-python">MEDIA_CHOICES = (
+    ('Audio', (
+            ('vinyl', 'Vinyl'),
+            ('cd', 'CD'),
+        )
+    ),
+    ('Video', (
+            ('vhs', 'VHS Tape'),
+            ('dvd', 'DVD'),
+        )
+    ),
+    ('unknown', 'Unknown'),
+)
+</code></pre>
+
+<p>对于 choices 中设置的每个模型字段， django 将添加一个方法来检索当前字段对应的可读名称，即 get_FOO_display()：</p>
+
+<pre><code class="language-python">from django.db import models
+
+class Person(models.Model):
+    SHIRT_SIZES = (
+        ('S', 'Small'),
+        ('M', 'Medium'),
+        ('L', 'Large'),
+    )
+    name = models.CharField(max_length=60)
+    shirt_size = models.CharField(max_length=2, choices=SHIRT_SIZES)
+
+&gt;&gt;&gt; p = Person(name=&quot;Fred Flintstone&quot;, shirt_size=&quot;L&quot;)
+&gt;&gt;&gt; p.save()
+&gt;&gt;&gt; p.shirt_size
+'L'
+&gt;&gt;&gt; p.get_shirt_size_display()
+'Large'
+</code></pre>
+
+<p>选择可以是任何的可迭代对象，不一定是列表或者元组。这让你可以动态的构建选择。但如果你的 choices 是动态的，那么最好有一个合适的数据库表来存储。</p>
+
+<p>除非 blank=False 在字段中被设置，否则选择框默认将显示 default 的标签&rdquo;&mdash;&mdash;&mdash;&ldquo;，要覆盖此行为，请在 choices 元组中添加 None，比如：(None, &lsquo;Your String For Display&rsquo;)。或者，你也可以使用空字符串。</p>
+
+<hr />
+
+<h1 id="db-column">db_column</h1>
+
+<h2 id="field-db-column">Field.db_column</h2>
+
+<p>用于设置此字段在数据库中的名称，如果没有给定， django 将使用该字段的名称。</p>
+
+<p>此设置可以为 SQL 保留字或者 Python 变量名不允许使用的字符， django 将自动处理好后台的联系。</p>
+
+<hr />
+
+<h1 id="db-index">db_index</h1>
+
+<h2 id="field-db-index">Field.db_index</h2>
+
+<p>如果此设置为 True ，则为此字段创建数据库索引。</p>
+
+<hr />
+
+<h1 id="db-tablespace">db_tablespace</h1>
+
+<h2 id="field-db-tablespace">Field.db_tablespace</h2>
+
+<p>如果此字段已经设置了索引，则用此字段索引数据库表空间的名称。默认值是项目的DEFAULT_INDEX_TABLESPACE设置（如果已设置）或 db_tablespace模型（如果有）。如果后端不支持索引的表空间，则忽略此选项。</p>
+
+<p>注意：SQLite 和 MySQL 不支持数据库表空间的设置，PostgreSQL和Oracle支持。此设置是通过组织磁盘布局来优化数据库性能的。</p>
+
+<hr />
+
+<h1 id="default">default</h1>
+
+<h2 id="field-default">Field.default</h2>
+
+<p>字段的默认值，可以是一个常量值或者一个可调用的对象。如果是一个可调用的对象，则在每次创建新对象的时候都会调用它。</p>
+
+<p>default 的值不能是可变对象（模型实例、list、set等），因为对该对象的同一实例的引用将被用作所有新模型实例中的默认值。除非将所需的默认值包装成一个可调用的对象。例如，如果想要为 JSONField 字段指定一个默认的 dict ，使用函数：</p>
+
+<pre><code class="language-python">def contact_default():
+    return {&quot;email&quot;: &quot;to1@example.com&quot;}
+
+contact_info = JSONField(&quot;ContactInfo&quot;, default=contact_default)
+</code></pre>
+
+<p>lambda 不能用于该字段选项，因为他们无法被迁移序列化（关于迁移序列化，详见 django 官网文档）。</p>
+
+<p>对于像ForeignKey映射到模型实例的字段，默认值应该是它们引用的字段的值（pk，除非通过to_field设置引用了其他键），而不是模型实例。</p>
+
+<p>default 是在未为该字段提供值的时候使用的默认值，如果该字段是主键，则即使有该设置，也会使用默认值。</p>
+
+<hr />
+
+<h1 id="editable">editable</h1>
+
+<h2 id="field-editable">Field.editable</h2>
+
+<p>如果该设置为 False ，则该字段不会在管理员或者 <a href="https://docs.djangoproject.com/en/2.0/topics/forms/modelforms/#django.forms.ModelForm">ModelForm</a> 中被显示，在模型验证中也会被跳过。默认为 True 。</p>
+
+<hr />
+
+<h1 id="error-messages">error_messages</h1>
+
+<h2 id="field-error-messages">Field.error_messages</h2>
+
+<p>该参数允许您覆盖该字段异常时引发的默认消息，传入一个字典，其中包含与要覆盖的错误信息相匹配的键。</p>
+
+<p>错误信息键包括：null，blank，invalid，invalid_choice，unique，unique_for_date。</p>
+
+<p>这些错误通常不会被传递到表单，官方文档也没有关于此字段的使用事例和更多的说明。</p>
+
+<hr />
+
+<h1 id="help-text">help_text</h1>
+
+<h2 id="field-help-text">Field.help_text</h2>
+
+<p>使用默认的窗体小部件时显示的额外的“帮助”文本，即使此字段并没有被用于表单，作为字段的文档也很有用。</p>
+
+<p>如果在自动生成的表单中显示的话，则不会被 HTML 转义，如：</p>
+
+<pre><code class="language-python">help_text=&quot;Please use the following format: &lt;em&gt;YYYY-MM-DD&lt;/em&gt;.&quot;
+</code></pre>
+
+<p>如果有必要的话，也可以通过 django.utils.html.escape() 来转义 HTML 特殊字符，确保避开来自不受信任的用户的跨站脚本攻击。</p>
+
+<hr />
+
+<h1 id="primary-key">primary_key</h1>
+
+<h2 id="field-primary-key">Field.primary_key</h2>
+
+<p>如果为 True ，则此字段为模型的主键。</p>
+
+<p>如果没有指定一个字段的 primary_key=True ，则 django 会自动添加一个 AutoField 来保存主键。因此除非必要，请不要在其他字段上设置 primary_key=True 。</p>
+
+<p>primary_key=True 同时代表了 null=False 和 unique=True ，一个对象值允许有一个主键。</p>
+
+<p>主键的字段是只读的，如果您更改了一个已有的对象的主键并保存，那么会保存一个额外的对象（而不会修改之前的对象）。</p>
+
+<hr />
+
+<h1 id="unique">unique</h1>
+
+<h2 id="field-unique">Field.unique</h2>
+
+<p>如果此参数为 True ，则该字段在整个表中必须是唯一的。</p>
+
+<p>这是在数据库级别与模型验证级别实施的，如果在 unique=True 的字段中保存具有重复值的对象，则会引发一个 django.db.IntegrityError 的错误。</p>
+
+<p>此选项在除了 ManyToManyField 和 OneToOneField 以外的任何字段类型中都有效。</p>
+
+<p>请注意：如果 unique 为 True ，则不需要指定 db_index ，因为 unique 意味着创建唯一索引。</p>
+
+<hr />
+
+<h1 id="unique-for-date">unique_for_date</h1>
+
+<h2 id="field-unique-for-date">Field.unique_for_date</h2>
+
+<p>将其值设置为一个 DateField 或者 DateTimeField 的名称，要求此字段对于给定的日期字段的值是唯一的。</p>
+
+<p>举例来说：如果有一个 CharField 字段 title 和 DateField 字段 pub_time ， title 字段的 unique_for_date 值为 &lsquo;pub_time&rsquo;，那么不允许 title 和 pub_time 同时相同的数据出现。</p>
+
+<p>这个设置是在模型验证期间进行的验证，不会在数据库级别验证。因此，如果字段的 editable=False 的话，将跳过此验证。</p>
+
+<hr />
+
+<h1 id="unique-for-month">unique_for_month</h1>
+
+<h2 id="field-unique-for-month">Field.unique_for_month</h2>
+
+<p>类似 unique_for_date，但该设置要求月份是唯一的。</p>
+
+<hr />
+
+<h1 id="unique-for-year">unique_for_year</h1>
+
+<h2 id="field-unique-for-year">Field.unique_for_year</h2>
+
+<p>我不说你们也明白了吧&hellip;</p>
+
+<hr />
+
+<h1 id="verbose-name">verbose_name</h1>
+
+<h2 id="field-verbose-name">Field.verbose_name</h2>
+
+<p>该字段的可读名称，如果没有给出详细名称， django 将会自动使用该字段的属性名，并把下划线转换为空格。</p>
+
+<hr />
+
+<h1 id="validators">validators</h1>
+
+<h2 id="field-validators">Field.validators</h2>
+
+<p>要为此字段运行的验证程序列表。</p>
+
+<pre><code class="language-python">from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+
+def validate_even(value):
+    if value % 2 != 0:
+        raise ValidationError(
+            _('%(value)s is not an even number'),
+            params={'value': value},
+        )
+</code></pre>
+
+<pre><code class="language-python">from django.db import models
+
+class MyModel(models.Model):
+    even_field = models.IntegerField(validators=[validate_even])
+</code></pre>
+
+<p>可以在窗体中使用同样的验证函数</p>
+
+<pre><code class="language-python">from django import forms
+
+class MyForm(forms.Form):
+    even_field = forms.IntegerField(validators=[validate_even])
+</code></pre>
+
+<h2 id="registering-and-fetching-lookups">Registering and fetching lookups</h2>
+
+<p>这个我看不懂，就直接放官方文档吧。</p>
+
+<p>Field implements the <a href="https://docs.djangoproject.com/en/2.0/ref/models/lookups/#lookup-registration-api">lookup registration API</a>. The API can be used to customize which lookups are available for a field class, and how lookups are fetched from a field.</p></article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+  <div class="footer container-xl width-full p-responsive">
+  <div
+    class="position-relative d-flex flex-row-reverse flex-lg-row flex-wrap flex-lg-nowrap flex-justify-center flex-lg-justify-between flex-sm-items-center pt-6 pb-2 mt-6 f6 text-gray border-top border-gray-light ">
+    <a aria-label="Homepage" title="GitHub" class="footer-octicon d-none d-lg-block mr-lg-4" href="https://meik2333.com/">
+      <svg height="24" class="octicon octicon-mark-github" viewBox="0 0 16 16" version="1.1" width="24">
+        <path fill-rule="evenodd"
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+        </path>
+      </svg>
+    </a>
+    <ul class="list-style-none d-flex flex-wrap col-12 flex-justify-center flex-lg-justify-between mb-2 mb-lg-0">
+      
+      <li class="mr-3 mr-lg-0">Theme by <a href='https://github.com/MeiK2333/github-style'>github-style</a></li>
+      
+    </ul>
+  </div>
+  <div class="d-flex flex-justify-center pb-6">
+    <span class="f6 text-gray-light"></span>
+  </div>
+
+
+</div>
+</body>
+
+<script type="application/javascript" src="https://meik2333.com/js/github-style.js"></script>
+
+
+
+</html>

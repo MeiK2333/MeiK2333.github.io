@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>DNS on MeiK&#39;s blog</title>
+    <link>https://meik2333.com/tags/dns/</link>
+    <description>Recent content in DNS on MeiK&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>Theme by &lt;a href=&#39;https://github.com/MeiK2333/github-style&#39;&gt;github-style&lt;/a&gt;</copyright>
+    <lastBuildDate>Mon, 21 Oct 2019 10:39:42 +0800</lastBuildDate>
+    
+	<atom:link href="https://meik2333.com/tags/dns/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>DNS 安全</title>
+      <link>https://meik2333.com/post/dns-security/</link>
+      <pubDate>Mon, 21 Oct 2019 10:39:42 +0800</pubDate>
+      
+      <guid>https://meik2333.com/post/dns-security/</guid>
+      <description>&lt;p&gt;浅谈 DNS 安全。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -6,6 +6,7 @@
     <description>Recent content in BUG on MeiK&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
+    <copyright>Theme by &lt;a href=&#39;https://github.com/MeiK2333/github-style&#39;&gt;github-style&lt;/a&gt;</copyright>
     <lastBuildDate>Tue, 29 Jan 2019 21:27:43 +0000</lastBuildDate>
     
 	<atom:link href="https://meik2333.com/tags/bug/index.xml" rel="self" type="application/rss+xml" />
@@ -13,10 +14,10 @@
     
     <item>
       <title>我是如何找到一个 BUG 的</title>
-      <link>https://meik2333.com/posts/fix-bug/</link>
+      <link>https://meik2333.com/post/fix-bug/</link>
       <pubDate>Tue, 29 Jan 2019 21:27:43 +0000</pubDate>
       
-      <guid>https://meik2333.com/posts/fix-bug/</guid>
+      <guid>https://meik2333.com/post/fix-bug/</guid>
       <description>&lt;p&gt;本文介绍了我是如何找到一个 BUG 的。&lt;/p&gt;</description>
     </item>
     

@@ -6,6 +6,7 @@
     <description>Recent content in 转载 on MeiK&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
+    <copyright>Theme by &lt;a href=&#39;https://github.com/MeiK2333/github-style&#39;&gt;github-style&lt;/a&gt;</copyright>
     <lastBuildDate>Sat, 24 Feb 2018 22:24:09 +0000</lastBuildDate>
     
 	<atom:link href="https://meik2333.com/tags/%E8%BD%AC%E8%BD%BD/index.xml" rel="self" type="application/rss+xml" />
@@ -13,19 +14,19 @@
     
     <item>
       <title>（转）如何有效的报告 Bug</title>
-      <link>https://meik2333.com/posts/how-to-report-bugs-effectively/</link>
+      <link>https://meik2333.com/post/how-to-report-bugs-effectively/</link>
       <pubDate>Sat, 24 Feb 2018 22:24:09 +0000</pubDate>
       
-      <guid>https://meik2333.com/posts/how-to-report-bugs-effectively/</guid>
+      <guid>https://meik2333.com/post/how-to-report-bugs-effectively/</guid>
       <description>&lt;p&gt;转自&lt;a href=&#34;https://www.chiark.greenend.org.uk/~sgtatham/bugs-cn.html&#34;&gt;如何有效的报告 Bug&lt;/a&gt;，和上一篇一样，我认为它不止适用于程序的用户向开发者报告 Bug ，同时也是一个好的思考方式的指导。&lt;/p&gt;</description>
     </item>
     
     <item>
       <title>（转）提问的智慧</title>
-      <link>https://meik2333.com/posts/how-to-ask-questions-the-smart-way/</link>
+      <link>https://meik2333.com/post/how-to-ask-questions-the-smart-way/</link>
       <pubDate>Sat, 24 Feb 2018 22:05:00 +0000</pubDate>
       
-      <guid>https://meik2333.com/posts/how-to-ask-questions-the-smart-way/</guid>
+      <guid>https://meik2333.com/post/how-to-ask-questions-the-smart-way/</guid>
       <description>&lt;p&gt;转自 GitHub &lt;a href=&#34;https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way&#34;&gt;https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way&lt;/a&gt;，个人认为无论从事什么行业都要看一看的东西，也是成为一个合格的程序员的先决条件。&lt;/p&gt;</description>
     </item>
     

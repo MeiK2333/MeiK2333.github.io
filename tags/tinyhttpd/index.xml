@@ -6,6 +6,7 @@
     <description>Recent content in Tinyhttpd on MeiK&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
+    <copyright>Theme by &lt;a href=&#39;https://github.com/MeiK2333/github-style&#39;&gt;github-style&lt;/a&gt;</copyright>
     <lastBuildDate>Fri, 29 Jun 2018 17:16:20 +0000</lastBuildDate>
     
 	<atom:link href="https://meik2333.com/tags/tinyhttpd/index.xml" rel="self" type="application/rss+xml" />
@@ -13,10 +14,10 @@
     
     <item>
       <title>Tinyhttpd 源码及分析</title>
-      <link>https://meik2333.com/posts/tinyhttpd-source-and-analysis/</link>
+      <link>https://meik2333.com/post/tinyhttpd-source-and-analysis/</link>
       <pubDate>Fri, 29 Jun 2018 17:16:20 +0000</pubDate>
       
-      <guid>https://meik2333.com/posts/tinyhttpd-source-and-analysis/</guid>
+      <guid>https://meik2333.com/post/tinyhttpd-source-and-analysis/</guid>
       <description>&lt;p&gt;Tinyhttpd 是J. David Blackstone在1999年写的一个不到 500 行的超轻量型 Http Server，分析这个项目可以帮助我们理解服务器软件的本质。&lt;/p&gt;</description>
     </item>
     

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <script type="application/javascript" src='https://meik2333.com/js/theme-mode.js'></script>
+    <link rel="stylesheet" href='https://meik2333.com/css/frameworks.min.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/github.min.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <title>关于评测姬的内存测量问题 - MeiK&#39;s blog</title>
+    <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
+    <meta name="theme-color" content="#1e2327">
+
+    
+    <meta name="description"
+  content="SDUT OJ 的评测姬有时候会造成异常 MLE 的问题, 比如 字典树 题目, 或者是 装备合成(第八届校赛题目, 有一位同学在比赛中疯狂提交 20&#43; 发 MLE) .
+然后, 有人会发现, 使用静态变量(栈区/静态区)的代码居然可以通过, 而使用同样多内存的动态分配(堆区)的代码却无论如何都是 MLE, 这难道是玄学问题咩?
+本期的走进科学, 我们就来探究 SDUT OJ 评测姬的各种神奇之处.
+" />
+<meta name="keywords"
+  content='' />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="https://meik2333.com/post/online-judge-get-memory-usage/" />
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="关于评测姬的内存测量问题 - MeiK&#39;s blog" />
+<meta name="twitter:description"
+  content="SDUT OJ 的评测姬有时候会造成异常 MLE 的问题, 比如 字典树 题目, 或者是 装备合成(第八届校赛题目, 有一位同学在比赛中疯狂提交 20&#43; 发 MLE) .
+然后, 有人会发现, 使用静态变量(栈区/静态区)的代码居然可以通过, 而使用同样多内存的动态分配(堆区)的代码却无论如何都是 MLE, 这难道是玄学问题咩?
+本期的走进科学, 我们就来探究 SDUT OJ 评测姬的各种神奇之处.
+" />
+<meta name="twitter:site" content="https://meik2333.com/" />
+<meta name="twitter:creator" content="" />
+<meta name="twitter:image"
+  content="https://meik2333.com/">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:title" content="关于评测姬的内存测量问题 - MeiK&#39;s blog">
+<meta property="og:description"
+  content="SDUT OJ 的评测姬有时候会造成异常 MLE 的问题, 比如 字典树 题目, 或者是 装备合成(第八届校赛题目, 有一位同学在比赛中疯狂提交 20&#43; 发 MLE) .
+然后, 有人会发现, 使用静态变量(栈区/静态区)的代码居然可以通过, 而使用同样多内存的动态分配(堆区)的代码却无论如何都是 MLE, 这难道是玄学问题咩?
+本期的走进科学, 我们就来探究 SDUT OJ 评测姬的各种神奇之处.
+" />
+<meta property="og:url" content="https://meik2333.com/post/online-judge-get-memory-usage/" />
+<meta property="og:site_name" content="关于评测姬的内存测量问题" />
+<meta property="og:image"
+  content="https://meik2333.com/">
+<meta property="og:image:width" content="2048">
+<meta property="og:image:height" content="1024">
+
+<meta property="article:published_time" content="2018-08-09 22:00:39 &#43;0000 UTC" />
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body>
+  <div style="position: relative">
+  <header class="Header js-details-container Details px-3 px-md-4 px-lg-5 flex-wrap flex-md-nowrap open Details--on">
+    <div class="Header-item mobile-none" style="margin-top: -4px; margin-bottom: -4px;">
+      <a class="Header-link" href="https://meik2333.com/">
+        <svg class="octicon" height="32" viewBox="0 0 16 16" version="1.1" width="32">
+          <path fill-rule="evenodd"
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+          </path>
+        </svg>
+      </a>
+    </div>
+    <div class="Header-item d-md-none">
+      <button class="Header-link btn-link js-details-target" type="button"
+        onclick="document.querySelector('#header-search').style.display = document.querySelector('#header-search').style.display == 'none'? 'block': 'none'">
+        <svg height="24" class="octicon octicon-three-bars" viewBox="0 0 16 16" version="1.1" width="24">
+          <path fill-rule="evenodd"
+            d="M1 2.75A.75.75 0 011.75 2h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 2.75zm0 5A.75.75 0 011.75 7h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 7.75zM1.75 12a.75.75 0 100 1.5h12.5a.75.75 0 100-1.5H1.75z">
+          </path>
+        </svg>
+      </button>
+    </div>
+    <div style="display: none;" id="header-search"
+      class="Header-item Header-item--full flex-column flex-md-row width-full flex-order-2 flex-md-order-none mr-0 mr-md-3 mt-3 mt-md-0 Details-content--hidden-not-important d-md-flex">
+      <div
+        class="Header-search header-search flex-auto js-site-search position-relative flex-self-stretch flex-md-self-auto mb-3 mb-md-0 mr-0 mr-md-3 scoped-search site-scoped-search js-jump-to">
+        <div class="position-relative">
+          <form target="_blank" action="https://www.google.com/search" accept-charset="UTF-8" method="get"
+            autocomplete="off">
+            <label
+              class="Header-search-label form-control input-sm header-search-wrapper p-0 js-chromeless-input-container header-search-wrapper-jump-to position-relative d-flex flex-justify-between flex-items-center">
+              <input type="text"
+                class="Header-search-input form-control input-sm header-search-input jump-to-field js-jump-to-field js-site-search-focus js-site-search-field is-clearable"
+                name="q" value="" placeholder="Search" autocomplete="off">
+              <input type="hidden" name="q" value="site:https://meik2333.com/">
+            </label>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="Header-item Header-item--full flex-justify-center d-md-none position-relative">
+      <a class="Header-link " href="https://meik2333.com/">
+        <svg class="octicon octicon-mark-github v-align-middle" height="32" viewBox="0 0 16 16" version="1.1"
+          width="32">
+          <path fill-rule="evenodd"
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+          </path>
+        </svg>
+      </a>
+    </div>
+    <div class="Header-item" style="margin-right: 0;">
+      <a href="javascript:void(0)" class="Header-link no-select" onclick="switchTheme()">
+        <svg style="fill: var(--color-profile-color-modes-toggle-moon);" class="no-select" viewBox="0 0 16 16"
+          version="1.1" width="16" height="16">
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M4.52208 7.71754C7.5782 7.71754 10.0557 5.24006 10.0557 2.18394C10.0557 1.93498 10.0392 1.68986 10.0074 1.44961C9.95801 1.07727 10.3495 0.771159 10.6474 0.99992C12.1153 2.12716 13.0615 3.89999 13.0615 5.89383C13.0615 9.29958 10.3006 12.0605 6.89485 12.0605C3.95334 12.0605 1.49286 10.001 0.876728 7.24527C0.794841 6.87902 1.23668 6.65289 1.55321 6.85451C2.41106 7.40095 3.4296 7.71754 4.52208 7.71754Z">
+          </path>
+        </svg>
+      </a>
+    </div>
+  </header>
+</div>
+  
+<div>
+  <main>
+    <div class="gisthead pagehead bg-gray-light pb-0 pt-3 mb-4">
+      <div class="px-0">
+        <div class="mb-3 d-flex px-3 px-md-3 px-lg-5">
+          <div class="flex-auto min-width-0 width-fit mr-3">
+            <div class="d-flex">
+              <div class="d-none d-md-block">
+                <a class="avatar mr-2 flex-shrink-0" href="https://meik2333.com/">
+                  <img class=" avatar-user"
+                    src="https://meik2333.com/images/avatar.png"
+                    width="32" height="32"></a>
+              </div>
+              <div class="d-flex flex-column">
+                <h1 class="break-word f3 text-normal mb-md-0 mb-1">
+                  <span class="author">
+                    <a href="https://meik2333.com/">MeiK</a></span><span
+                    class="path-divider">/</span><strong class="css-truncate-target mr-1" style="max-width: 410px"><a
+                      href="https://meik2333.com/post/online-judge-get-memory-usage/">关于评测姬的内存测量问题</a></strong>
+                </h1>
+                <div class="note m-0">
+                  Created <relative-time datetime="Thu, 09 Aug 2018 22:00:39 &#43;0000"
+                    class="no-wrap">
+                    Thu, 09 Aug 2018 22:00:39 &#43;0000</relative-time>
+
+                  
+                  <span class="file-info-divider"></span>
+                  Modified <relative-time datetime="Fri, 11 Oct 2019 17:07:23 &#43;0800"
+                    class="no-wrap">
+                    Fri, 11 Oct 2019 17:07:23 &#43;0800</relative-time>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-lg px-3 new-discussion-timeline">
+      <div class="repository-content gist-content">
+        <div>
+          <div class="js-gist-file-update-container js-task-list-container file-box">
+            <div id="file-pytest" class="file my-2">
+              <div class="file-header d-flex flex-md-items-center flex-items-start">
+                <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
+                  <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
+                    2142 Words
+                    
+
+                  </div>
+                  <div class="file-actions flex-order-2 pt-0">
+                    
+                    
+                    <a class="muted-link mr-3" href="/tags/%E6%94%BB%E7%95%A5">
+                      <svg class="octicon octicon-tag" viewBox="0 0 16 16" version="1.1" width="16" height="16">
+                        <path fill-rule="evenodd"
+                          d="M2.5 7.775V2.75a.25.25 0 01.25-.25h5.025a.25.25 0 01.177.073l6.25 6.25a.25.25 0 010 .354l-5.025 5.025a.25.25 0 01-.354 0l-6.25-6.25a.25.25 0 01-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.75 1.75 0 011 7.775zM6 5a1 1 0 100 2 1 1 0 000-2z">
+                        </path>
+                      </svg>
+                      攻略
+                    </a>
+                    
+                    <a class="muted-link mr-3" href="/tags/%E8%AF%84%E6%B5%8B%E5%A7%AC">
+                      <svg class="octicon octicon-tag" viewBox="0 0 16 16" version="1.1" width="16" height="16">
+                        <path fill-rule="evenodd"
+                          d="M2.5 7.775V2.75a.25.25 0 01.25-.25h5.025a.25.25 0 01.177.073l6.25 6.25a.25.25 0 010 .354l-5.025 5.025a.25.25 0 01-.354 0l-6.25-6.25a.25.25 0 01-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.75 1.75 0 011 7.775zM6 5a1 1 0 100 2 1 1 0 000-2z">
+                        </path>
+                      </svg>
+                      评测姬
+                    </a>
+                    
+                    
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="Box-body px-5 pb-5">
+                <article class="markdown-body entry-content container-lg"><p>SDUT OJ 的评测姬有时候会造成异常 MLE 的问题, 比如 <a href="https://acm.sdut.edu.cn/onlinejudge2/index.php/Home/Index/problemdetail/pid/2828.html">字典树</a> 题目, 或者是 <a href="https://acm.sdut.edu.cn/onlinejudge2/index.php/Home/Index/problemdetail/pid/3545.html">装备合成</a>(第八届校赛题目, 有一位同学在比赛中疯狂提交 20+ 发 MLE) .</p>
+
+<p>然后, 有人会发现, 使用静态变量(栈区/静态区)的代码居然可以通过, 而使用同样多内存的动态分配(堆区)的代码却无论如何都是 MLE, 这难道是玄学问题咩?</p>
+
+<p>本期的走进科学, 我们就来探究 SDUT OJ 评测姬的各种神奇之处.</p>
+
+<h2 id="同样的代码在不同平台的表现">同样的代码在不同平台的表现</h2>
+
+<p>我们选用同样的代码, 在几个知名度较高的 OJ 平台上使用同样的编译器测试一下</p>
+
+<pre><code class="language-C++">#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    int a, b;
+    cin &gt;&gt; a &gt;&gt; b;
+    cout &lt;&lt; a + b &lt;&lt; endl;
+    return 0;
+}
+</code></pre>
+
+<p>选用的题目是 A + B Problem, 在选中的 OJ 上都是 1000 题目.</p>
+
+<h3 id="poj">POJ</h3>
+
+<table>
+<thead>
+<tr>
+<th>User</th>
+<th>Problem</th>
+<th>Result</th>
+<th>Memory</th>
+<th>Time</th>
+<th>Language</th>
+<th>Code Length</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>MeiK</td>
+<td>1000</td>
+<td>Accepted</td>
+<td>720K</td>
+<td>0MS</td>
+<td>G++</td>
+<td>132B</td>
+</tr>
+</tbody>
+</table>
+
+<p>(因为贴图太麻烦了, 这里直接贴个表格)</p>
+
+<h3 id="hdu-oj">HDU OJ</h3>
+
+<table>
+<thead>
+<tr>
+<th>Judge Status</th>
+<th>Pro.ID</th>
+<th>Exe.Time</th>
+<th>Exe.Memory</th>
+<th>Code Len.</th>
+<th>Language</th>
+<th>Author</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Accepted</td>
+<td>1000</td>
+<td>0MS</td>
+<td>1796K</td>
+<td>149 B</td>
+<td>G++</td>
+<td>MeiK</td>
+</tr>
+</tbody>
+</table>
+
+<p>HDU OJ 上这个题目是多组输入的, 因此代码中处理了多组输入, 代码长度略长</p>
+
+<h3 id="sdut-oj">SDUT OJ</h3>
+
+<table>
+<thead>
+<tr>
+<th>Nick Name</th>
+<th>Problem</th>
+<th>Result</th>
+<th>Time</th>
+<th>Memory</th>
+<th>Language</th>
+<th>Code Len</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>MeiK</td>
+<td>1000</td>
+<td>Accepted</td>
+<td>0 ms</td>
+<td>240 KiB</td>
+<td>g++</td>
+<td>142 B</td>
+</tr>
+</tbody>
+</table>
+
+<p>看出什么问题了没有? 虽然同样是 G++ 编译器, 但是在 SDUT OJ 上运行所使用的内存, 只有 POJ 的 <sup>1</sup>&frasl;<sub>3</sub> , 只有 HDU OJ 的近 <sup>1</sup>&frasl;<sub>8</sub> !</p>
+
+<p>是因为 SDUT OJ 的评测姬有什么神奇的优化技术吗? 这里还是先讲解一下评测姬(Linux 平台下)是怎么获得程序运行的时间和内存的吧.</p>
+
+<h2 id="评测姬原理">评测姬原理</h2>
+
+<h3 id="时间">时间</h3>
+
+<p>获得时间的方法各个 OJ 基本都没有区别, Linux 下有 <code>wait</code> 系列函数, 可以通过这个函数收集某个进程运行所占用的资源, 其中就有 CPU 时间.</p>
+
+<p>CPU 时间是指进程实际占用 CPU 的时间, 系统中断和 I/O 阻塞的时间不计入其中, 同样的, 如果是多线程的程序的话, 那么最终统计到的也是所有线程的用时之和. 这个时间的值和墙上时钟没有什么必然的联系, 墙上时钟运行了 10S 的程序也有可能只占用了 1S 的 CPU 时间, 多线程的程序也有可能在 1S 内占用 3S CPU 时间. Linux 下有 <code>time</code> 命令, 可以轻松的计算某个程序的运行用时.</p>
+
+<h3 id="内存">内存</h3>
+
+<p>和运行时间比起来, 获得运行占用内存是个相当不容易的事情. <code>wait</code> 函数虽然也可以获得程序占用内存, 但是有个弊端, 就是会将 <code>exec</code> 之前的内存也统计进来, 如果用户提交程序的内存占用还没有 <code>exec</code> 之前的内存大的话, 用户就会获得一个偏大的内存占用. (使用 <code>fork</code> 和 <code>exec</code>  几乎是 Linux 系统下执行新的程序的唯一方法, 所有基于 Linux 的评测姬都要通过这个方法来执行用户提交的代码)</p>
+
+<p>那么有什么办法可以解决这个问题呢? HUST 开源的评测姬是这样做的: 评测姬监测用户程序, 用户程序每次执行系统调用的时候, 评测姬去 <code>/proc/${pid}/status</code> 中读取程序当前所占用的内存, 然后取一个最大值作为最终的内存占用.</p>
+
+<p>这样的好处是不会再把其他的内存给统计进去, 缺点就是: 每次用户程序执行系统调用都要中断用户程序, 导致整体运行时间变长, 并且由于过多的来回切换, CPU 时间也相应的变长了. 经统计, HUST 的评测姬比基于 <code>wait</code> 获得内存的评测姬评测出来的程序用时要大 30% 左右.</p>
+
+<p>那还有没有其他的方法了? 我暂时是不知道还有什么能<strong>比较准确</strong>的测量程序运行占用内存的方法了. 我所知的大部分 OJ 都采用了 <code>wait</code> 的方法来获得内存占用, 但也有一些 OJ , 两种方法都没有使用, 比如 SDUTOJ &hellip;</p>
+
+<h2 id="问题出现的原因">问题出现的原因</h2>
+
+<p>时间回到 2017 年, 大概是四五月份(也许吧), 当时评测姬被发现了一个 BUG: 任何一个程序运行超过 2S 就会超时, 当时学长们都去实习了, 我就借此机会研究了评测姬的源码. 经过一个多星期的研究, 我终于找出了 BUG 出现的原因, 可同时我也发现了一个神奇的操作 &mdash; SDUT OJ 的评测姬, 是根据缺页中断次数判断使用内存的!</p>
+
+<p>学过操作系统的同学们应该都知道, 缺页中断发生在系统缺页的时候, 也就是要访问的页还不在主存中, 这时候需要系统将数据置换到主存中才可以访问. 缺页中断的次数和程序实际使用的内存并没有必然的联系, 但是, SDUTOJ 的评测姬居然是用缺页中断的次数乘以每页内存的大小来计算内存使用的!</p>
+
+<p>在程序中用全局变量中申请的内存位于 <em>全局/静态区</em> , 这部分会在程序开始执行的时候与程序正文段一起被装载到内存中. 而使用 <code>new</code> 或者 <code>malloc</code> 申请的内存位于堆区, 在每次调用的时候都会实时申请. 这中间具体的分配过程与缺页情况我并不是很清楚, 但是, 在 SDUTOJ 评测姬的这种计算方式下, 使用同样多的内存, 如果使用全局变量的程序被计算出 1000KIB 内存占用, 那么使用 <code>new</code> 的程序将会被计算出 150000KIB 甚至更多. 没错, 是一千和十五万的、 超过 100 倍的差距.</p>
+
+<h2 id="为何我没有修复这个问题">为何我没有修复这个问题</h2>
+
+<p>我当时注意到这个问题的时候, 想过要修复它. 但是考虑到了以下几点:</p>
+
+<ul>
+<li>OJ 中有大量限制内存严格的题目, 比如有个题目通过内存限制只能使用某种数据结构(几百 KIB 的内存限制). 而如果修复了这个问题的话, 那么这些题目将都无法通过, 因为任何一个提交的内存占用都将超过 1000KIB.</li>
+<li>当时我并不知道这个问题会导致什么样的后果, 我认为即使和其他 OJ 不同, 但只要能拿到一个相对正确的值即可. 比如两个代码, 在 POJ 上占用 2000KIB 和 4000KIB, 而在 SDUTOJ 上分别占用 300KIB 和 600KIB, 那么也是可以接受的.</li>
+<li>还有一点, 就是我当时确实认为这个是学长或者原作者有意为之(原版 SDUTOJ 基于 Lo_runner, 我不知道是 Lo_runner 就做了这个设定, 还是学长在修改的时候做的). 当年写评测姬的学长已经联系不到了, 而这个评测姬已经*稳定*运行了很多年, 出于一些稳定性的原因, 我也不能去修复它.</li>
+</ul>
+
+<h2 id="现在的解决方案">现在的解决方案</h2>
+
+<p>如果我现在修复了这个问题, 那么后续也会有大量的问题. 之前的题目是基于错误的内存测量方式而给定的内存限制, 这些题目全部需要进行修改, 是一个不小的工程.</p>
+
+<p>当然我们也并不会回避问题, 我们将在商讨后给定一个解决方案, 在修复这个 BUG 之前, 如果碰到了这种问题的话, 权宜之计就是申请全局变量来自己维持一个内存池, 这样就可以在内存方面通过限制.</p></article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+  <div class="footer container-xl width-full p-responsive">
+  <div
+    class="position-relative d-flex flex-row-reverse flex-lg-row flex-wrap flex-lg-nowrap flex-justify-center flex-lg-justify-between flex-sm-items-center pt-6 pb-2 mt-6 f6 text-gray border-top border-gray-light ">
+    <a aria-label="Homepage" title="GitHub" class="footer-octicon d-none d-lg-block mr-lg-4" href="https://meik2333.com/">
+      <svg height="24" class="octicon octicon-mark-github" viewBox="0 0 16 16" version="1.1" width="24">
+        <path fill-rule="evenodd"
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+        </path>
+      </svg>
+    </a>
+    <ul class="list-style-none d-flex flex-wrap col-12 flex-justify-center flex-lg-justify-between mb-2 mb-lg-0">
+      
+      <li class="mr-3 mr-lg-0">Theme by <a href='https://github.com/MeiK2333/github-style'>github-style</a></li>
+      
+    </ul>
+  </div>
+  <div class="d-flex flex-justify-center pb-6">
+    <span class="f6 text-gray-light"></span>
+  </div>
+
+
+</div>
+</body>
+
+<script type="application/javascript" src="https://meik2333.com/js/github-style.js"></script>
+
+
+
+</html>

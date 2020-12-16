@@ -6,6 +6,7 @@
     <description>Recent content in Docker on MeiK&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
+    <copyright>Theme by &lt;a href=&#39;https://github.com/MeiK2333/github-style&#39;&gt;github-style&lt;/a&gt;</copyright>
     <lastBuildDate>Fri, 23 Mar 2018 16:10:22 +0000</lastBuildDate>
     
 	<atom:link href="https://meik2333.com/tags/docker/index.xml" rel="self" type="application/rss+xml" />
@@ -13,10 +14,10 @@
     
     <item>
       <title>CentOS 配置 PHP5.2 &#43; Apache &#43; MySQL</title>
-      <link>https://meik2333.com/posts/centos-setup-php5.2-apache-mysql/</link>
+      <link>https://meik2333.com/post/centos-setup-php5.2-apache-mysql/</link>
       <pubDate>Fri, 23 Mar 2018 16:10:22 +0000</pubDate>
       
-      <guid>https://meik2333.com/posts/centos-setup-php5.2-apache-mysql/</guid>
+      <guid>https://meik2333.com/post/centos-setup-php5.2-apache-mysql/</guid>
       <description>&lt;h2 id=&#34;原材料&#34;&gt;原材料&lt;/h2&gt;
 
 &lt;ul&gt;

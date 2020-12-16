@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <script type="application/javascript" src='https://meik2333.com/js/theme-mode.js'></script>
+    <link rel="stylesheet" href='https://meik2333.com/css/frameworks.min.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/github.min.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <title>如何写一个评测姬 - 第五篇 - MeiK&#39;s blog</title>
+    <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
+    <meta name="theme-color" content="#1e2327">
+
+    
+    <meta name="description"
+  content="从零开始实现一个 OJ 评测姬。
+" />
+<meta name="keywords"
+  content='' />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="https://meik2333.com/post/judger5/" />
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="如何写一个评测姬 - 第五篇 - MeiK&#39;s blog" />
+<meta name="twitter:description"
+  content="从零开始实现一个 OJ 评测姬。
+" />
+<meta name="twitter:site" content="https://meik2333.com/" />
+<meta name="twitter:creator" content="" />
+<meta name="twitter:image"
+  content="https://meik2333.com/">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:title" content="如何写一个评测姬 - 第五篇 - MeiK&#39;s blog">
+<meta property="og:description"
+  content="从零开始实现一个 OJ 评测姬。
+" />
+<meta property="og:url" content="https://meik2333.com/post/judger5/" />
+<meta property="og:site_name" content="如何写一个评测姬 - 第五篇" />
+<meta property="og:image"
+  content="https://meik2333.com/">
+<meta property="og:image:width" content="2048">
+<meta property="og:image:height" content="1024">
+
+<meta property="article:published_time" content="2019-07-08 20:44:09 &#43;0000 UTC" />
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body>
+  <div style="position: relative">
+  <header class="Header js-details-container Details px-3 px-md-4 px-lg-5 flex-wrap flex-md-nowrap open Details--on">
+    <div class="Header-item mobile-none" style="margin-top: -4px; margin-bottom: -4px;">
+      <a class="Header-link" href="https://meik2333.com/">
+        <svg class="octicon" height="32" viewBox="0 0 16 16" version="1.1" width="32">
+          <path fill-rule="evenodd"
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+          </path>
+        </svg>
+      </a>
+    </div>
+    <div class="Header-item d-md-none">
+      <button class="Header-link btn-link js-details-target" type="button"
+        onclick="document.querySelector('#header-search').style.display = document.querySelector('#header-search').style.display == 'none'? 'block': 'none'">
+        <svg height="24" class="octicon octicon-three-bars" viewBox="0 0 16 16" version="1.1" width="24">
+          <path fill-rule="evenodd"
+            d="M1 2.75A.75.75 0 011.75 2h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 2.75zm0 5A.75.75 0 011.75 7h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 7.75zM1.75 12a.75.75 0 100 1.5h12.5a.75.75 0 100-1.5H1.75z">
+          </path>
+        </svg>
+      </button>
+    </div>
+    <div style="display: none;" id="header-search"
+      class="Header-item Header-item--full flex-column flex-md-row width-full flex-order-2 flex-md-order-none mr-0 mr-md-3 mt-3 mt-md-0 Details-content--hidden-not-important d-md-flex">
+      <div
+        class="Header-search header-search flex-auto js-site-search position-relative flex-self-stretch flex-md-self-auto mb-3 mb-md-0 mr-0 mr-md-3 scoped-search site-scoped-search js-jump-to">
+        <div class="position-relative">
+          <form target="_blank" action="https://www.google.com/search" accept-charset="UTF-8" method="get"
+            autocomplete="off">
+            <label
+              class="Header-search-label form-control input-sm header-search-wrapper p-0 js-chromeless-input-container header-search-wrapper-jump-to position-relative d-flex flex-justify-between flex-items-center">
+              <input type="text"
+                class="Header-search-input form-control input-sm header-search-input jump-to-field js-jump-to-field js-site-search-focus js-site-search-field is-clearable"
+                name="q" value="" placeholder="Search" autocomplete="off">
+              <input type="hidden" name="q" value="site:https://meik2333.com/">
+            </label>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="Header-item Header-item--full flex-justify-center d-md-none position-relative">
+      <a class="Header-link " href="https://meik2333.com/">
+        <svg class="octicon octicon-mark-github v-align-middle" height="32" viewBox="0 0 16 16" version="1.1"
+          width="32">
+          <path fill-rule="evenodd"
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+          </path>
+        </svg>
+      </a>
+    </div>
+    <div class="Header-item" style="margin-right: 0;">
+      <a href="javascript:void(0)" class="Header-link no-select" onclick="switchTheme()">
+        <svg style="fill: var(--color-profile-color-modes-toggle-moon);" class="no-select" viewBox="0 0 16 16"
+          version="1.1" width="16" height="16">
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M4.52208 7.71754C7.5782 7.71754 10.0557 5.24006 10.0557 2.18394C10.0557 1.93498 10.0392 1.68986 10.0074 1.44961C9.95801 1.07727 10.3495 0.771159 10.6474 0.99992C12.1153 2.12716 13.0615 3.89999 13.0615 5.89383C13.0615 9.29958 10.3006 12.0605 6.89485 12.0605C3.95334 12.0605 1.49286 10.001 0.876728 7.24527C0.794841 6.87902 1.23668 6.65289 1.55321 6.85451C2.41106 7.40095 3.4296 7.71754 4.52208 7.71754Z">
+          </path>
+        </svg>
+      </a>
+    </div>
+  </header>
+</div>
+  
+<div>
+  <main>
+    <div class="gisthead pagehead bg-gray-light pb-0 pt-3 mb-4">
+      <div class="px-0">
+        <div class="mb-3 d-flex px-3 px-md-3 px-lg-5">
+          <div class="flex-auto min-width-0 width-fit mr-3">
+            <div class="d-flex">
+              <div class="d-none d-md-block">
+                <a class="avatar mr-2 flex-shrink-0" href="https://meik2333.com/">
+                  <img class=" avatar-user"
+                    src="https://meik2333.com/images/avatar.png"
+                    width="32" height="32"></a>
+              </div>
+              <div class="d-flex flex-column">
+                <h1 class="break-word f3 text-normal mb-md-0 mb-1">
+                  <span class="author">
+                    <a href="https://meik2333.com/">MeiK</a></span><span
+                    class="path-divider">/</span><strong class="css-truncate-target mr-1" style="max-width: 410px"><a
+                      href="https://meik2333.com/post/judger5/">如何写一个评测姬 - 第五篇</a></strong>
+                </h1>
+                <div class="note m-0">
+                  Created <relative-time datetime="Mon, 08 Jul 2019 20:44:09 &#43;0000"
+                    class="no-wrap">
+                    Mon, 08 Jul 2019 20:44:09 &#43;0000</relative-time>
+
+                  
+                  <span class="file-info-divider"></span>
+                  Modified <relative-time datetime="Fri, 11 Oct 2019 17:37:10 &#43;0800"
+                    class="no-wrap">
+                    Fri, 11 Oct 2019 17:37:10 &#43;0800</relative-time>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-lg px-3 new-discussion-timeline">
+      <div class="repository-content gist-content">
+        <div>
+          <div class="js-gist-file-update-container js-task-list-container file-box">
+            <div id="file-pytest" class="file my-2">
+              <div class="file-header d-flex flex-md-items-center flex-items-start">
+                <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
+                  <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
+                    1449 Words
+                    
+
+                  </div>
+                  <div class="file-actions flex-order-2 pt-0">
+                    
+                    
+                    <a class="muted-link mr-3" href="/tags/onlinejudge">
+                      <svg class="octicon octicon-tag" viewBox="0 0 16 16" version="1.1" width="16" height="16">
+                        <path fill-rule="evenodd"
+                          d="M2.5 7.775V2.75a.25.25 0 01.25-.25h5.025a.25.25 0 01.177.073l6.25 6.25a.25.25 0 010 .354l-5.025 5.025a.25.25 0 01-.354 0l-6.25-6.25a.25.25 0 01-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.75 1.75 0 011 7.775zM6 5a1 1 0 100 2 1 1 0 000-2z">
+                        </path>
+                      </svg>
+                      OnlineJudge
+                    </a>
+                    
+                    <a class="muted-link mr-3" href="/tags/%E8%AF%84%E6%B5%8B%E5%A7%AC">
+                      <svg class="octicon octicon-tag" viewBox="0 0 16 16" version="1.1" width="16" height="16">
+                        <path fill-rule="evenodd"
+                          d="M2.5 7.775V2.75a.25.25 0 01.25-.25h5.025a.25.25 0 01.177.073l6.25 6.25a.25.25 0 010 .354l-5.025 5.025a.25.25 0 01-.354 0l-6.25-6.25a.25.25 0 01-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.75 1.75 0 011 7.775zM6 5a1 1 0 100 2 1 1 0 000-2z">
+                        </path>
+                      </svg>
+                      评测姬
+                    </a>
+                    
+                    
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="Box-body px-5 pb-5">
+                <article class="markdown-body entry-content container-lg"><p>从零开始实现一个 OJ 评测姬。</p>
+
+<p>获取指定子进程的资源占用，是一个常见的需求，Linux 也提供了相应的实现方法。OJ 也需要使用这些方法来评判用户程序的时间与空间复杂度。</p>
+
+<h2 id="获取程序运行时间">获取程序运行时间</h2>
+
+<p>获取程序运行了多久，其实很简单：在程序运行前后分别计时，然后相减即可。</p>
+
+<pre><code class="language-c">struct timeval start, end;
+pid_t pid;
+int time_used;  // 运行耗时
+
+gettimeofday(&amp;start, NULL);  // 运行前计时
+if ((pid = fork()) == 0) {  // child
+    // exec 执行子进程
+}
+// wait 等待子进程结束
+gettimeofday(&amp;end, NULL);  // 运行后计时
+time_used =
+    (int)(end.tv_sec * 1000 + end.tv_usec / 1000 - start.tv_sec * 1000 -
+            start.tv_usec / 1000);
+</code></pre>
+
+<h2 id="获取-cpu-时间">获取 CPU 时间</h2>
+
+<p>上面的方法乍一想好像没什么问题，但仔细一想，Linux 是分时处理系统，我们并不能保证耗时相同的两个程序进行了同样多的计算。如果一个时间复杂度较高的程序在系统负载低的时候运行，而时间复杂度较低的程序在系统满载的时候运行，那么有可能时间复杂度高的程序运行耗时反而更少，这样肯定是不公平的。</p>
+
+<p>这就引出了另一个概念：<a href="https://en.wikipedia.org/wiki/CPU_time">CPU time</a>。CPU time 是程序运行实际占用 CPU 的时间，如果是多线程的程序的话，则是多个线程的累加耗时。如果使用 CPU 时间作为程序运行耗时的话，就可以公平的评比用户程序了。</p>
+
+<p>在 Linux 中可以通过 <code>rusage</code> 结构体与 <code>wait4</code> 系统调用来获取子进程的 CPU 时间。</p>
+
+<pre><code class="language-c">int status, time_used;  // CPU 时间
+struct rusage ru;
+
+wait4(pid, &amp;status, 0, &amp;ru);
+time_used =
+    ru.ru_utime.tv_sec * 1000 + ru.ru_utime.tv_usec / 1000 +
+    ru.ru_stime.tv_sec * 1000 + ru.ru_stime.tv_usec / 1000;
+</code></pre>
+
+<h2 id="获取内存占用">获取内存占用</h2>
+
+<p>同样的， <code>rusage</code> 结构体中也包含了进程运行占用的内存，我们可以使用与 CPU 时间一样的方法来获得这个值。</p>
+
+<pre><code class="language-c">int status, memory_used;  // 运行过程中的最大内存占用
+struct rusage ru;
+
+wait4(pid, &amp;status, 0, &amp;ru);
+memory_used = ru.ru_maxrss;
+</code></pre>
+
+<p>不过，如果你使用这种方法来测量进程内存的话，可能会出现这种情况：一个输出 <code>Hello World!</code> 的简单 C 语言程序与一个申请了长度几千的数组的 C++ 程序，测量出来的内存是一样多的。</p>
+
+<p>这种情况并非 BUG，而是预期中的行为。在 <a href="https://linux.die.net/man/2/getrusage">https://linux.die.net/man/2/getrusage</a> 中明确地指出： <code>Resource usage metrics are preserved across an execve(2)</code>。如果你要测量的程序的内存占用还没有你 <code>exec</code> 之前的子进程占用的内存大的话， <code>ru_maxrss</code> 实际是你 <code>exec</code> 之前的进程内存占用。</p>
+
+<p>虽然这不是 BUG，但是对于较少内存占用的程序来说，确实会造成测量不精准的问题。针对这个问题，有三个解决方案：</p>
+
+<ol>
+<li>置之不理，对于较少内存占用的程序不做精确测量</li>
+<li>尽量减少 <code>exec</code> 之前的内存占用，比如 <a href="https://github.com/QingdaoU/Judger">QDUOJ</a>，他们使用 C 语言写了一个很小的评测核心，其功能基本只有执行子进程，因此其内存占用很低，可以降低测量不精准的上限。虽然这个问题依旧存在，可对于 ACM 来说，精度已经足够了，如果有题目在这种尺度进行卡内存的话，就容易出现“卡常毒瘤题”</li>
+<li>读取 <code>/proc/&lt;pid&gt;/status</code> 的内容，这个文件中有进程当前的内存占用，只要循环读取这个文件，解析出内存占用即可。缺点也很明显：因为要循环读取文件，效率较低</li>
+</ol>
+
+<p>其实还有一种方案：<a href="https://duck.ac/">评测鸭</a>，他们自己造了个操作系统……这就不在讨论范围内了。我们在下面稍微讨论一下如何使用方法三测量较为精确的内存占用。</p>
+
+<h2 id="获取精确的内存占用">获取精确的内存占用</h2>
+
+<p>循环读取 <code>/proc/&lt;pid&gt;/status</code> 文件内容，实现内存占用测量。那么问题来了，我们以什么频率去读取呢？</p>
+
+<p>Linux 还有个系统调用 <code>ptrace</code>，可以捕获被调试进程的每个系统调用，考虑到进程申请与释放内存都会使用系统调用，因此，我们仅在进程进行系统调用时进行读取即可。此处仅给出思路，就不给出具体代码了。</p>
+
+<h2 id="获取子进程退出状态">获取子进程退出状态</h2>
+
+<p>依旧是我们的 <code>wait4</code>(<code>waitpid</code>)，文档 <a href="https://linux.die.net/man/2/waitpid">https://linux.die.net/man/2/waitpid</a> 中有对它的明确定义。配合使用 <code>WEXITSTATUS</code> 等宏，就可以获得子进程的退出状态。</p>
+
+<h2 id="总结">总结</h2>
+
+<p>通过这章内容可以看出来，想要获取子进程的资源占用，其实基本只使用 <code>wait4</code> 就够了……本章的示例代码可以在 <a href="https://github.com/MeiK2333/ZeroJudger/tree/master/getusage">https://github.com/MeiK2333/ZeroJudger/tree/master/getusage</a> 中找到，这个代码简单的实现了获取子进程运行占用资源与退出状态的功能。</p>
+
+<p>加上这篇文章，如何写一个评测姬系列已经五篇了，虽然中间隔了近三个月……下一篇里，我们将运用我们这在这五篇中介绍过的内容，实现一个功能完整的简单评测姬。</p></article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+  <div class="footer container-xl width-full p-responsive">
+  <div
+    class="position-relative d-flex flex-row-reverse flex-lg-row flex-wrap flex-lg-nowrap flex-justify-center flex-lg-justify-between flex-sm-items-center pt-6 pb-2 mt-6 f6 text-gray border-top border-gray-light ">
+    <a aria-label="Homepage" title="GitHub" class="footer-octicon d-none d-lg-block mr-lg-4" href="https://meik2333.com/">
+      <svg height="24" class="octicon octicon-mark-github" viewBox="0 0 16 16" version="1.1" width="24">
+        <path fill-rule="evenodd"
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+        </path>
+      </svg>
+    </a>
+    <ul class="list-style-none d-flex flex-wrap col-12 flex-justify-center flex-lg-justify-between mb-2 mb-lg-0">
+      
+      <li class="mr-3 mr-lg-0">Theme by <a href='https://github.com/MeiK2333/github-style'>github-style</a></li>
+      
+    </ul>
+  </div>
+  <div class="d-flex flex-justify-center pb-6">
+    <span class="f6 text-gray-light"></span>
+  </div>
+
+
+</div>
+</body>
+
+<script type="application/javascript" src="https://meik2333.com/js/github-style.js"></script>
+
+
+
+</html>

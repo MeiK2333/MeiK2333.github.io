@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <script type="application/javascript" src='https://meik2333.com/js/theme-mode.js'></script>
+    <link rel="stylesheet" href='https://meik2333.com/css/frameworks.min.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/github.min.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <title>Android Hook 技术 - MeiK&#39;s blog</title>
+    <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
+    <meta name="theme-color" content="#1e2327">
+
+    
+    <meta name="description"
+  content="浅谈 Android Hook 技术。
+" />
+<meta name="keywords"
+  content='' />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="https://meik2333.com/post/android-hook/" />
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Android Hook 技术 - MeiK&#39;s blog" />
+<meta name="twitter:description"
+  content="浅谈 Android Hook 技术。
+" />
+<meta name="twitter:site" content="https://meik2333.com/" />
+<meta name="twitter:creator" content="" />
+<meta name="twitter:image"
+  content="https://meik2333.com/">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Android Hook 技术 - MeiK&#39;s blog">
+<meta property="og:description"
+  content="浅谈 Android Hook 技术。
+" />
+<meta property="og:url" content="https://meik2333.com/post/android-hook/" />
+<meta property="og:site_name" content="Android Hook 技术" />
+<meta property="og:image"
+  content="https://meik2333.com/">
+<meta property="og:image:width" content="2048">
+<meta property="og:image:height" content="1024">
+
+<meta property="article:published_time" content="2020-11-11 10:53:37 &#43;0800 CST" />
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body>
+  <div style="position: relative">
+  <header class="Header js-details-container Details px-3 px-md-4 px-lg-5 flex-wrap flex-md-nowrap open Details--on">
+    <div class="Header-item mobile-none" style="margin-top: -4px; margin-bottom: -4px;">
+      <a class="Header-link" href="https://meik2333.com/">
+        <svg class="octicon" height="32" viewBox="0 0 16 16" version="1.1" width="32">
+          <path fill-rule="evenodd"
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+          </path>
+        </svg>
+      </a>
+    </div>
+    <div class="Header-item d-md-none">
+      <button class="Header-link btn-link js-details-target" type="button"
+        onclick="document.querySelector('#header-search').style.display = document.querySelector('#header-search').style.display == 'none'? 'block': 'none'">
+        <svg height="24" class="octicon octicon-three-bars" viewBox="0 0 16 16" version="1.1" width="24">
+          <path fill-rule="evenodd"
+            d="M1 2.75A.75.75 0 011.75 2h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 2.75zm0 5A.75.75 0 011.75 7h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 7.75zM1.75 12a.75.75 0 100 1.5h12.5a.75.75 0 100-1.5H1.75z">
+          </path>
+        </svg>
+      </button>
+    </div>
+    <div style="display: none;" id="header-search"
+      class="Header-item Header-item--full flex-column flex-md-row width-full flex-order-2 flex-md-order-none mr-0 mr-md-3 mt-3 mt-md-0 Details-content--hidden-not-important d-md-flex">
+      <div
+        class="Header-search header-search flex-auto js-site-search position-relative flex-self-stretch flex-md-self-auto mb-3 mb-md-0 mr-0 mr-md-3 scoped-search site-scoped-search js-jump-to">
+        <div class="position-relative">
+          <form target="_blank" action="https://www.google.com/search" accept-charset="UTF-8" method="get"
+            autocomplete="off">
+            <label
+              class="Header-search-label form-control input-sm header-search-wrapper p-0 js-chromeless-input-container header-search-wrapper-jump-to position-relative d-flex flex-justify-between flex-items-center">
+              <input type="text"
+                class="Header-search-input form-control input-sm header-search-input jump-to-field js-jump-to-field js-site-search-focus js-site-search-field is-clearable"
+                name="q" value="" placeholder="Search" autocomplete="off">
+              <input type="hidden" name="q" value="site:https://meik2333.com/">
+            </label>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="Header-item Header-item--full flex-justify-center d-md-none position-relative">
+      <a class="Header-link " href="https://meik2333.com/">
+        <svg class="octicon octicon-mark-github v-align-middle" height="32" viewBox="0 0 16 16" version="1.1"
+          width="32">
+          <path fill-rule="evenodd"
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+          </path>
+        </svg>
+      </a>
+    </div>
+    <div class="Header-item" style="margin-right: 0;">
+      <a href="javascript:void(0)" class="Header-link no-select" onclick="switchTheme()">
+        <svg style="fill: var(--color-profile-color-modes-toggle-moon);" class="no-select" viewBox="0 0 16 16"
+          version="1.1" width="16" height="16">
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M4.52208 7.71754C7.5782 7.71754 10.0557 5.24006 10.0557 2.18394C10.0557 1.93498 10.0392 1.68986 10.0074 1.44961C9.95801 1.07727 10.3495 0.771159 10.6474 0.99992C12.1153 2.12716 13.0615 3.89999 13.0615 5.89383C13.0615 9.29958 10.3006 12.0605 6.89485 12.0605C3.95334 12.0605 1.49286 10.001 0.876728 7.24527C0.794841 6.87902 1.23668 6.65289 1.55321 6.85451C2.41106 7.40095 3.4296 7.71754 4.52208 7.71754Z">
+          </path>
+        </svg>
+      </a>
+    </div>
+  </header>
+</div>
+  
+<div>
+  <main>
+    <div class="gisthead pagehead bg-gray-light pb-0 pt-3 mb-4">
+      <div class="px-0">
+        <div class="mb-3 d-flex px-3 px-md-3 px-lg-5">
+          <div class="flex-auto min-width-0 width-fit mr-3">
+            <div class="d-flex">
+              <div class="d-none d-md-block">
+                <a class="avatar mr-2 flex-shrink-0" href="https://meik2333.com/">
+                  <img class=" avatar-user"
+                    src="https://meik2333.com/images/avatar.png"
+                    width="32" height="32"></a>
+              </div>
+              <div class="d-flex flex-column">
+                <h1 class="break-word f3 text-normal mb-md-0 mb-1">
+                  <span class="author">
+                    <a href="https://meik2333.com/">MeiK</a></span><span
+                    class="path-divider">/</span><strong class="css-truncate-target mr-1" style="max-width: 410px"><a
+                      href="https://meik2333.com/post/android-hook/">Android Hook 技术</a></strong>
+                </h1>
+                <div class="note m-0">
+                  Created <relative-time datetime="Wed, 11 Nov 2020 10:53:37 &#43;0800"
+                    class="no-wrap">
+                    Wed, 11 Nov 2020 10:53:37 &#43;0800</relative-time>
+
+                  
+                  <span class="file-info-divider"></span>
+                  Modified <relative-time datetime="Wed, 16 Dec 2020 14:53:18 &#43;0800"
+                    class="no-wrap">
+                    Wed, 16 Dec 2020 14:53:18 &#43;0800</relative-time>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-lg px-3 new-discussion-timeline">
+      <div class="repository-content gist-content">
+        <div>
+          <div class="js-gist-file-update-container js-task-list-container file-box">
+            <div id="file-pytest" class="file my-2">
+              <div class="file-header d-flex flex-md-items-center flex-items-start">
+                <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
+                  <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
+                    3990 Words
+                    
+
+                  </div>
+                  <div class="file-actions flex-order-2 pt-0">
+                    
+                    
+                    <a class="muted-link mr-3" href="/tags/android">
+                      <svg class="octicon octicon-tag" viewBox="0 0 16 16" version="1.1" width="16" height="16">
+                        <path fill-rule="evenodd"
+                          d="M2.5 7.775V2.75a.25.25 0 01.25-.25h5.025a.25.25 0 01.177.073l6.25 6.25a.25.25 0 010 .354l-5.025 5.025a.25.25 0 01-.354 0l-6.25-6.25a.25.25 0 01-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.75 1.75 0 011 7.775zM6 5a1 1 0 100 2 1 1 0 000-2z">
+                        </path>
+                      </svg>
+                      Android
+                    </a>
+                    
+                    <a class="muted-link mr-3" href="/tags/hook">
+                      <svg class="octicon octicon-tag" viewBox="0 0 16 16" version="1.1" width="16" height="16">
+                        <path fill-rule="evenodd"
+                          d="M2.5 7.775V2.75a.25.25 0 01.25-.25h5.025a.25.25 0 01.177.073l6.25 6.25a.25.25 0 010 .354l-5.025 5.025a.25.25 0 01-.354 0l-6.25-6.25a.25.25 0 01-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.75 1.75 0 011 7.775zM6 5a1 1 0 100 2 1 1 0 000-2z">
+                        </path>
+                      </svg>
+                      Hook
+                    </a>
+                    
+                    
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="Box-body px-5 pb-5">
+                <article class="markdown-body entry-content container-lg"><p>浅谈 Android Hook 技术。</p>
+
+<h2 id="什么是-hook">什么是 Hook</h2>
+
+<p>Hook 直译为中文就是“钩子”，一般指将自定义的逻辑“钩”在要 Hook 的事件上。在 Android 平台上，Hook 的目标事件的粒度一般为函数级别，即在指定函数被调用时执行我们 Hook 的代码，根据我们的逻辑拦截修改原有的函数响应。</p>
+
+<h2 id="hook-可以做什么">Hook 可以做什么</h2>
+
+<ul>
+<li>对于 APP 开发者来说，可以通过 Hook 实现 AOP 编程、插桩性能监控、热补丁、在线修复等</li>
+<li>对于用户来说，可以使用 Hook 来管理应用权限，保护隐私等；也可以通过 Hook 来跳过 APP 开屏广告、自动抢红包等，获取更好的使用体验</li>
+</ul>
+
+<div style="text-align:center">
+    <img src="/images/android-hook/关闭广告.jpg" />
+    <figcaption style="font-size: 14px; padding-bottom: 4px;">永远点不到的关闭广告按钮</figcaption>
+</div>
+
+<h2 id="常见的-hook-方案">常见的 Hook 方案</h2>
+
+<p>安卓下 Hook 的方案五花八门，有基于 Linux 调试的、基于文件替换的、基于动态库加载的、基于 JVM 虚拟机的等等，可谓是八仙过海，各显神通。我们将其分为以下几大类，分别介绍一下。</p>
+
+<h3 id="root-环境下全局-hook">root 环境下全局 Hook</h3>
+
+<p>功能最强大，也是技术要求最高的一种方案，需要用户有一定的动手能力来刷机等。借助 root 后的 sudo 权限，Hook 基本可以做到为所欲为。</p>
+
+<div style="text-align:center">
+    <img src="/images/android-hook/root.jpg" />
+    <figcaption style="font-size: 14px; padding-bottom: 4px;">通过刷机进行 root</figcaption>
+</div>
+
+<p>这种方案下，用户能够获取手机的所有权限，不止能修改 Java 方法，向 APP 注入代码，甚至可以修改系统本身。用户在 root 后安装的插件可以做到最大程度的优化用户体验，但也可以做到获取用户隐私数据、拦截短信电话等恶意操作。</p>
+
+<p>事实上，已经出现过很多次因用户 root 后安装第三方插件而导致的安全问题了。因此，这种方案虽然功能最强大，但同时也是最危险的。</p>
+
+<h3 id="非-root-环境下-hook-自身">非 root 环境下 Hook 自身</h3>
+
+<p>应用最广泛的方案，每个安卓用户都应该有意无意的使用过这种 Hook 技术。为了更好的体验（插桩、AOP、热修复等），很多开发者都会在 APP 中搭载这些功能，尤其是大厂的应用，无一例外都使用了这个机制。</p>
+
+<div style="text-align:center">
+    <img src="/images/android-hook/hotfix.gif" />
+    <figcaption style="font-size: 14px; padding-bottom: 4px;">修复线上 BUG</figcaption>
+</div>
+
+<p>因为只能由 APP 自己来 Hook 自己，因此这种方案几乎没有危害，也不会有什么安全隐患（也不是完全没有，APP 可以通过动态下载代码执行来绕过商店审核和安全扫描，不过使用大厂的 APP 基本不会有这种问题）。</p>
+
+<h3 id="非-root-环境下-hook-其他-app">非 root 环境下 Hook 其他 APP</h3>
+
+<p>root 后 Hook 虽然功能强大，但很危险，非 root 环境下 Hook 自身对用户来说又作用不大，那么，有没有两全其美的方案呢？</p>
+
+<div style="text-align:center">
+    <img src="/images/android-hook/allbuy.jpg" />
+    <figcaption style="font-size: 14px; padding-bottom: 4px;">我全都要</figcaption>
+</div>
+
+<p>答案是肯定的，为了实现这个目标，很多项目使用了不同的方案，从不同的角度切入。有通过虚拟化空间来运行 APP 来实现的，有通过重新打包 APP 来实现的，还有使用类似 Docker 的容器方案来实现的。令人惊艳的套路层出不穷。</p>
+
+<h2 id="不同-hook-方案的原理与实现">不同 Hook 方案的原理与实现</h2>
+
+<div style="text-align:center">
+    <img src="/images/android-hook/hook.jpg" />
+    <figcaption style="font-size: 14px; padding-bottom: 4px;">不同的 Hook 技术，图转自知乎@wawa yang</figcaption>
+</div>
+
+<h3 id="原版-xposed-https-repo-xposed-info-module-de-robv-android-xposed-installer"><a href="https://repo.xposed.info/module/de.robv.android.xposed.installer">原版 Xposed</a></h3>
+
+<p>Xposed 不知道是不是出现最早的 Android Hook 方案，但绝对是影响力最大的方案。后面出现的 Android Hook 框架几乎都使用了 Xposed 的 API 设计，也因此，大部分框架的模块都可以复用。</p>
+
+<p>对安卓开发有过一定了解的同学应该都知道，Android 上所有 APP 进程都是一个叫 <code>Zygote</code> 进程的子进程，这个进程是由 <code>/system/bin/app_process</code> 这个可执行文件执行得到的。在安卓的安全机制里，父进程是可以对自身的子进程进程调试注入的，因此，替换这个统一的入口，即可做到 Hook 任意 APP。</p>
+
+<p>Xposed 具体的实现为：修改 <code>ART/Davilk</code> 虚拟机，将要 Hook 的函数注册为 <code>Native</code> 函数，虚拟机在调用同名函数时，会优先选择 <code>Native</code> 方法执行，从而达到 Hook 指定函数的目的。</p>
+
+<p>在最初的时期，Xposed 可谓是一统 Hook 江湖，叱咤风云。然而由于不同版本的 Android 内核都不同，再加上很多厂商会自己对 AOSP 做很多魔改，导致 Xposed 需要做大量的适配工作。同时替换系统文件的方式也容易造成系统不稳定，导致系统崩溃等。近几年原版的 Xposed 也慢慢停止了开发，最终版本止步 Android 8。</p>
+
+<h3 id="edxposed-https-github-com-elderdrivers-edxposed"><a href="https://github.com/ElderDrivers/EdXposed">EdXposed</a></h3>
+
+<p>Xposed 的精神继承者，官方推荐的继承者。API 设计与原版 Xposed 相同，因此双方的插件都是可以复用的。</p>
+
+<p>EdXposed 使用 <a href="https://github.com/RikkaApps/Riru">Riru</a> 来注入系统，Riru 选定了一个系统自带的动态链接库 <code>libmemtrack.so</code> 进行修改，这个库非常简单，只有 10 个导出函数。</p>
+
+<p>Riru 会在自己的代码里实现这 10 个导出函数，然后在额外附带自己的 Hook 代码，编译为 <code>so</code> 文件后替换掉原始的 <code>libmemtrack.so</code>，当 <code>Zygote</code> 进程启动时会链接这个库，执行内部的代码，从而实现注入。在这个基础上，EdXposed 封装出与 Xposed 相同的 API。</p>
+
+<p>因为几乎没有手机厂商会修改这个简单的动态链接库，因此 Riru 不需要频繁的进行适配更新，EdXposed 也比原版的 Xposed 更加稳定。</p>
+
+<p>在最近的更新中，Riru 使用了新方案进行注入，不再替换系统原有文件，基本杜绝了因为替换系统文件而导致的不稳定与崩溃。不过截至本文发布时，EdXposed 还没有合并这个更新。</p>
+
+<p>因为需要修改系统文件，Xposed 和 EdXposed 都需要手机系统 root 之后才能使用。</p>
+
+<h3 id="太极-tai-chi">太极（Tai Chi）</h3>
+
+<p>与上面两个框架不同，太极无需 root 就可以对 APP 进行 Hook。因为太极并没有开源，因此对于它的具体实现我们也无从了解，只能从开发者的一些言论中猜测，太极通过“解包 APP -&gt; 添加 Hook 代码 -&gt; 重新打包”的方式实现无 root Hook。</p>
+
+<p>由于太极并未开源，内部实现完全是黑盒；同时太极内置了对不同 APP 的特殊逻辑，比如不能对支付宝进行 Hook，这些信息用户是完全无法感知的，因此太极的安全性存疑。</p>
+
+<p>Magisk 框架（强大的 root 解决方案，Xposed、EdXposed 以及几乎所有 root 类型框架的基础）的作者曾公开发表言论认为太极会进行恶意活动，太极的开发者对此进行了否认，但作为用户，我们完全不知道太极框架都做了哪些操作。安装太极之后，太极可以获取我们 Hook 的 APP 的完全控制权，一个不知道它做了什么的高权限的第三方应用十分危险，我个人不推荐使用（仅在安全性上，无需 root 就可以 Hook 其他 APP，太极确实是个很优秀的框架）。</p>
+
+<h3 id="epic-https-github-com-tiann-epic"><a href="https://github.com/tiann/epic">epic</a></h3>
+
+<p>并不是所有的 Hook 都是为了对 APP 进行魔改，也有一些 Hook 是出于优化体验的，比如 epic。</p>
+
+<p>epic 本身有一篇讲解非常详细的<a href="http://weishu.me/2017/11/23/dexposed-on-art/">文章</a>，这里只大概介绍一下原理：基于 <code>dynamic dispatch</code> 的 <code>dynamic callee-side rewriting</code>，一头雾水对吧，其实我也一知半解，大概描述一下的话，就是 epic 会去修改函数的内容，将函数的前两条指令修改为跳转到自己自定义的逻辑，从而实现对任意方法的 Hook。</p>
+
+<p>因为 Android 系统的限制，对函数体的注入，只能在同一个 Uid 的进程之间进行。Android 会给每个 APP 分配一个独立的 <code>uid</code>，因此，epic 只能对自己进行 Hook，epic 主要用于优化体验，比如热修复、AOP、插桩等。</p>
+
+<h3 id="virtualapp-https-github-com-aslody-virtualapp"><a href="https://github.com/asLody/VirtualApp">VirtualApp</a></h3>
+
+<p>商业软件，提供了类似虚拟机的功能，可以在 VirtualApp 内部启动第三方 APP，VA 对内部的 APP 拥有完全的控制权。</p>
+
+<p>4 年前 VirtualApp 开源版本停止更新，我们无法获知新版本的 VA 原理。就 4 年前的版本来分析，VA 会代理所有的系统服务，包括 <code>ActivityManager</code> 和 <code>PackageManager</code>，通过被代理的 <code>ActivityManager</code> 启动的 APP 会被 VA 归到自己麾下（同一个 <code>uid</code>），从而实现后续的代理。</p>
+
+<p>VirtualApp 轻量、强大、无需 root，因此很受青睐，很多公司都购买了 VirtualApp 的商业授权。要注意的是，即使是四年前的开源版本，没有购买商业授权的话也是不允许用于商业活动的。</p>
+
+<h3 id="virtualxposed-https-github-com-android-hacker-virtualxposed"><a href="https://github.com/android-hacker/VirtualXposed">VirtualXposed</a></h3>
+
+<p>epic 可以实现任意方法 Hook，但只能对同一个 <code>uid</code> 的进程生效，VA 可以运行任意 APP，使其与自己使用同一个 <code>uid</code>。结合上面两种技术，有没有想到什么？</p>
+
+<p>是的，这就是 VirtualXposed，结合了 epic 与 VA 的终极框架。无需 root，类 Xposed 的 API，可以说是一个相当完善的方案了。</p>
+
+<p>可惜，由于 VirtualApp 的许可证要求，我们不能使用 VA 及其衍生项目进行商业活动，只能个人使用。</p>
+
+<h3 id="各类-xx-os">各类 XX OS</h3>
+
+<p>独辟蹊径的想法：Android 系统也是基于 Linux 的，那我们能不能像 Linux 上运行 Docker 一样，在 Android 上再运行一个 Android 呢？</p>
+
+<p>答案是可以的，这就是近几年层出不穷的各种 XX OS。如果说 VirtualApp 通过代理提供了类似虚拟机的功能，那这些 OS 就是真的提供了一个虚拟机。这些 OS 在 Android 宿主机上运行一个新的 Android 虚拟机，宿主机拥有对虚拟机的完全控制权限，因此可以使用各种 Hook 技术。</p>
+
+<p>然而，基于虚拟机的 Android，虽然易于控制，但性能也令人堪忧。据我亲身体验，只是打开这些 OS 就会占用手机不少资源，如果在这些 OS 里面玩游戏，那么手机就会秒变暖手宝……</p>
+
+<h2 id="android-hook-难点">Android Hook 难点</h2>
+
+<p>从上面可以看出来，Android 的 Hook 技术可谓是百花齐放，但大体来说，都有下面两个痛点。</p>
+
+<ul>
+<li>版本兼容：每个大版本，Google 都会毫不留情的推翻重构 Android 的大量特性，也导致 Hook 框架需要对不同的版本进行兼容</li>
+<li>厂商魔改：Android 大版本有 4 - 11 共 8 个，开发者还可以跟得上兼容。但加上厂商魔改，这个数字直接涨了一个数量级。要想跟上所有厂商的魔改可不是件容易的事。大的项目靠大量的贡献者贡献代码，小的项目跟不上厂商魔改的速度，就只能慢慢没落了。</li>
+</ul>
+
+<h2 id="hook-防范">Hook 防范</h2>
+
+<p>用户可以对 Hook 后的 APP 进行各种修改，跳过广告、自动抢红包、自动刷单等等，这无疑会损害商家的利益。因此，就像用户想尽方法 Hook APP 一样，APP 也会想尽方法来防止自己被 Hook。</p>
+
+<p>常见的反 Hook 的手段有以下几种。</p>
+
+<h3 id="xposed-检测">Xposed 检测</h3>
+
+<p>最知名、应用最广泛的 Hook 技术，肯定也是要第一个被检测的。通过 <code>PackageManager</code> 或者 <code>ps</code> 等方法获取手机内已安装和正在运行的应用，如果检测到了 Xposed 就可以停止服务来防止受到损失。</p>
+
+<h3 id="自造异常读取栈">自造异常读取栈</h3>
+
+<p>绝大部分 Hook 方案都采用 Xposed API，也就是在 Hook 的函数前后添加自定义的逻辑。这时候我们就可以通过触发异常来检查异常栈，查看是否有 Xposed 参与其中。</p>
+
+<pre><code class="language-java">try {
+    throw new Exception(&quot;blah&quot;);
+} catch(Exception e) {
+    for (StackTraceElement stackTraceElement: e.getStackTrace()) {
+        // stackTraceElement.getClassName() stackTraceElement.getMethodName() 是否存 在Xposed
+    }
+}
+</code></pre>
+
+<pre><code class="language-java">E/GEnvironment: no such table: preference (code 1): while compiling: SELECT keyguard_show_livewallpaper FROM preference
+...
+at com.meituan.test.extpackage.ExtPackageManager.checkUpdate(ExtPackageManager.java:127)
+at com.meituan.test.MiFGService$1.run(MiFGService.java:41)
+at android.os.Looper.loop(Looper.java:136)
+at android.app.ActivityThread.main(ActivityThread.java:5072)
+at java.lang.reflect.Method.invokeNative(Native Method)
+at java.lang.reflect.Method.invoke(Method.java:515)
+...
+at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:793)
+at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:609)
+at de.robv.android.xposed.XposedBridge.main(XposedBridge.java:132) //发现Xposed模块
+at dalvik.system.NativeStart.main(Native Method)
+</code></pre>
+
+<div style="text-align:center">
+    <figcaption style="font-size: 14px; padding-bottom: 4px;">代码来自《Android Hook技术防范漫谈》</figcaption>
+</div>
+
+<h3 id="检查方法类型">检查方法类型</h3>
+
+<p>有些框架的 Hook 方法是将要注入的代码注册为 <code>Native</code> 方法，因此我们可以通过检测我们调用的方法有没有异常的变为 <code>Native</code> 方法，如果有的话就需要注意了。</p>
+
+<h3 id="动态链接库检查">动态链接库检查</h3>
+
+<p>通过读取 <code>/proc/self/maps</code> 文件来检查 APP 本身链接的动态链接库，看有没有异常的库。EdXposed 和 Riru 会通过随机名来绕过这类检查，其他 Hook 方法又很少会修改动态链接库，因此这种方法并不是很可靠，聊胜于无。</p>
+
+<h3 id="ptrace-调试检查">ptrace 调试检查</h3>
+
+<p>一些基于 native 层注入的框架是通过 <code>ptrace</code> 来进行注入的，因为一切都发生在系统层面，在 Java 层很难检测。</p>
+
+<p>不过 <code>ptrace</code> 有个特性：被 <code>ptrace</code> 的目标进程不能再次执行 <code>ptrace</code>，我们可以利用这个特性，在自己的代码里执行 <code>ptrace</code>，如果失败了，则说明我们很可能被人利用 <code>ptrace</code> 进行注入了。</p>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+<li><a href="https://www.jianshu.com/p/ce2f26f4b03b">《VirtualApp 框架浅析》</a></li>
+<li><a href="http://rk700.github.io/2017/03/15/virtualapp-basic/">《VirtualApp沙盒基本原理》</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/109157321">《盘点Android常用Hook技术》</a></li>
+<li><a href="https://tech.meituan.com/2018/02/02/android-anti-hooking.html">《Android Hook技术防范漫谈》</a></li>
+<li><a href="https://www.jianshu.com/p/4f6d20076922">《理解 Android Hook 技术以及简单实战》</a></li>
+<li><a href="http://weishu.me/2017/11/23/dexposed-on-art/">《我为Dexposed续一秒——论ART上运行时 Method AOP实现》</a></li>
+</ul></article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+  <div class="footer container-xl width-full p-responsive">
+  <div
+    class="position-relative d-flex flex-row-reverse flex-lg-row flex-wrap flex-lg-nowrap flex-justify-center flex-lg-justify-between flex-sm-items-center pt-6 pb-2 mt-6 f6 text-gray border-top border-gray-light ">
+    <a aria-label="Homepage" title="GitHub" class="footer-octicon d-none d-lg-block mr-lg-4" href="https://meik2333.com/">
+      <svg height="24" class="octicon octicon-mark-github" viewBox="0 0 16 16" version="1.1" width="24">
+        <path fill-rule="evenodd"
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+        </path>
+      </svg>
+    </a>
+    <ul class="list-style-none d-flex flex-wrap col-12 flex-justify-center flex-lg-justify-between mb-2 mb-lg-0">
+      
+      <li class="mr-3 mr-lg-0">Theme by <a href='https://github.com/MeiK2333/github-style'>github-style</a></li>
+      
+    </ul>
+  </div>
+  <div class="d-flex flex-justify-center pb-6">
+    <span class="f6 text-gray-light"></span>
+  </div>
+
+
+</div>
+</body>
+
+<script type="application/javascript" src="https://meik2333.com/js/github-style.js"></script>
+
+
+
+</html>

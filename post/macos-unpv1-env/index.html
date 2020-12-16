@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <script type="application/javascript" src='https://meik2333.com/js/theme-mode.js'></script>
+    <link rel="stylesheet" href='https://meik2333.com/css/frameworks.min.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/github.min.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <title>MacOS 搭建 UNPv1 编译环境 - MeiK&#39;s blog</title>
+    <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
+    <meta name="theme-color" content="#1e2327">
+
+    
+    <meta name="description"
+  content="为了能够编译运行 《UNIX 网络编程》（UNPv1）上的示例代码，需要编译 libunp.a 库文件，然后才可以正常编译书中的代码。
+关于如何编译《UNIX 环境高级编程》（APUE）的示例代码，可以参照这里。
+" />
+<meta name="keywords"
+  content='' />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="https://meik2333.com/post/macos-unpv1-env/" />
+
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="MacOS 搭建 UNPv1 编译环境 - MeiK&#39;s blog" />
+<meta name="twitter:description"
+  content="为了能够编译运行 《UNIX 网络编程》（UNPv1）上的示例代码，需要编译 libunp.a 库文件，然后才可以正常编译书中的代码。
+关于如何编译《UNIX 环境高级编程》（APUE）的示例代码，可以参照这里。
+" />
+<meta name="twitter:site" content="https://meik2333.com/" />
+<meta name="twitter:creator" content="" />
+<meta name="twitter:image"
+  content="https://meik2333.com/">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:title" content="MacOS 搭建 UNPv1 编译环境 - MeiK&#39;s blog">
+<meta property="og:description"
+  content="为了能够编译运行 《UNIX 网络编程》（UNPv1）上的示例代码，需要编译 libunp.a 库文件，然后才可以正常编译书中的代码。
+关于如何编译《UNIX 环境高级编程》（APUE）的示例代码，可以参照这里。
+" />
+<meta property="og:url" content="https://meik2333.com/post/macos-unpv1-env/" />
+<meta property="og:site_name" content="MacOS 搭建 UNPv1 编译环境" />
+<meta property="og:image"
+  content="https://meik2333.com/">
+<meta property="og:image:width" content="2048">
+<meta property="og:image:height" content="1024">
+
+<meta property="article:published_time" content="2018-08-21 20:49:13 &#43;0000 UTC" />
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body>
+  <div style="position: relative">
+  <header class="Header js-details-container Details px-3 px-md-4 px-lg-5 flex-wrap flex-md-nowrap open Details--on">
+    <div class="Header-item mobile-none" style="margin-top: -4px; margin-bottom: -4px;">
+      <a class="Header-link" href="https://meik2333.com/">
+        <svg class="octicon" height="32" viewBox="0 0 16 16" version="1.1" width="32">
+          <path fill-rule="evenodd"
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+          </path>
+        </svg>
+      </a>
+    </div>
+    <div class="Header-item d-md-none">
+      <button class="Header-link btn-link js-details-target" type="button"
+        onclick="document.querySelector('#header-search').style.display = document.querySelector('#header-search').style.display == 'none'? 'block': 'none'">
+        <svg height="24" class="octicon octicon-three-bars" viewBox="0 0 16 16" version="1.1" width="24">
+          <path fill-rule="evenodd"
+            d="M1 2.75A.75.75 0 011.75 2h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 2.75zm0 5A.75.75 0 011.75 7h12.5a.75.75 0 110 1.5H1.75A.75.75 0 011 7.75zM1.75 12a.75.75 0 100 1.5h12.5a.75.75 0 100-1.5H1.75z">
+          </path>
+        </svg>
+      </button>
+    </div>
+    <div style="display: none;" id="header-search"
+      class="Header-item Header-item--full flex-column flex-md-row width-full flex-order-2 flex-md-order-none mr-0 mr-md-3 mt-3 mt-md-0 Details-content--hidden-not-important d-md-flex">
+      <div
+        class="Header-search header-search flex-auto js-site-search position-relative flex-self-stretch flex-md-self-auto mb-3 mb-md-0 mr-0 mr-md-3 scoped-search site-scoped-search js-jump-to">
+        <div class="position-relative">
+          <form target="_blank" action="https://www.google.com/search" accept-charset="UTF-8" method="get"
+            autocomplete="off">
+            <label
+              class="Header-search-label form-control input-sm header-search-wrapper p-0 js-chromeless-input-container header-search-wrapper-jump-to position-relative d-flex flex-justify-between flex-items-center">
+              <input type="text"
+                class="Header-search-input form-control input-sm header-search-input jump-to-field js-jump-to-field js-site-search-focus js-site-search-field is-clearable"
+                name="q" value="" placeholder="Search" autocomplete="off">
+              <input type="hidden" name="q" value="site:https://meik2333.com/">
+            </label>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="Header-item Header-item--full flex-justify-center d-md-none position-relative">
+      <a class="Header-link " href="https://meik2333.com/">
+        <svg class="octicon octicon-mark-github v-align-middle" height="32" viewBox="0 0 16 16" version="1.1"
+          width="32">
+          <path fill-rule="evenodd"
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+          </path>
+        </svg>
+      </a>
+    </div>
+    <div class="Header-item" style="margin-right: 0;">
+      <a href="javascript:void(0)" class="Header-link no-select" onclick="switchTheme()">
+        <svg style="fill: var(--color-profile-color-modes-toggle-moon);" class="no-select" viewBox="0 0 16 16"
+          version="1.1" width="16" height="16">
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M4.52208 7.71754C7.5782 7.71754 10.0557 5.24006 10.0557 2.18394C10.0557 1.93498 10.0392 1.68986 10.0074 1.44961C9.95801 1.07727 10.3495 0.771159 10.6474 0.99992C12.1153 2.12716 13.0615 3.89999 13.0615 5.89383C13.0615 9.29958 10.3006 12.0605 6.89485 12.0605C3.95334 12.0605 1.49286 10.001 0.876728 7.24527C0.794841 6.87902 1.23668 6.65289 1.55321 6.85451C2.41106 7.40095 3.4296 7.71754 4.52208 7.71754Z">
+          </path>
+        </svg>
+      </a>
+    </div>
+  </header>
+</div>
+  
+<div>
+  <main>
+    <div class="gisthead pagehead bg-gray-light pb-0 pt-3 mb-4">
+      <div class="px-0">
+        <div class="mb-3 d-flex px-3 px-md-3 px-lg-5">
+          <div class="flex-auto min-width-0 width-fit mr-3">
+            <div class="d-flex">
+              <div class="d-none d-md-block">
+                <a class="avatar mr-2 flex-shrink-0" href="https://meik2333.com/">
+                  <img class=" avatar-user"
+                    src="https://meik2333.com/images/avatar.png"
+                    width="32" height="32"></a>
+              </div>
+              <div class="d-flex flex-column">
+                <h1 class="break-word f3 text-normal mb-md-0 mb-1">
+                  <span class="author">
+                    <a href="https://meik2333.com/">MeiK</a></span><span
+                    class="path-divider">/</span><strong class="css-truncate-target mr-1" style="max-width: 410px"><a
+                      href="https://meik2333.com/post/macos-unpv1-env/">MacOS 搭建 UNPv1 编译环境</a></strong>
+                </h1>
+                <div class="note m-0">
+                  Created <relative-time datetime="Tue, 21 Aug 2018 20:49:13 &#43;0000"
+                    class="no-wrap">
+                    Tue, 21 Aug 2018 20:49:13 &#43;0000</relative-time>
+
+                  
+                  <span class="file-info-divider"></span>
+                  Modified <relative-time datetime="Fri, 11 Oct 2019 17:16:15 &#43;0800"
+                    class="no-wrap">
+                    Fri, 11 Oct 2019 17:16:15 &#43;0800</relative-time>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-lg px-3 new-discussion-timeline">
+      <div class="repository-content gist-content">
+        <div>
+          <div class="js-gist-file-update-container js-task-list-container file-box">
+            <div id="file-pytest" class="file my-2">
+              <div class="file-header d-flex flex-md-items-center flex-items-start">
+                <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
+                  <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
+                    749 Words
+                    
+
+                  </div>
+                  <div class="file-actions flex-order-2 pt-0">
+                    
+                    
+                    <a class="muted-link mr-3" href="/tags/unpv1">
+                      <svg class="octicon octicon-tag" viewBox="0 0 16 16" version="1.1" width="16" height="16">
+                        <path fill-rule="evenodd"
+                          d="M2.5 7.775V2.75a.25.25 0 01.25-.25h5.025a.25.25 0 01.177.073l6.25 6.25a.25.25 0 010 .354l-5.025 5.025a.25.25 0 01-.354 0l-6.25-6.25a.25.25 0 01-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.75 1.75 0 011 7.775zM6 5a1 1 0 100 2 1 1 0 000-2z">
+                        </path>
+                      </svg>
+                      UNPv1
+                    </a>
+                    
+                    <a class="muted-link mr-3" href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B">
+                      <svg class="octicon octicon-tag" viewBox="0 0 16 16" version="1.1" width="16" height="16">
+                        <path fill-rule="evenodd"
+                          d="M2.5 7.775V2.75a.25.25 0 01.25-.25h5.025a.25.25 0 01.177.073l6.25 6.25a.25.25 0 010 .354l-5.025 5.025a.25.25 0 01-.354 0l-6.25-6.25a.25.25 0 01-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.75 1.75 0 011 7.775zM6 5a1 1 0 100 2 1 1 0 000-2z">
+                        </path>
+                      </svg>
+                      网络编程
+                    </a>
+                    
+                    <a class="muted-link mr-3" href="/tags/c-%E8%AF%AD%E8%A8%80">
+                      <svg class="octicon octicon-tag" viewBox="0 0 16 16" version="1.1" width="16" height="16">
+                        <path fill-rule="evenodd"
+                          d="M2.5 7.775V2.75a.25.25 0 01.25-.25h5.025a.25.25 0 01.177.073l6.25 6.25a.25.25 0 010 .354l-5.025 5.025a.25.25 0 01-.354 0l-6.25-6.25a.25.25 0 01-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 010 2.474l-5.026 5.026a1.75 1.75 0 01-2.474 0l-6.25-6.25A1.75 1.75 0 011 7.775zM6 5a1 1 0 100 2 1 1 0 000-2z">
+                        </path>
+                      </svg>
+                      C 语言
+                    </a>
+                    
+                    
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="Box-body px-5 pb-5">
+                <article class="markdown-body entry-content container-lg"><p>为了能够编译运行 《UNIX 网络编程》（UNPv1）上的示例代码，需要编译 <code>libunp.a</code> 库文件，然后才可以正常编译书中的代码。</p>
+
+<p>关于如何编译《UNIX 环境高级编程》（APUE）的示例代码，可以参照<a href="https://github.com/MeiK2333/apue/tree/master/apue.3e">这里</a>。</p>
+
+<h2 id="准备工作">准备工作</h2>
+
+<p>首先需要去<a href="http://www.unpbook.com/src.html">官网</a>下载所需的头文件，下载之后将其解压。</p>
+
+<p>切换文件夹</p>
+
+<pre><code class="language-shell">cd unpv13e
+vim README
+</code></pre>
+
+<p>其中有 <code>README</code> 文件指示了如何编译这些文件，但是在 MacOS 下直接按照其步骤会出现一些问题。</p>
+
+<h2 id="开始编译">开始编译</h2>
+
+<pre><code class="language-shell">./configure
+cd lib
+make
+
+cd ../libfree
+make
+</code></pre>
+
+<p>此处出现报错</p>
+
+<pre><code class="language-shell">inet_ntop.c:56:1: error: conflicting types for 'inet_ntop'
+inet_ntop(af, src, dst, size)
+^
+/usr/include/arpa/inet.h:77:13: note: previous declaration is here
+const char      *inet_ntop(int, const void *, char *, socklen_t);
+                 ^
+1 error generated.
+</code></pre>
+
+<p>找到 <code>inet_ntop.c</code> 文件，把 <code>#include &lt;arpa/inet.h&gt;</code> 这行注释掉，再次执行 <code>make</code>。</p>
+
+<h2 id="测试">测试</h2>
+
+<pre><code class="language-shell">cd ../intro    
+make daytimetcpcli
+</code></pre>
+
+<p>然后执行编译好的 <code>daytimetcpcli</code> 程序，如果你之前没有完成书上 1.5 的“一个简单的时间获取服务器程序”，那么你这里按照 <code>README</code> 中的方法是不行的。（事实上你肯定没有这个程序，因为这个程序需要 <code>unp.h</code> 头文件，而你现在正在编译它&hellip;）</p>
+
+<pre><code class="language-shell">./daytimetcpcli 127.0.0.1
+connect error: Connection refused
+</code></pre>
+
+<p>这时候我们可以在 <a href="https://tf.nist.gov/tf-cgi/servers.cgi">NIST Internet Time Servers</a> 来找一个可用的时间服务器地址进行测试</p>
+
+<pre><code class="language-shell">./daytimetcpcli 129.6.15.28
+
+58351 18-08-21 12:38:39 50 0 0 724.4 UTC(NIST) *
+</code></pre>
+
+<h2 id="使用">使用</h2>
+
+<p>虽然 <code>libunp.a</code> 已经成功编译出来了，但是如果每次编写程序的时候都要将这个文件添加到查找目录里未免过于繁琐。我们可以将静态链接库添加到系统目录中。</p>
+
+<p>回到主目录，首先修改 <code>./lib/unp.h</code>，将其中的 <code>#include &quot;../config.h&quot;</code> 修改为 <code>#include &quot;config.h&quot;</code>，然后拷贝文件。</p>
+
+<pre><code class="language-shell">sudo cp ./config.h  /usr/local/include
+sudo cp ./lib/unp.h  /usr/local/include
+
+sudo cp ./libunp.a  /usr/local/lib
+</code></pre>
+
+<p>我们用书中 3.4 的确定主机字节序的程序来测试一下。</p>
+
+<pre><code class="language-C">// byteorder.c
+#include &quot;unp.h&quot;
+
+int main(int argc, char *argv[]) {
+    union {
+        short s;
+        char c[sizeof(short)];
+    } un;
+    un.s = 0x0102;
+    printf(&quot;%s: &quot;, CPU_VENDOR_OS);
+    if (sizeof(short) == 2) {
+        if (un.c[0] == 1 &amp;&amp; un.c[1] == 2) {
+            printf(&quot;big-endian\n&quot;);
+        } else if (un.c[0] == 2 &amp;&amp; un.c[1] == 1) {
+            printf(&quot;little-endian\n&quot;);
+        } else {
+            printf(&quot;unknown\n&quot;);
+        }
+    } else {
+        printf(&quot;sizeof(short) = %d\n&quot;, sizeof(short));
+    }
+    exit(0);
+}
+</code></pre>
+
+<p>编译时指定库文件链接 <code>-lunp</code></p>
+
+<pre><code class="language-shell">gcc byteorder.c -lunp -o byteorder
+./byteorder 
+i386-apple-darwin17.7.0: little-endian
+</code></pre>
+
+<p>运行成功！</p>
+
+<p>另附一份 CLion 的 CMakeList.txt：</p>
+
+<pre><code class="language-CMake">cmake_minimum_required(VERSION 3.9)
+project(UNPv1 C)
+
+include_directories(/usr/local/include)
+set(CMAKE_C_STANDARD 11)
+
+add_executable(UNPv1 main.c)
+
+target_link_libraries(UNPv1 unp)
+</code></pre>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+<li><a href="https://www.jianshu.com/p/7e395e4f8515">UNIX网络编程（第3版）环境搭建——使用MAC OSX10.10 - 简书</a></li>
+<li><a href="https://www.cnblogs.com/52php/p/5684487.html">《UNIX网络编程(第3版)》unp.h等源码文件的编译安装 - 博客园</a></li>
+<li><a href="https://github.com/MeiK2333/apue/tree/master/apue.3e">MeiK 的 GitHub</a></li>
+</ul></article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+  <div class="footer container-xl width-full p-responsive">
+  <div
+    class="position-relative d-flex flex-row-reverse flex-lg-row flex-wrap flex-lg-nowrap flex-justify-center flex-lg-justify-between flex-sm-items-center pt-6 pb-2 mt-6 f6 text-gray border-top border-gray-light ">
+    <a aria-label="Homepage" title="GitHub" class="footer-octicon d-none d-lg-block mr-lg-4" href="https://meik2333.com/">
+      <svg height="24" class="octicon octicon-mark-github" viewBox="0 0 16 16" version="1.1" width="24">
+        <path fill-rule="evenodd"
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+        </path>
+      </svg>
+    </a>
+    <ul class="list-style-none d-flex flex-wrap col-12 flex-justify-center flex-lg-justify-between mb-2 mb-lg-0">
+      
+      <li class="mr-3 mr-lg-0">Theme by <a href='https://github.com/MeiK2333/github-style'>github-style</a></li>
+      
+    </ul>
+  </div>
+  <div class="d-flex flex-justify-center pb-6">
+    <span class="f6 text-gray-light"></span>
+  </div>
+
+
+</div>
+</body>
+
+<script type="application/javascript" src="https://meik2333.com/js/github-style.js"></script>
+
+
+
+</html>

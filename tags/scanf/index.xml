@@ -6,6 +6,7 @@
     <description>Recent content in scanf on MeiK&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
+    <copyright>Theme by &lt;a href=&#39;https://github.com/MeiK2333/github-style&#39;&gt;github-style&lt;/a&gt;</copyright>
     <lastBuildDate>Fri, 23 Mar 2018 20:38:08 +0000</lastBuildDate>
     
 	<atom:link href="https://meik2333.com/tags/scanf/index.xml" rel="self" type="application/rss+xml" />
@@ -13,10 +14,10 @@
     
     <item>
       <title>C 语言中 scanf 函数的使用</title>
-      <link>https://meik2333.com/posts/use-scanf-in-c/</link>
+      <link>https://meik2333.com/post/use-scanf-in-c/</link>
       <pubDate>Fri, 23 Mar 2018 20:38:08 +0000</pubDate>
       
-      <guid>https://meik2333.com/posts/use-scanf-in-c/</guid>
+      <guid>https://meik2333.com/post/use-scanf-in-c/</guid>
       <description>&lt;p&gt;我在大学里学的第一门语言就是 C 语言，几年里用 C 语言在 OJ 上交了成百上千发题目，却连最基本的 scanf 函数的用法都不了解。碰到一些字符串和数字混杂输入的题目，基本就只能靠猜来输入……这次来具体的看一下 scanf 函数的用法。&lt;/p&gt;</description>
     </item>
     
