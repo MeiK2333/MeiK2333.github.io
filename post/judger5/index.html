@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>如何写一个评测姬 - 第五篇 - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -209,22 +210,19 @@
 <h2 id="获取程序运行时间">获取程序运行时间</h2>
 
 <p>获取程序运行了多久，其实很简单：在程序运行前后分别计时，然后相减即可。</p>
-
-<pre><code class="language-c">struct timeval start, end;
-pid_t pid;
-int time_used;  // 运行耗时
-
-gettimeofday(&amp;start, NULL);  // 运行前计时
-if ((pid = fork()) == 0) {  // child
-    // exec 执行子进程
-}
-// wait 等待子进程结束
-gettimeofday(&amp;end, NULL);  // 运行后计时
-time_used =
-    (int)(end.tv_sec * 1000 + end.tv_usec / 1000 - start.tv_sec * 1000 -
-            start.tv_usec / 1000);
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="k">struct</span> <span class="n">timeval</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">;</span>
+<span class="n">pid_t</span> <span class="n">pid</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">time_used</span><span class="p">;</span>  <span class="c1">// 运行耗时
+</span><span class="c1"></span>
+<span class="n">gettimeofday</span><span class="p">(</span><span class="o">&amp;</span><span class="n">start</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>  <span class="c1">// 运行前计时
+</span><span class="c1"></span><span class="k">if</span> <span class="p">((</span><span class="n">pid</span> <span class="o">=</span> <span class="n">fork</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>  <span class="c1">// child
+</span><span class="c1"></span>    <span class="c1">// exec 执行子进程
+</span><span class="c1"></span><span class="p">}</span>
+<span class="c1">// wait 等待子进程结束
+</span><span class="c1"></span><span class="n">gettimeofday</span><span class="p">(</span><span class="o">&amp;</span><span class="n">end</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>  <span class="c1">// 运行后计时
+</span><span class="c1"></span><span class="n">time_used</span> <span class="o">=</span>
+    <span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">end</span><span class="p">.</span><span class="n">tv_sec</span> <span class="o">*</span> <span class="mi">1000</span> <span class="o">+</span> <span class="n">end</span><span class="p">.</span><span class="n">tv_usec</span> <span class="o">/</span> <span class="mi">1000</span> <span class="o">-</span> <span class="n">start</span><span class="p">.</span><span class="n">tv_sec</span> <span class="o">*</span> <span class="mi">1000</span> <span class="o">-</span>
+            <span class="n">start</span><span class="p">.</span><span class="n">tv_usec</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">);</span></code></pre></div>
 <h2 id="获取-cpu-时间">获取 CPU 时间</h2>
 
 <p>上面的方法乍一想好像没什么问题，但仔细一想，Linux 是分时处理系统，我们并不能保证耗时相同的两个程序进行了同样多的计算。如果一个时间复杂度较高的程序在系统负载低的时候运行，而时间复杂度较低的程序在系统满载的时候运行，那么有可能时间复杂度高的程序运行耗时反而更少，这样肯定是不公平的。</p>
@@ -232,27 +230,21 @@ time_used =
 <p>这就引出了另一个概念：<a href="https://en.wikipedia.org/wiki/CPU_time">CPU time</a>。CPU time 是程序运行实际占用 CPU 的时间，如果是多线程的程序的话，则是多个线程的累加耗时。如果使用 CPU 时间作为程序运行耗时的话，就可以公平的评比用户程序了。</p>
 
 <p>在 Linux 中可以通过 <code>rusage</code> 结构体与 <code>wait4</code> 系统调用来获取子进程的 CPU 时间。</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="n">status</span><span class="p">,</span> <span class="n">time_used</span><span class="p">;</span>  <span class="c1">// CPU 时间
+</span><span class="c1"></span><span class="k">struct</span> <span class="n">rusage</span> <span class="n">ru</span><span class="p">;</span>
 
-<pre><code class="language-c">int status, time_used;  // CPU 时间
-struct rusage ru;
-
-wait4(pid, &amp;status, 0, &amp;ru);
-time_used =
-    ru.ru_utime.tv_sec * 1000 + ru.ru_utime.tv_usec / 1000 +
-    ru.ru_stime.tv_sec * 1000 + ru.ru_stime.tv_usec / 1000;
-</code></pre>
-
+<span class="n">wait4</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">status</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ru</span><span class="p">);</span>
+<span class="n">time_used</span> <span class="o">=</span>
+    <span class="n">ru</span><span class="p">.</span><span class="n">ru_utime</span><span class="p">.</span><span class="n">tv_sec</span> <span class="o">*</span> <span class="mi">1000</span> <span class="o">+</span> <span class="n">ru</span><span class="p">.</span><span class="n">ru_utime</span><span class="p">.</span><span class="n">tv_usec</span> <span class="o">/</span> <span class="mi">1000</span> <span class="o">+</span>
+    <span class="n">ru</span><span class="p">.</span><span class="n">ru_stime</span><span class="p">.</span><span class="n">tv_sec</span> <span class="o">*</span> <span class="mi">1000</span> <span class="o">+</span> <span class="n">ru</span><span class="p">.</span><span class="n">ru_stime</span><span class="p">.</span><span class="n">tv_usec</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">;</span></code></pre></div>
 <h2 id="获取内存占用">获取内存占用</h2>
 
 <p>同样的， <code>rusage</code> 结构体中也包含了进程运行占用的内存，我们可以使用与 CPU 时间一样的方法来获得这个值。</p>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="n">status</span><span class="p">,</span> <span class="n">memory_used</span><span class="p">;</span>  <span class="c1">// 运行过程中的最大内存占用
+</span><span class="c1"></span><span class="k">struct</span> <span class="n">rusage</span> <span class="n">ru</span><span class="p">;</span>
 
-<pre><code class="language-c">int status, memory_used;  // 运行过程中的最大内存占用
-struct rusage ru;
-
-wait4(pid, &amp;status, 0, &amp;ru);
-memory_used = ru.ru_maxrss;
-</code></pre>
-
+<span class="n">wait4</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">status</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ru</span><span class="p">);</span>
+<span class="n">memory_used</span> <span class="o">=</span> <span class="n">ru</span><span class="p">.</span><span class="n">ru_maxrss</span><span class="p">;</span></code></pre></div>
 <p>不过，如果你使用这种方法来测量进程内存的话，可能会出现这种情况：一个输出 <code>Hello World!</code> 的简单 C 语言程序与一个申请了长度几千的数组的 C++ 程序，测量出来的内存是一样多的。</p>
 
 <p>这种情况并非 BUG，而是预期中的行为。在 <a href="https://linux.die.net/man/2/getrusage">https://linux.die.net/man/2/getrusage</a> 中明确地指出： <code>Resource usage metrics are preserved across an execve(2)</code>。如果你要测量的程序的内存占用还没有你 <code>exec</code> 之前的子进程占用的内存大的话， <code>ru_maxrss</code> 实际是你 <code>exec</code> 之前的进程内存占用。</p>

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>SYN Flood 攻击原理与 C 语言实现 - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -170,7 +171,7 @@
               <div class="file-header d-flex flex-md-items-center flex-items-start">
                 <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
                   <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
-                    1467 Words
+                    1466 Words
                     
 
                   </div>
@@ -218,12 +219,9 @@
 <p>在之前的博客<a href="/posts/tcp-status/#TCP-连接的流程">《TCP-连接的流程与状态转换》</a>中，我介绍了 TCP 服务器与客户端进行通信的流程。一个服务器为了能够接收并响应来自客户端的请求，需要执行 <code>socket</code>、<code>bind</code> 以及 <code>listen</code> 函数。而在 TCP 连接实际交换数据之前，需要先进行<a href="/posts/tcp-connection/">三次握手</a>。</p>
 
 <p>SYN flood 就是针对三次握手的机制以及 <code>listen</code> 函数进行的攻击。首先看一下 <code>listen</code> 的定义。</p>
-
-<pre><code class="language-C">#include &lt;sys/socket.h&gt;
-int listen(int sockfd, int backlog);
-// 若成功返回 0，若出错则为 -1
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="cp">#include</span> <span class="cpf">&lt;sys/socket.h&gt;</span><span class="cp">
+</span><span class="cp"></span><span class="kt">int</span> <span class="nf">listen</span><span class="p">(</span><span class="kt">int</span> <span class="n">sockfd</span><span class="p">,</span> <span class="kt">int</span> <span class="n">backlog</span><span class="p">);</span>
+<span class="o">//</span> <span class="err">若成功返回</span> <span class="mi">0</span><span class="err">，若出错则为</span> <span class="o">-</span><span class="mi">1</span></code></pre></div>
 <p>其中 <code>backlog</code> 的含义没有正式的定义，一般认为这个值是未完成连接队列与已完成连接队列之和。</p>
 
 <h3 id="连接队列">连接队列</h3>
@@ -243,20 +241,17 @@ int listen(int sockfd, int backlog);
 <h2 id="实现">实现</h2>
 
 <p>实现 SYN flood 攻击需要创建一个请求连接的 TCP 报文，修改其中的源地址 IP 使得对方无法从 IP 来判断攻击者。因此，攻击者需要自己构建一个原始的 IP 报文，并且处理其中的校验和等信息。</p>
-
-<pre><code class="language-C">/* 创建原始套接字并可以自定义 IP 首部 */
-int sockfd;
-if ((sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_TCP)) &lt; 0) {
-    fprintf(stderr, &quot;socket failure!\n&quot;);
-    exit(1);
-}
-int on = 1;
-if (setsockopt(sockfd, IPPROTO_IP, IP_HDRINCL, &amp;on, sizeof(on)) &lt; 0) {
-    fprintf(stderr, &quot;setsockopt failure!\n&quot;);
-    exit(1);
-}
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="cm">/* 创建原始套接字并可以自定义 IP 首部 */</span>
+<span class="kt">int</span> <span class="n">sockfd</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">((</span><span class="n">sockfd</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_RAW</span><span class="p">,</span> <span class="n">IPPROTO_TCP</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&#34;socket failure!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="kt">int</span> <span class="n">on</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="n">IPPROTO_IP</span><span class="p">,</span> <span class="n">IP_HDRINCL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">on</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">on</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&#34;setsockopt failure!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div>
 <p>填充其中的 IP 首部与 TCP 信息后，通过 <code>sendto</code> 函数发送，就可以完成一次 SYN flood 攻击。</p>
 
 <p>完整代码可以参考：<a href="https://github.com/MeiK2333/ctrick/blob/master/syn_flood.c">MeiK - GitHub</a></p>

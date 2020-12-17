@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>Tinyhttpd 源码及分析 - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -170,7 +171,7 @@
               <div class="file-header d-flex flex-md-items-center flex-items-start">
                 <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
                   <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
-                    2894 Words
+                    2881 Words
                     
 
                   </div>
@@ -214,549 +215,545 @@
                 <article class="markdown-body entry-content container-lg"><p>Tinyhttpd 是J. David Blackstone在1999年写的一个不到 500 行的超轻量型 Http Server，分析这个项目可以帮助我们理解服务器软件的本质。</p>
 
 <h2 id="源码">源码</h2>
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="cm">/* J. David&#39;s webserver */</span>
+<span class="cm">/* This is a simple webserver.
+</span><span class="cm"> * Created November 1999 by J. David Blackstone.
+</span><span class="cm"> * CSE 4344 (Network concepts), Prof. Zeigler
+</span><span class="cm"> * University of Texas at Arlington
+</span><span class="cm"> */</span>
+<span class="cm">/* This program compiles for Sparc Solaris 2.6.
+</span><span class="cm"> * To compile for Linux:
+</span><span class="cm"> *  1) Comment out the #include &lt;pthread.h&gt; line.
+</span><span class="cm"> *  2) Comment out the line that defines the variable newthread.
+</span><span class="cm"> *  3) Comment out the two lines that run pthread_create().
+</span><span class="cm"> *  4) Uncomment the line that runs accept_request().
+</span><span class="cm"> *  5) Remove -lsocket from the Makefile.
+</span><span class="cm"> */</span>
+<span class="cm">/**
+</span><span class="cm"> * 较新版本的 Linux 已经内置了对线程的支持，只需要在编译时添加 -lpthread
+</span><span class="cm"> * 参数即可 调整 Makefile 的编译选项，使 $(LIBS) 在第 4 行的最后即可
+</span><span class="cm"> */</span>
+<span class="cp">#include</span> <span class="cpf">&lt;arpa/inet.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;ctype.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;netinet/in.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;pthread.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;stdint.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;string.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;strings.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;sys/socket.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;sys/stat.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;sys/types.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;sys/wait.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="cp">#define ISspace(x) isspace((int)(x))
+</span><span class="cp"></span>
+<span class="cp">#define SERVER_STRING &#34;Server: jdbhttpd/0.1.0\r\n&#34;
+</span><span class="cp">#define STDIN 0
+</span><span class="cp">#define STDOUT 1
+</span><span class="cp">#define STDERR 2
+</span><span class="cp"></span>
+<span class="cp">#define u_short unsigned short int
+</span><span class="cp"></span>
+<span class="kt">void</span> <span class="nf">accept_request</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">bad_request</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">cat</span><span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="n">FILE</span> <span class="o">*</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">cannot_execute</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">error_die</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">execute_cgi</span><span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="p">);</span>
+<span class="kt">int</span> <span class="nf">get_line</span><span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="p">,</span> <span class="kt">int</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">headers</span><span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">not_found</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">serve_file</span><span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="p">);</span>
+<span class="kt">int</span> <span class="nf">startup</span><span class="p">(</span><span class="n">u_short</span> <span class="o">*</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">unimplemented</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
 
-<pre><code class="language-C">/* J. David's webserver */
-/* This is a simple webserver.
- * Created November 1999 by J. David Blackstone.
- * CSE 4344 (Network concepts), Prof. Zeigler
- * University of Texas at Arlington
- */
-/* This program compiles for Sparc Solaris 2.6.
- * To compile for Linux:
- *  1) Comment out the #include &lt;pthread.h&gt; line.
- *  2) Comment out the line that defines the variable newthread.
- *  3) Comment out the two lines that run pthread_create().
- *  4) Uncomment the line that runs accept_request().
- *  5) Remove -lsocket from the Makefile.
- */
-/**
- * 较新版本的 Linux 已经内置了对线程的支持，只需要在编译时添加 -lpthread
- * 参数即可 调整 Makefile 的编译选项，使 $(LIBS) 在第 4 行的最后即可
- */
-#include &lt;arpa/inet.h&gt;
-#include &lt;ctype.h&gt;
-#include &lt;netinet/in.h&gt;
-#include &lt;pthread.h&gt;
-#include &lt;stdint.h&gt;
-#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-#include &lt;string.h&gt;
-#include &lt;strings.h&gt;
-#include &lt;sys/socket.h&gt;
-#include &lt;sys/stat.h&gt;
-#include &lt;sys/types.h&gt;
-#include &lt;sys/wait.h&gt;
-#include &lt;unistd.h&gt;
+<span class="cm">/**********************************************************************/</span>
+<span class="cm">/* A request has caused a call to accept() on the server port to
+</span><span class="cm"> * return.  Process the request appropriately.
+</span><span class="cm"> * Parameters: the socket connected to the client */</span>
+<span class="cm">/**********************************************************************/</span>
+<span class="kt">void</span> <span class="nf">accept_request</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">int</span> <span class="n">client</span> <span class="o">=</span> <span class="p">(</span><span class="n">intptr_t</span><span class="p">)</span><span class="n">arg</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1024</span><span class="p">];</span>
+  <span class="n">size_t</span> <span class="n">numchars</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">method</span><span class="p">[</span><span class="mi">255</span><span class="p">];</span>
+  <span class="kt">char</span> <span class="n">url</span><span class="p">[</span><span class="mi">255</span><span class="p">];</span>
+  <span class="kt">char</span> <span class="n">path</span><span class="p">[</span><span class="mi">512</span><span class="p">];</span>
+  <span class="n">size_t</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">;</span>
+  <span class="k">struct</span> <span class="n">stat</span> <span class="n">st</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">cgi</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="cm">/* becomes true if server decides this is a CGI
+</span><span class="cm">                * program */</span>
+  <span class="kt">char</span> <span class="o">*</span><span class="n">query_string</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
 
-#define ISspace(x) isspace((int)(x))
+  <span class="cm">/* 读取第一行，格式类似 &#34;GET / HTTP/1.1&#34; */</span>
+  <span class="n">numchars</span> <span class="o">=</span> <span class="n">get_line</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">));</span>
+  <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="cm">/* 首先解析 method (GET / POST) */</span>
+  <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">ISspace</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">method</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">method</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="n">i</span><span class="o">++</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="n">j</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+  <span class="n">method</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
 
-#define SERVER_STRING &quot;Server: jdbhttpd/0.1.0\r\n&quot;
-#define STDIN 0
-#define STDOUT 1
-#define STDERR 2
+  <span class="cm">/* 不能处理 GET 和 POST 之外的请求类型 */</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">strcasecmp</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="s">&#34;GET&#34;</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">strcasecmp</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="s">&#34;POST&#34;</span><span class="p">))</span> <span class="p">{</span>
+    <span class="cm">/* 直接返回 501 Method Not Implemented */</span>
+    <span class="n">unimplemented</span><span class="p">(</span><span class="n">client</span><span class="p">);</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
 
-#define u_short unsigned short int
+  <span class="cm">/* 若为 POST 请求类型，则认为送给 cgi 程序处理 */</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">strcasecmp</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="s">&#34;POST&#34;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">cgi</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="p">}</span>
 
-void accept_request(void *);
-void bad_request(int);
-void cat(int, FILE *);
-void cannot_execute(int);
-void error_die(const char *);
-void execute_cgi(int, const char *, const char *, const char *);
-int get_line(int, char *, int);
-void headers(int, const char *);
-void not_found(int);
-void serve_file(int, const char *);
-int startup(u_short *);
-void unimplemented(int);
+  <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="k">while</span> <span class="p">(</span><span class="n">ISspace</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">j</span> <span class="o">&lt;</span> <span class="n">numchars</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">j</span><span class="o">++</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">ISspace</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">j</span> <span class="o">&lt;</span> <span class="n">numchars</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">url</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">buf</span><span class="p">[</span><span class="n">j</span><span class="p">];</span>
+    <span class="n">i</span><span class="o">++</span><span class="p">;</span>
+    <span class="n">j</span><span class="o">++</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="n">url</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
 
-/**********************************************************************/
-/* A request has caused a call to accept() on the server port to
- * return.  Process the request appropriately.
- * Parameters: the socket connected to the client */
-/**********************************************************************/
-void accept_request(void *arg) {
-  int client = (intptr_t)arg;
-  char buf[1024];
-  size_t numchars;
-  char method[255];
-  char url[255];
-  char path[512];
-  size_t i, j;
-  struct stat st;
-  int cgi = 0; /* becomes true if server decides this is a CGI
-                * program */
-  char *query_string = NULL;
+  <span class="k">if</span> <span class="p">(</span><span class="n">strcasecmp</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="s">&#34;GET&#34;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">query_string</span> <span class="o">=</span> <span class="n">url</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">((</span><span class="o">*</span><span class="n">query_string</span> <span class="o">!=</span> <span class="sc">&#39;?&#39;</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="o">*</span><span class="n">query_string</span> <span class="o">!=</span> <span class="sc">&#39;\0&#39;</span><span class="p">))</span> <span class="p">{</span>
+      <span class="n">query_string</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">*</span><span class="n">query_string</span> <span class="o">==</span> <span class="sc">&#39;?&#39;</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">cgi</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+      <span class="o">*</span><span class="n">query_string</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
+      <span class="n">query_string</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
 
-  /* 读取第一行，格式类似 &quot;GET / HTTP/1.1&quot; */
-  numchars = get_line(client, buf, sizeof(buf));
-  i = 0;
-  j = 0;
-  /* 首先解析 method (GET / POST) */
-  while (!ISspace(buf[i]) &amp;&amp; (i &lt; sizeof(method) - 1)) {
-    method[i] = buf[i];
-    i++;
-  }
-  j = i;
-  method[i] = '\0';
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&#34;htdocs%s&#34;</span><span class="p">,</span> <span class="n">url</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="n">strlen</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;/&#39;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">strcat</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&#34;index.html&#34;</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="cm">/* 判断请求的文件是否存在 */</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">stat</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">st</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="cm">/* read &amp; discard headers */</span>
+    <span class="k">while</span> <span class="p">((</span><span class="n">numchars</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">strcmp</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">buf</span><span class="p">))</span> <span class="p">{</span>
+      <span class="n">numchars</span> <span class="o">=</span> <span class="n">get_line</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">));</span>
+    <span class="p">}</span>
+    <span class="n">not_found</span><span class="p">(</span><span class="n">client</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="cm">/* 如果为一个目录，则自动寻找 index.html */</span>
+    <span class="k">if</span> <span class="p">((</span><span class="n">st</span><span class="p">.</span><span class="n">st_mode</span> <span class="o">&amp;</span> <span class="n">S_IFMT</span><span class="p">)</span> <span class="o">==</span> <span class="n">S_IFDIR</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">strcat</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&#34;/index.html&#34;</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">((</span><span class="n">st</span><span class="p">.</span><span class="n">st_mode</span> <span class="o">&amp;</span> <span class="n">S_IXUSR</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="n">st</span><span class="p">.</span><span class="n">st_mode</span> <span class="o">&amp;</span> <span class="n">S_IXGRP</span><span class="p">)</span> <span class="o">||</span>
+        <span class="p">(</span><span class="n">st</span><span class="p">.</span><span class="n">st_mode</span> <span class="o">&amp;</span> <span class="n">S_IXOTH</span><span class="p">))</span> <span class="p">{</span>
+      <span class="n">cgi</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">cgi</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">serve_file</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">path</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="n">execute_cgi</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">query_string</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
 
-  /* 不能处理 GET 和 POST 之外的请求类型 */
-  if (strcasecmp(method, &quot;GET&quot;) &amp;&amp; strcasecmp(method, &quot;POST&quot;)) {
-    /* 直接返回 501 Method Not Implemented */
-    unimplemented(client);
-    return;
-  }
+  <span class="n">close</span><span class="p">(</span><span class="n">client</span><span class="p">);</span>
+<span class="p">}</span>
 
-  /* 若为 POST 请求类型，则认为送给 cgi 程序处理 */
-  if (strcasecmp(method, &quot;POST&quot;) == 0) {
-    cgi = 1;
-  }
+<span class="cm">/**********************************************************************/</span>
+<span class="cm">/* Inform the client that a request it has made has a problem.
+</span><span class="cm"> * Parameters: client socket */</span>
+<span class="cm">/**********************************************************************/</span>
+<span class="kt">void</span> <span class="nf">bad_request</span><span class="p">(</span><span class="kt">int</span> <span class="n">client</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1024</span><span class="p">];</span>
 
-  i = 0;
-  while (ISspace(buf[j]) &amp;&amp; (j &lt; numchars)) {
-    j++;
-  }
-  while (!ISspace(buf[j]) &amp;&amp; (i &lt; sizeof(url) - 1) &amp;&amp; (j &lt; numchars)) {
-    url[i] = buf[j];
-    i++;
-    j++;
-  }
-  url[i] = '\0';
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;HTTP/1.0 400 BAD REQUEST</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;Content-type: text/html</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;&lt;P&gt;Your browser sent a bad request, &#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;such as a POST without a Content-Length.</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
 
-  if (strcasecmp(method, &quot;GET&quot;) == 0) {
-    query_string = url;
-    while ((*query_string != '?') &amp;&amp; (*query_string != '\0')) {
-      query_string++;
-    }
-    if (*query_string == '?') {
-      cgi = 1;
-      *query_string = '\0';
-      query_string++;
-    }
-  }
+<span class="cm">/**********************************************************************/</span>
+<span class="cm">/* Put the entire contents of a file out on a socket.  This function
+</span><span class="cm"> * is named after the UNIX &#34;cat&#34; command, because it might have been
+</span><span class="cm"> * easier just to do something like pipe, fork, and exec(&#34;cat&#34;).
+</span><span class="cm"> * Parameters: the client socket descriptor
+</span><span class="cm"> *             FILE pointer for the file to cat */</span>
+<span class="cm">/**********************************************************************/</span>
+<span class="kt">void</span> <span class="nf">cat</span><span class="p">(</span><span class="kt">int</span> <span class="n">client</span><span class="p">,</span> <span class="n">FILE</span> <span class="o">*</span><span class="n">resource</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1024</span><span class="p">];</span>
 
-  sprintf(path, &quot;htdocs%s&quot;, url);
-  if (path[strlen(path) - 1] == '/') {
-    strcat(path, &quot;index.html&quot;);
-  }
-  /* 判断请求的文件是否存在 */
-  if (stat(path, &amp;st) == -1) {
-    /* read &amp; discard headers */
-    while ((numchars &gt; 0) &amp;&amp; strcmp(&quot;\n&quot;, buf)) {
-      numchars = get_line(client, buf, sizeof(buf));
-    }
-    not_found(client);
-  } else {
-    /* 如果为一个目录，则自动寻找 index.html */
-    if ((st.st_mode &amp; S_IFMT) == S_IFDIR) {
-      strcat(path, &quot;/index.html&quot;);
-    }
-    if ((st.st_mode &amp; S_IXUSR) || (st.st_mode &amp; S_IXGRP) ||
-        (st.st_mode &amp; S_IXOTH)) {
-      cgi = 1;
-    }
-    if (!cgi) {
-      serve_file(client, path);
-    } else {
-      execute_cgi(client, path, method, query_string);
-    }
-  }
+  <span class="n">fgets</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="n">resource</span><span class="p">);</span>
+  <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">feof</span><span class="p">(</span><span class="n">resource</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="n">fgets</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="n">resource</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
 
-  close(client);
-}
+<span class="cm">/**********************************************************************/</span>
+<span class="cm">/* Inform the client that a CGI script could not be executed.
+</span><span class="cm"> * Parameter: the client socket descriptor. */</span>
+<span class="cm">/**********************************************************************/</span>
+<span class="kt">void</span> <span class="nf">cannot_execute</span><span class="p">(</span><span class="kt">int</span> <span class="n">client</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1024</span><span class="p">];</span>
 
-/**********************************************************************/
-/* Inform the client that a request it has made has a problem.
- * Parameters: client socket */
-/**********************************************************************/
-void bad_request(int client) {
-  char buf[1024];
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;HTTP/1.0 500 Internal Server Error</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;Content-type: text/html</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;&lt;P&gt;Error prohibited CGI execution.</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
 
-  sprintf(buf, &quot;HTTP/1.0 400 BAD REQUEST\r\n&quot;);
-  send(client, buf, sizeof(buf), 0);
-  sprintf(buf, &quot;Content-type: text/html\r\n&quot;);
-  send(client, buf, sizeof(buf), 0);
-  sprintf(buf, &quot;\r\n&quot;);
-  send(client, buf, sizeof(buf), 0);
-  sprintf(buf, &quot;&lt;P&gt;Your browser sent a bad request, &quot;);
-  send(client, buf, sizeof(buf), 0);
-  sprintf(buf, &quot;such as a POST without a Content-Length.\r\n&quot;);
-  send(client, buf, sizeof(buf), 0);
-}
+<span class="cm">/**********************************************************************/</span>
+<span class="cm">/* Print out an error message with perror() (for system errors; based
+</span><span class="cm"> * on value of errno, which indicates system call errors) and exit the
+</span><span class="cm"> * program indicating an error. */</span>
+<span class="cm">/**********************************************************************/</span>
+<span class="kt">void</span> <span class="nf">error_die</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">sc</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">perror</span><span class="p">(</span><span class="n">sc</span><span class="p">);</span>
+  <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
 
-/**********************************************************************/
-/* Put the entire contents of a file out on a socket.  This function
- * is named after the UNIX &quot;cat&quot; command, because it might have been
- * easier just to do something like pipe, fork, and exec(&quot;cat&quot;).
- * Parameters: the client socket descriptor
- *             FILE pointer for the file to cat */
-/**********************************************************************/
-void cat(int client, FILE *resource) {
-  char buf[1024];
+<span class="cm">/**********************************************************************/</span>
+<span class="cm">/* Execute a CGI script.  Will need to set environment variables as
+</span><span class="cm"> * appropriate.
+</span><span class="cm"> * Parameters: client socket descriptor
+</span><span class="cm"> *             path to the CGI script */</span>
+<span class="cm">/**********************************************************************/</span>
+<span class="kt">void</span> <span class="nf">execute_cgi</span><span class="p">(</span><span class="kt">int</span> <span class="n">client</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">path</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">method</span><span class="p">,</span>
+                 <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">query_string</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1024</span><span class="p">];</span>
+  <span class="kt">int</span> <span class="n">cgi_output</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+  <span class="kt">int</span> <span class="n">cgi_input</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+  <span class="n">pid_t</span> <span class="n">pid</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">status</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">c</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">numchars</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">content_length</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
 
-  fgets(buf, sizeof(buf), resource);
-  while (!feof(resource)) {
-    send(client, buf, strlen(buf), 0);
-    fgets(buf, sizeof(buf), resource);
-  }
-}
+  <span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;A&#39;</span><span class="p">;</span>
+  <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">strcasecmp</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="s">&#34;GET&#34;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="cm">/* read &amp; discard headers */</span>
+    <span class="k">while</span> <span class="p">((</span><span class="n">numchars</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">strcmp</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">buf</span><span class="p">))</span> <span class="p">{</span>
+      <span class="n">numchars</span> <span class="o">=</span> <span class="n">get_line</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">));</span>
+    <span class="p">}</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">strcasecmp</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="s">&#34;POST&#34;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* POST */</span>
+    <span class="n">numchars</span> <span class="o">=</span> <span class="n">get_line</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">));</span>
+    <span class="k">while</span> <span class="p">((</span><span class="n">numchars</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">strcmp</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">buf</span><span class="p">))</span> <span class="p">{</span>
+      <span class="n">buf</span><span class="p">[</span><span class="mi">15</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">strcasecmp</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;Content-Length:&#34;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">content_length</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="o">&amp;</span><span class="p">(</span><span class="n">buf</span><span class="p">[</span><span class="mi">16</span><span class="p">]));</span>
+      <span class="p">}</span>
+      <span class="n">numchars</span> <span class="o">=</span> <span class="n">get_line</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">));</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">content_length</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">bad_request</span><span class="p">(</span><span class="n">client</span><span class="p">);</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="cm">/*HEAD or other*/</span>
+  <span class="p">}</span>
 
-/**********************************************************************/
-/* Inform the client that a CGI script could not be executed.
- * Parameter: the client socket descriptor. */
-/**********************************************************************/
-void cannot_execute(int client) {
-  char buf[1024];
+  <span class="k">if</span> <span class="p">(</span><span class="n">pipe</span><span class="p">(</span><span class="n">cgi_output</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">cannot_execute</span><span class="p">(</span><span class="n">client</span><span class="p">);</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">pipe</span><span class="p">(</span><span class="n">cgi_input</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">cannot_execute</span><span class="p">(</span><span class="n">client</span><span class="p">);</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
 
-  sprintf(buf, &quot;HTTP/1.0 500 Internal Server Error\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-  sprintf(buf, &quot;Content-type: text/html\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-  sprintf(buf, &quot;\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-  sprintf(buf, &quot;&lt;P&gt;Error prohibited CGI execution.\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-}
+  <span class="k">if</span> <span class="p">((</span><span class="n">pid</span> <span class="o">=</span> <span class="n">fork</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">cannot_execute</span><span class="p">(</span><span class="n">client</span><span class="p">);</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;HTTP/1.0 200 OK</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="cm">/* child: CGI script */</span>
+  <span class="cm">/**
+</span><span class="cm">   * 子进程去执行 cgi 程序
+</span><span class="cm">   * 父子进程通过 pipe 管道通信
+</span><span class="cm">   * */</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">pid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">char</span> <span class="n">meth_env</span><span class="p">[</span><span class="mi">255</span><span class="p">];</span>
+    <span class="kt">char</span> <span class="n">query_env</span><span class="p">[</span><span class="mi">255</span><span class="p">];</span>
+    <span class="kt">char</span> <span class="n">length_env</span><span class="p">[</span><span class="mi">255</span><span class="p">];</span>
 
-/**********************************************************************/
-/* Print out an error message with perror() (for system errors; based
- * on value of errno, which indicates system call errors) and exit the
- * program indicating an error. */
-/**********************************************************************/
-void error_die(const char *sc) {
-  perror(sc);
-  exit(1);
-}
+    <span class="n">dup2</span><span class="p">(</span><span class="n">cgi_output</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">STDOUT</span><span class="p">);</span>
+    <span class="n">dup2</span><span class="p">(</span><span class="n">cgi_input</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">STDIN</span><span class="p">);</span>
+    <span class="n">close</span><span class="p">(</span><span class="n">cgi_output</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+    <span class="n">close</span><span class="p">(</span><span class="n">cgi_input</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+    <span class="n">sprintf</span><span class="p">(</span><span class="n">meth_env</span><span class="p">,</span> <span class="s">&#34;REQUEST_METHOD=%s&#34;</span><span class="p">,</span> <span class="n">method</span><span class="p">);</span>
+    <span class="n">putenv</span><span class="p">(</span><span class="n">meth_env</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">strcasecmp</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="s">&#34;GET&#34;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">sprintf</span><span class="p">(</span><span class="n">query_env</span><span class="p">,</span> <span class="s">&#34;QUERY_STRING=%s&#34;</span><span class="p">,</span> <span class="n">query_string</span><span class="p">);</span>
+      <span class="n">putenv</span><span class="p">(</span><span class="n">query_env</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="cm">/* POST */</span>
+      <span class="n">sprintf</span><span class="p">(</span><span class="n">length_env</span><span class="p">,</span> <span class="s">&#34;CONTENT_LENGTH=%d&#34;</span><span class="p">,</span> <span class="n">content_length</span><span class="p">);</span>
+      <span class="n">putenv</span><span class="p">(</span><span class="n">length_env</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">execl</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="cm">/* parent */</span>
+    <span class="n">close</span><span class="p">(</span><span class="n">cgi_output</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+    <span class="n">close</span><span class="p">(</span><span class="n">cgi_input</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">strcasecmp</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="s">&#34;POST&#34;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">content_length</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">recv</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+        <span class="n">write</span><span class="p">(</span><span class="n">cgi_input</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="cm">/* 将 cgi 程序的输出返回到网页 */</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">read</span><span class="p">(</span><span class="n">cgi_output</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="p">}</span>
 
-/**********************************************************************/
-/* Execute a CGI script.  Will need to set environment variables as
- * appropriate.
- * Parameters: client socket descriptor
- *             path to the CGI script */
-/**********************************************************************/
-void execute_cgi(int client, const char *path, const char *method,
-                 const char *query_string) {
-  char buf[1024];
-  int cgi_output[2];
-  int cgi_input[2];
-  pid_t pid;
-  int status;
-  int i;
-  char c;
-  int numchars = 1;
-  int content_length = -1;
+    <span class="n">close</span><span class="p">(</span><span class="n">cgi_output</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+    <span class="n">close</span><span class="p">(</span><span class="n">cgi_input</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+    <span class="n">waitpid</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">status</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
 
-  buf[0] = 'A';
-  buf[1] = '\0';
-  if (strcasecmp(method, &quot;GET&quot;) == 0) {
-    /* read &amp; discard headers */
-    while ((numchars &gt; 0) &amp;&amp; strcmp(&quot;\n&quot;, buf)) {
-      numchars = get_line(client, buf, sizeof(buf));
-    }
-  } else if (strcasecmp(method, &quot;POST&quot;) == 0) { /* POST */
-    numchars = get_line(client, buf, sizeof(buf));
-    while ((numchars &gt; 0) &amp;&amp; strcmp(&quot;\n&quot;, buf)) {
-      buf[15] = '\0';
-      if (strcasecmp(buf, &quot;Content-Length:&quot;) == 0) {
-        content_length = atoi(&amp;(buf[16]));
-      }
-      numchars = get_line(client, buf, sizeof(buf));
-    }
-    if (content_length == -1) {
-      bad_request(client);
-      return;
-    }
-  } else { /*HEAD or other*/
-  }
+<span class="cm">/**********************************************************************/</span>
+<span class="cm">/* Get a line from a socket, whether the line ends in a newline,
+</span><span class="cm"> * carriage return, or a CRLF combination.  Terminates the string read
+</span><span class="cm"> * with a null character.  If no newline indicator is found before the
+</span><span class="cm"> * end of the buffer, the string is terminated with a null.  If any of
+</span><span class="cm"> * the above three line terminators is read, the last character of the
+</span><span class="cm"> * string will be a linefeed and the string will be terminated with a
+</span><span class="cm"> * null character.
+</span><span class="cm"> * Parameters: the socket descriptor
+</span><span class="cm"> *             the buffer to save the data in
+</span><span class="cm"> *             the size of the buffer
+</span><span class="cm"> * Returns: the number of bytes stored (excluding null) */</span>
+<span class="cm">/**********************************************************************/</span>
+<span class="kt">int</span> <span class="nf">get_line</span><span class="p">(</span><span class="kt">int</span> <span class="n">sock</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">buf</span><span class="p">,</span> <span class="kt">int</span> <span class="n">size</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">c</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
 
-  if (pipe(cgi_output) &lt; 0) {
-    cannot_execute(client);
-    return;
-  }
-  if (pipe(cgi_input) &lt; 0) {
-    cannot_execute(client);
-    return;
-  }
+  <span class="k">while</span> <span class="p">((</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">c</span> <span class="o">!=</span> <span class="sc">&#39;\n&#39;</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">recv</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="cm">/* DEBUG printf(&#34;%02X\n&#34;, c); */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">==</span> <span class="sc">&#39;\r&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">recv</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MSG_PEEK</span><span class="p">);</span>
+        <span class="cm">/* DEBUG printf(&#34;%02X\n&#34;, c); */</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">c</span> <span class="o">==</span> <span class="sc">&#39;\n&#39;</span><span class="p">))</span> <span class="p">{</span>
+          <span class="n">recv</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="n">c</span> <span class="o">=</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+      <span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="p">;</span>
+      <span class="n">i</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="n">c</span> <span class="o">=</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="n">buf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
 
-  if ((pid = fork()) &lt; 0) {
-    cannot_execute(client);
-    return;
-  }
-  sprintf(buf, &quot;HTTP/1.0 200 OK\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-  /* child: CGI script */
-  /**
-   * 子进程去执行 cgi 程序
-   * 父子进程通过 pipe 管道通信
-   * */
-  if (pid == 0) {
-    char meth_env[255];
-    char query_env[255];
-    char length_env[255];
+  <span class="k">return</span> <span class="p">(</span><span class="n">i</span><span class="p">);</span>
+<span class="p">}</span>
 
-    dup2(cgi_output[1], STDOUT);
-    dup2(cgi_input[0], STDIN);
-    close(cgi_output[0]);
-    close(cgi_input[1]);
-    sprintf(meth_env, &quot;REQUEST_METHOD=%s&quot;, method);
-    putenv(meth_env);
-    if (strcasecmp(method, &quot;GET&quot;) == 0) {
-      sprintf(query_env, &quot;QUERY_STRING=%s&quot;, query_string);
-      putenv(query_env);
-    } else { /* POST */
-      sprintf(length_env, &quot;CONTENT_LENGTH=%d&quot;, content_length);
-      putenv(length_env);
-    }
-    execl(path, NULL);
-    exit(0);
-  } else { /* parent */
-    close(cgi_output[1]);
-    close(cgi_input[0]);
-    if (strcasecmp(method, &quot;POST&quot;) == 0) {
-      for (i = 0; i &lt; content_length; i++) {
-        recv(client, &amp;c, 1, 0);
-        write(cgi_input[1], &amp;c, 1);
-      }
-    }
-    /* 将 cgi 程序的输出返回到网页 */
-    while (read(cgi_output[0], &amp;c, 1) &gt; 0) {
-      send(client, &amp;c, 1, 0);
-    }
+<span class="cm">/**********************************************************************/</span>
+<span class="cm">/* Return the informational HTTP headers about a file. */</span>
+<span class="cm">/* Parameters: the socket to print the headers on
+</span><span class="cm"> *             the name of the file */</span>
+<span class="cm">/**********************************************************************/</span>
+<span class="kt">void</span> <span class="nf">headers</span><span class="p">(</span><span class="kt">int</span> <span class="n">client</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">filename</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1024</span><span class="p">];</span>
+  <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">filename</span><span class="p">;</span> <span class="cm">/* could use filename to determine file type */</span>
 
-    close(cgi_output[0]);
-    close(cgi_input[1]);
-    waitpid(pid, &amp;status, 0);
-  }
-}
+  <span class="n">strcpy</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;HTTP/1.0 200 OK</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">strcpy</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">SERVER_STRING</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;Content-Type: text/html</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">strcpy</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
 
-/**********************************************************************/
-/* Get a line from a socket, whether the line ends in a newline,
- * carriage return, or a CRLF combination.  Terminates the string read
- * with a null character.  If no newline indicator is found before the
- * end of the buffer, the string is terminated with a null.  If any of
- * the above three line terminators is read, the last character of the
- * string will be a linefeed and the string will be terminated with a
- * null character.
- * Parameters: the socket descriptor
- *             the buffer to save the data in
- *             the size of the buffer
- * Returns: the number of bytes stored (excluding null) */
-/**********************************************************************/
-int get_line(int sock, char *buf, int size) {
-  int i = 0;
-  char c = '\0';
-  int n;
+<span class="cm">/**********************************************************************/</span>
+<span class="cm">/* Give a client a 404 not found status message. */</span>
+<span class="cm">/**********************************************************************/</span>
+<span class="kt">void</span> <span class="nf">not_found</span><span class="p">(</span><span class="kt">int</span> <span class="n">client</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1024</span><span class="p">];</span>
 
-  while ((i &lt; size - 1) &amp;&amp; (c != '\n')) {
-    n = recv(sock, &amp;c, 1, 0);
-    /* DEBUG printf(&quot;%02X\n&quot;, c); */
-    if (n &gt; 0) {
-      if (c == '\r') {
-        n = recv(sock, &amp;c, 1, MSG_PEEK);
-        /* DEBUG printf(&quot;%02X\n&quot;, c); */
-        if ((n &gt; 0) &amp;&amp; (c == '\n')) {
-          recv(sock, &amp;c, 1, 0);
-        } else {
-          c = '\n';
-        }
-      }
-      buf[i] = c;
-      i++;
-    } else {
-      c = '\n';
-    }
-  }
-  buf[i] = '\0';
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;HTTP/1.0 404 NOT FOUND</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">SERVER_STRING</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;Content-Type: text/html</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;&lt;HTML&gt;&lt;TITLE&gt;Not Found&lt;/TITLE&gt;</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;&lt;BODY&gt;&lt;P&gt;The server could not fulfill</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;your request because the resource specified</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;is unavailable or nonexistent.</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;&lt;/BODY&gt;&lt;/HTML&gt;</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
 
-  return (i);
-}
+<span class="cm">/**********************************************************************/</span>
+<span class="cm">/* Send a regular file to the client.  Use headers, and report
+</span><span class="cm"> * errors to client if they occur.
+</span><span class="cm"> * Parameters: a pointer to a file structure produced from the socket
+</span><span class="cm"> *              file descriptor
+</span><span class="cm"> *             the name of the file to serve */</span>
+<span class="cm">/**********************************************************************/</span>
+<span class="kt">void</span> <span class="nf">serve_file</span><span class="p">(</span><span class="kt">int</span> <span class="n">client</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">filename</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">FILE</span> <span class="o">*</span><span class="n">resource</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">numchars</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1024</span><span class="p">];</span>
 
-/**********************************************************************/
-/* Return the informational HTTP headers about a file. */
-/* Parameters: the socket to print the headers on
- *             the name of the file */
-/**********************************************************************/
-void headers(int client, const char *filename) {
-  char buf[1024];
-  (void)filename; /* could use filename to determine file type */
+  <span class="n">buf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;A&#39;</span><span class="p">;</span>
+  <span class="n">buf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
+  <span class="cm">/* read &amp; discard headers */</span>
+  <span class="k">while</span> <span class="p">((</span><span class="n">numchars</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">strcmp</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">buf</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">numchars</span> <span class="o">=</span> <span class="n">get_line</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">));</span>
+  <span class="p">}</span>
 
-  strcpy(buf, &quot;HTTP/1.0 200 OK\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-  strcpy(buf, SERVER_STRING);
-  send(client, buf, strlen(buf), 0);
-  sprintf(buf, &quot;Content-Type: text/html\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-  strcpy(buf, &quot;\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-}
+  <span class="n">resource</span> <span class="o">=</span> <span class="n">fopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#34;r&#34;</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">resource</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">not_found</span><span class="p">(</span><span class="n">client</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">headers</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">filename</span><span class="p">);</span>
+    <span class="n">cat</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">resource</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="n">fclose</span><span class="p">(</span><span class="n">resource</span><span class="p">);</span>
+<span class="p">}</span>
 
-/**********************************************************************/
-/* Give a client a 404 not found status message. */
-/**********************************************************************/
-void not_found(int client) {
-  char buf[1024];
+<span class="cm">/**********************************************************************/</span>
+<span class="cm">/* This function starts the process of listening for web connections
+</span><span class="cm"> * on a specified port.  If the port is 0, then dynamically allocate a
+</span><span class="cm"> * port and modify the original port variable to reflect the actual
+</span><span class="cm"> * port.
+</span><span class="cm"> * Parameters: pointer to variable containing the port to connect on
+</span><span class="cm"> * Returns: the socket */</span>
+<span class="cm">/**********************************************************************/</span>
+<span class="kt">int</span> <span class="nf">startup</span><span class="p">(</span><span class="n">u_short</span> <span class="o">*</span><span class="n">port</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">int</span> <span class="n">httpd</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">on</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="n">name</span><span class="p">;</span>
 
-  sprintf(buf, &quot;HTTP/1.0 404 NOT FOUND\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-  sprintf(buf, SERVER_STRING);
-  send(client, buf, strlen(buf), 0);
-  sprintf(buf, &quot;Content-Type: text/html\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-  sprintf(buf, &quot;\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-  sprintf(buf, &quot;&lt;HTML&gt;&lt;TITLE&gt;Not Found&lt;/TITLE&gt;\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-  sprintf(buf, &quot;&lt;BODY&gt;&lt;P&gt;The server could not fulfill\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-  sprintf(buf, &quot;your request because the resource specified\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-  sprintf(buf, &quot;is unavailable or nonexistent.\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-  sprintf(buf, &quot;&lt;/BODY&gt;&lt;/HTML&gt;\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-}
+  <span class="cm">/**
+</span><span class="cm">   * socker 创建套接字连接
+</span><span class="cm">   * PF_INET \ AF_INET IPv4 因特网域
+</span><span class="cm">   * SOCK_STREAM 有序的、可靠的、双向的、面向连接的字节流
+</span><span class="cm">   * */</span>
+  <span class="n">httpd</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">PF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">httpd</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">error_die</span><span class="p">(</span><span class="s">&#34;socket&#34;</span><span class="p">);</span>
+  <span class="p">}</span>
 
-/**********************************************************************/
-/* Send a regular file to the client.  Use headers, and report
- * errors to client if they occur.
- * Parameters: a pointer to a file structure produced from the socket
- *              file descriptor
- *             the name of the file to serve */
-/**********************************************************************/
-void serve_file(int client, const char *filename) {
-  FILE *resource = NULL;
-  int numchars = 1;
-  char buf[1024];
+  <span class="n">memset</span><span class="p">(</span><span class="o">&amp;</span><span class="n">name</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">name</span><span class="p">));</span>
+  <span class="n">name</span><span class="p">.</span><span class="n">sin_family</span> <span class="o">=</span> <span class="n">AF_INET</span><span class="p">;</span>
+  <span class="cm">/* htons: Host to Network Short */</span>
+  <span class="n">name</span><span class="p">.</span><span class="n">sin_port</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="o">*</span><span class="n">port</span><span class="p">);</span>
+  <span class="cm">/* htonl: Host to Network Long */</span>
+  <span class="n">name</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">htonl</span><span class="p">(</span><span class="n">INADDR_ANY</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">((</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">httpd</span><span class="p">,</span> <span class="n">SOL_SOCKET</span><span class="p">,</span> <span class="n">SO_REUSEADDR</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">on</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">on</span><span class="p">)))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">error_die</span><span class="p">(</span><span class="s">&#34;setsockopt failed&#34;</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="cm">/* 如果没有指定端口，则系统会自动指定一个 */</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">bind</span><span class="p">(</span><span class="n">httpd</span><span class="p">,</span> <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">name</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">name</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">error_die</span><span class="p">(</span><span class="s">&#34;bind&#34;</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="cm">/* 如果没有指定端口，则将系统指定的端口赋值给端口参数 */</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">*</span><span class="n">port</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">socklen_t</span> <span class="n">namelen</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">getsockname</span><span class="p">(</span><span class="n">httpd</span><span class="p">,</span> <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">namelen</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">error_die</span><span class="p">(</span><span class="s">&#34;getsockname&#34;</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="o">*</span><span class="n">port</span> <span class="o">=</span> <span class="n">ntohs</span><span class="p">(</span><span class="n">name</span><span class="p">.</span><span class="n">sin_port</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="cm">/* listen 的第二个参数指定了可以排队的请求的个数，多余的会被拒绝 */</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">listen</span><span class="p">(</span><span class="n">httpd</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">error_die</span><span class="p">(</span><span class="s">&#34;listen&#34;</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="p">(</span><span class="n">httpd</span><span class="p">);</span>
+<span class="p">}</span>
 
-  buf[0] = 'A';
-  buf[1] = '\0';
-  /* read &amp; discard headers */
-  while ((numchars &gt; 0) &amp;&amp; strcmp(&quot;\n&quot;, buf)) {
-    numchars = get_line(client, buf, sizeof(buf));
-  }
+<span class="cm">/**********************************************************************/</span>
+<span class="cm">/* Inform the client that the requested web method has not been
+</span><span class="cm"> * implemented.
+</span><span class="cm"> * Parameter: the client socket */</span>
+<span class="cm">/**********************************************************************/</span>
+<span class="kt">void</span> <span class="nf">unimplemented</span><span class="p">(</span><span class="kt">int</span> <span class="n">client</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1024</span><span class="p">];</span>
 
-  resource = fopen(filename, &quot;r&quot;);
-  if (resource == NULL) {
-    not_found(client);
-  } else {
-    headers(client, filename);
-    cat(client, resource);
-  }
-  fclose(resource);
-}
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;HTTP/1.0 501 Method Not Implemented</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">SERVER_STRING</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;Content-Type: text/html</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;&lt;HTML&gt;&lt;HEAD&gt;&lt;TITLE&gt;Method Not Implemented</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;&lt;/TITLE&gt;&lt;/HEAD&gt;</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;&lt;BODY&gt;&lt;P&gt;HTTP request method not supported.</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">sprintf</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&#34;&lt;/BODY&gt;&lt;/HTML&gt;</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+  <span class="n">send</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buf</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
 
-/**********************************************************************/
-/* This function starts the process of listening for web connections
- * on a specified port.  If the port is 0, then dynamically allocate a
- * port and modify the original port variable to reflect the actual
- * port.
- * Parameters: pointer to variable containing the port to connect on
- * Returns: the socket */
-/**********************************************************************/
-int startup(u_short *port) {
-  int httpd = 0;
-  int on = 1;
-  struct sockaddr_in name;
+<span class="cm">/**********************************************************************/</span>
 
-  /**
-   * socker 创建套接字连接
-   * PF_INET \ AF_INET IPv4 因特网域
-   * SOCK_STREAM 有序的、可靠的、双向的、面向连接的字节流
-   * */
-  httpd = socket(PF_INET, SOCK_STREAM, 0);
-  if (httpd == -1) {
-    error_die(&quot;socket&quot;);
-  }
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">int</span> <span class="n">server_sock</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+  <span class="n">u_short</span> <span class="n">port</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">client_sock</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+  <span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="n">client_name</span><span class="p">;</span>
+  <span class="n">socklen_t</span> <span class="n">client_name_len</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">client_name</span><span class="p">);</span>
+  <span class="n">pthread_t</span> <span class="n">newthread</span><span class="p">;</span>
 
-  memset(&amp;name, 0, sizeof(name));
-  name.sin_family = AF_INET;
-  /* htons: Host to Network Short */
-  name.sin_port = htons(*port);
-  /* htonl: Host to Network Long */
-  name.sin_addr.s_addr = htonl(INADDR_ANY);
-  if ((setsockopt(httpd, SOL_SOCKET, SO_REUSEADDR, &amp;on, sizeof(on))) &lt; 0) {
-    error_die(&quot;setsockopt failed&quot;);
-  }
-  /* 如果没有指定端口，则系统会自动指定一个 */
-  if (bind(httpd, (struct sockaddr *)&amp;name, sizeof(name)) &lt; 0) {
-    error_die(&quot;bind&quot;);
-  }
-  /* 如果没有指定端口，则将系统指定的端口赋值给端口参数 */
-  if (*port == 0) {
-    socklen_t namelen = sizeof(name);
-    if (getsockname(httpd, (struct sockaddr *)&amp;name, &amp;namelen) == -1) {
-      error_die(&quot;getsockname&quot;);
-    }
-    *port = ntohs(name.sin_port);
-  }
-  /* listen 的第二个参数指定了可以排队的请求的个数，多余的会被拒绝 */
-  if (listen(httpd, 5) &lt; 0) {
-    error_die(&quot;listen&quot;);
-  }
-  return (httpd);
-}
+  <span class="n">server_sock</span> <span class="o">=</span> <span class="n">startup</span><span class="p">(</span><span class="o">&amp;</span><span class="n">port</span><span class="p">);</span>
+  <span class="n">printf</span><span class="p">(</span><span class="s">&#34;httpd running on port %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">port</span><span class="p">);</span>
 
-/**********************************************************************/
-/* Inform the client that the requested web method has not been
- * implemented.
- * Parameter: the client socket */
-/**********************************************************************/
-void unimplemented(int client) {
-  char buf[1024];
+  <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="cm">/* accept 函数获得连接请求并建立连接，返回套接字描述符 */</span>
+    <span class="n">client_sock</span> <span class="o">=</span>
+        <span class="n">accept</span><span class="p">(</span><span class="n">server_sock</span><span class="p">,</span> <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">client_name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">client_name_len</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">client_sock</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">error_die</span><span class="p">(</span><span class="s">&#34;accept&#34;</span><span class="p">);</span>
+    <span class="p">}</span>
 
-  sprintf(buf, &quot;HTTP/1.0 501 Method Not Implemented\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-  sprintf(buf, SERVER_STRING);
-  send(client, buf, strlen(buf), 0);
-  sprintf(buf, &quot;Content-Type: text/html\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-  sprintf(buf, &quot;\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-  sprintf(buf, &quot;&lt;HTML&gt;&lt;HEAD&gt;&lt;TITLE&gt;Method Not Implemented\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-  sprintf(buf, &quot;&lt;/TITLE&gt;&lt;/HEAD&gt;\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-  sprintf(buf, &quot;&lt;BODY&gt;&lt;P&gt;HTTP request method not supported.\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-  sprintf(buf, &quot;&lt;/BODY&gt;&lt;/HTML&gt;\r\n&quot;);
-  send(client, buf, strlen(buf), 0);
-}
+    <span class="cm">/* 创建新线程处理此次请求 */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">pthread_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">newthread</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">accept_request</span><span class="p">,</span>
+                       <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)(</span><span class="n">intptr_t</span><span class="p">)</span><span class="n">client_sock</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">perror</span><span class="p">(</span><span class="s">&#34;pthread_create&#34;</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
 
-/**********************************************************************/
+  <span class="n">close</span><span class="p">(</span><span class="n">server_sock</span><span class="p">);</span>
 
-int main(void) {
-  int server_sock = -1;
-  u_short port = 0;
-  int client_sock = -1;
-  struct sockaddr_in client_name;
-  socklen_t client_name_len = sizeof(client_name);
-  pthread_t newthread;
-
-  server_sock = startup(&amp;port);
-  printf(&quot;httpd running on port %d\n&quot;, port);
-
-  while (1) {
-    /* accept 函数获得连接请求并建立连接，返回套接字描述符 */
-    client_sock =
-        accept(server_sock, (struct sockaddr *)&amp;client_name, &amp;client_name_len);
-    if (client_sock == -1) {
-      error_die(&quot;accept&quot;);
-    }
-
-    /* 创建新线程处理此次请求 */
-    if (pthread_create(&amp;newthread, NULL, (void *)accept_request,
-                       (void *)(intptr_t)client_sock) != 0) {
-      perror(&quot;pthread_create&quot;);
-    }
-  }
-
-  close(server_sock);
-
-  return (0);
-}
-
-</code></pre>
-
+  <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div>
 <h2 id="分析">分析</h2>
 
 <h3 id="main">main</h3>

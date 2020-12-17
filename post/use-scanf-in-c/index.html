@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>C 语言中 scanf 函数的使用 - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -215,10 +216,8 @@
 <h2 id="声明">声明</h2>
 
 <p>下面是 <code>scanf()</code> 函数的声明。</p>
-
-<pre><code class="language-cpp">int scanf(const char *format, ...)
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="kt">int</span> <span class="n">scanf</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">format</span><span class="p">,</span> <span class="p">...)</span>
+</code></pre></div>
 <h2 id="参数">参数</h2>
 
 <ul>
@@ -287,18 +286,13 @@
 <h3 id="具体示例">具体示例</h3>
 
 <p>比如：</p>
-
-<pre><code class="language-cpp">char ch;
-char str[100];
-scanf(&quot;%c%s&quot;, &amp;ch, str);
-printf(&quot;ch: %c\nstr: %s&quot;, ch, str);
-</code></pre>
-
-<pre><code class="language-shell">$ HelloWorld!
+<div class="highlight"><pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="kt">char</span> <span class="n">ch</span><span class="p">;</span>
+<span class="kt">char</span> <span class="n">str</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+<span class="n">scanf</span><span class="p">(</span><span class="s">&#34;%c%s&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ch</span><span class="p">,</span> <span class="n">str</span><span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&#34;ch: %c</span><span class="se">\n</span><span class="s">str: %s&#34;</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="n">str</span><span class="p">);</span>
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ HelloWorld!
 &gt; ch: H
-str: elloWorld!
-</code></pre>
-
+str: elloWorld!</code></pre></div>
 <p>在程序开始运行的时候，标准输入流中的字符串为 <code>&quot;HelloWorld!&quot;</code> ，<code>scanf</code> 首先尝试匹配 <code>'%c'</code> ：</p>
 
 <pre><code>HelloWorld!
@@ -314,19 +308,14 @@ str: elloWorld!
 <p>此时 <code>scanf</code> 尝试匹配 <code>'%s'</code> ， <code>'%s'</code> 的匹配规则为：匹配连续字符，直到遇到空白符（空格、换行或者格式制表符等）。 <code>'%s'</code> 成功匹配该行剩下的所有字符 <code>&quot;elloWorld!&quot;</code> ，并将其存到字符数组 <code>str</code> 中。</p>
 
 <p>另一个例子：</p>
-
-<pre><code class="language-cpp">char ch;
-char str1[100], str2[100];
-scanf(&quot;%c%s%s&quot;, &amp;ch, str1, str2);
-printf(&quot;ch: %c\nstr1: %s\nstr2: %s\n&quot;, ch, str1, str2);
-</code></pre>
-
-<pre><code class="language-shell">$ Hello                         World!
+<div class="highlight"><pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="kt">char</span> <span class="n">ch</span><span class="p">;</span>
+<span class="kt">char</span> <span class="n">str1</span><span class="p">[</span><span class="mi">100</span><span class="p">],</span> <span class="n">str2</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+<span class="n">scanf</span><span class="p">(</span><span class="s">&#34;%c%s%s&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ch</span><span class="p">,</span> <span class="n">str1</span><span class="p">,</span> <span class="n">str2</span><span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&#34;ch: %c</span><span class="se">\n</span><span class="s">str1: %s</span><span class="se">\n</span><span class="s">str2: %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="n">str1</span><span class="p">,</span> <span class="n">str2</span><span class="p">);</span>
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ Hello                         World!
 &gt; ch: H
 str1: ello
-str2: World!
-</code></pre>
-
+str2: World!</code></pre></div>
 <p>当 <code>ch</code> 和 <code>str1</code> 读取结束的时候，指针的位置如下：</p>
 
 <pre><code>Hello                         World!
@@ -336,32 +325,24 @@ str2: World!
 <p>那为什么 <code>str2</code> 读取到的却是 <code>&quot;World!&quot;</code> 呢？原因很简单，因为 <code>'%s'</code> 类型说明符在匹配的时候会忽略字符串开头所有的空白符，指针会一直后移直到指向 <code>'W'</code> 的时候才正式开始匹配。</p>
 
 <p>同样的程序，我们换一组输入：</p>
-
-<pre><code class="language-shell">$ Hello
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ Hello
 World!
 &gt; ch: H
 str1: ello
-str2: World!
-</code></pre>
-
+str2: World!</code></pre></div>
 <p>原理同上，在字符串中，换行和其他空白符没有本质上的区别，读取的字符串实际上是： <code>&quot;Hello\nWorld!&quot;</code> ，对于 <code>'\n'</code> 的处理和对其他空白符的处理是一样的，因此会出现和上面的程序一样的结果。</p>
 
 <p>但是如果我们把上面程序的格式说明符交换一下位置的话就会出现问题：</p>
-
-<pre><code class="language-cpp">char ch;
-char str1[100], str2[100];
-scanf(&quot;%s%c%s&quot;, str1, &amp;ch, str2);
-printf(&quot;ch: %c\nstr1: %s\nstr2: %s\n&quot;, ch, str1, str2);
-</code></pre>
-
-<pre><code class="language-shell">$ Hello
+<div class="highlight"><pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="kt">char</span> <span class="n">ch</span><span class="p">;</span>
+<span class="kt">char</span> <span class="n">str1</span><span class="p">[</span><span class="mi">100</span><span class="p">],</span> <span class="n">str2</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+<span class="n">scanf</span><span class="p">(</span><span class="s">&#34;%s%c%s&#34;</span><span class="p">,</span> <span class="n">str1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ch</span><span class="p">,</span> <span class="n">str2</span><span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&#34;ch: %c</span><span class="se">\n</span><span class="s">str1: %s</span><span class="se">\n</span><span class="s">str2: %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="n">str1</span><span class="p">,</span> <span class="n">str2</span><span class="p">);</span>
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ Hello
 World!
 &gt; ch: 
 
 str1: Hello
-str2: World!
-</code></pre>
-
+str2: World!</code></pre></div>
 <p><code>ch</code> 读取到了个空？并不是， 在 <code>str1</code> 读取结束的时候，指针刚好指到第一行的最后： <code>'\n'</code> ，<code>'%c'</code> 在读取的时候可不管三七二十一，只要它上场，就会读取当前指针所指的那个字符，因此， <code>'%c'</code> 实际上是把第一行末尾的 <code>'\n'</code> 给读取走了。因为 <code>'\n'</code> 在控制台下会表现为一个换行，因此会给人一种什么也没有读取到的感觉。</p>
 
 <h3 id="空格-的使用">[空格] 的使用</h3>
@@ -377,20 +358,15 @@ str2: World!
 <p>[空格] 的作用：读取 0 个、 1 个或多个连续的空白字符。</p>
 
 <p>从描述上就可以看出，如果不是主动想要读取空白字符，那么在原有的格式说明符两侧加 [空格] 是不会产生任何问题的，而且还可以完美避免因空白字符而导致的锅。</p>
-
-<pre><code class="language-cpp">char ch;
-char str1[100], str2[100];
-scanf(&quot;%s %c %s&quot;, str1, &amp;ch, str2);
-printf(&quot;ch: %c\nstr1: %s\nstr2: %s\n&quot;, ch, str1, str2);
-</code></pre>
-
-<pre><code class="language-shell">$ Hello
+<div class="highlight"><pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="kt">char</span> <span class="n">ch</span><span class="p">;</span>
+<span class="kt">char</span> <span class="n">str1</span><span class="p">[</span><span class="mi">100</span><span class="p">],</span> <span class="n">str2</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+<span class="n">scanf</span><span class="p">(</span><span class="s">&#34;%s %c %s&#34;</span><span class="p">,</span> <span class="n">str1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ch</span><span class="p">,</span> <span class="n">str2</span><span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&#34;ch: %c</span><span class="se">\n</span><span class="s">str1: %s</span><span class="se">\n</span><span class="s">str2: %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="n">str1</span><span class="p">,</span> <span class="n">str2</span><span class="p">);</span>
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ Hello
 World!
 &gt; ch: W
 str1: Hello
-str2: orld!
-</code></pre>
-
+str2: orld!</code></pre></div>
 <p>加上 [空格] 之后，产生了期望的结果。</p>
 
 <p>（其他空白符有同样的效果，但是空白符最顺手）</p>

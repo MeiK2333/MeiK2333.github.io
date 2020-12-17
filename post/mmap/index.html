@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>关于 mmap 映射的内存的释放问题 - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -170,7 +171,7 @@
               <div class="file-header d-flex flex-md-items-center flex-items-start">
                 <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
                   <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
-                    126 Words
+                    125 Words
                     
 
                   </div>
@@ -195,11 +196,9 @@
               <div class="Box-body px-5 pb-5">
                 <article class="markdown-body entry-content container-lg"><p>关于 mmap 映射的内存的释放问题。</p>
 
-<pre><code class="language-C">#include &lt;sys/mman.h&gt;
-void *mmap(void *addr, size_t len, int prot, int flag, int fd, off_t off);
-// 若执行成功， 则返回映射区的起始地址；若出错，则返回 `MAP_FAILED` 。
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="cp">#include</span> <span class="cpf">&lt;sys/mman.h&gt;</span><span class="cp">
+</span><span class="cp"></span><span class="kt">void</span> <span class="o">*</span><span class="nf">mmap</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">addr</span><span class="p">,</span> <span class="n">size_t</span> <span class="n">len</span><span class="p">,</span> <span class="kt">int</span> <span class="n">prot</span><span class="p">,</span> <span class="kt">int</span> <span class="n">flag</span><span class="p">,</span> <span class="kt">int</span> <span class="n">fd</span><span class="p">,</span> <span class="n">off_t</span> <span class="n">off</span><span class="p">);</span>
+<span class="o">//</span> <span class="err">若执行成功，</span> <span class="err">则返回映射区的起始地址；若出错，则返回</span> <span class="err">`</span><span class="n">MAP_FAILED</span><span class="err">`</span> <span class="err">。</span></code></pre></div>
 <p>其参数含义与可选选项可以参照<a href="http://man7.org/linux/man-pages/man2/mmap.2.html">这里</a>。</p>
 
 <p><code>mmap</code> 映射的空间应该使用 <a href="http://man7.org/linux/man-pages/man2/munmap.2.html"><code>munmap</code></a> 释放， 而非 <code>free</code> ，使用 <code>munmap</code> 后其空间将被自动释放。而如果使用 <code>free</code> 释放的话，将会导致程序卡死。</p></article>

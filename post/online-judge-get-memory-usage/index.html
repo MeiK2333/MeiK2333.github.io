@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>关于评测姬的内存测量问题 - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -176,7 +177,7 @@
               <div class="file-header d-flex flex-md-items-center flex-items-start">
                 <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
                   <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
-                    2142 Words
+                    2141 Words
                     
 
                   </div>
@@ -217,18 +218,16 @@
 <h2 id="同样的代码在不同平台的表现">同样的代码在不同平台的表现</h2>
 
 <p>我们选用同样的代码, 在几个知名度较高的 OJ 平台上使用同样的编译器测试一下</p>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span><span class="cp"></span><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
 
-<pre><code class="language-C++">#include &lt;iostream&gt;
-using namespace std;
-
-int main() {
-    int a, b;
-    cin &gt;&gt; a &gt;&gt; b;
-    cout &lt;&lt; a + b &lt;&lt; endl;
-    return 0;
-}
-</code></pre>
-
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">;</span>
+    <span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">a</span> <span class="o">&gt;&gt;</span> <span class="n">b</span><span class="p">;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
 <p>选用的题目是 A + B Problem, 在选中的 OJ 上都是 1000 题目.</p>
 
 <h3 id="poj">POJ</h3>

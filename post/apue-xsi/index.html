@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>《APUE》习题：通过 XSI 信号量函数实现父子进程的交替执行 - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -170,7 +171,7 @@
               <div class="file-header d-flex flex-md-items-center flex-items-start">
                 <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
                   <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
-                    409 Words
+                    406 Words
                     
 
                   </div>
@@ -209,62 +210,59 @@
 <p>因为添加与减少的个数都可以自由指定, 初始有 1 个资源, 可以父进程消耗 1 个资源, 释放 2 个资源, 然后再申请 3 个, 这样父进程无法通过现有资源执行; 而子进程初始申请消耗 2 个资源, 释放 3 个资源, 这样子进程初始无法执行, 但是父进程释放 2 个资源后就可以执行, 而子进程释放的 3 个进程将用于父进程执行. 以此类推, 可以实现父子进程交替执行.</p>
 
 <p>代码如下:</p>
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="cp">#include</span> <span class="cpf">&lt;fcntl.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;sys/mman.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;sys/sem.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&#34;apue.h&#34;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="cp">#define NLOOPS 1000
+</span><span class="cp">#define SIZE sizeof(long)
+</span><span class="cp"></span>
+<span class="k">static</span> <span class="kt">int</span> <span class="nf">update</span><span class="p">(</span><span class="kt">long</span> <span class="o">*</span><span class="n">ptr</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="p">((</span><span class="o">*</span><span class="n">ptr</span><span class="p">)</span><span class="o">++</span><span class="p">);</span> <span class="p">}</span>
 
-<pre><code class="language-C">#include &lt;fcntl.h&gt;
-#include &lt;sys/mman.h&gt;
-#include &lt;sys/sem.h&gt;
-#include &quot;apue.h&quot;
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="n">counter</span><span class="p">;</span>
+    <span class="n">pid_t</span> <span class="n">pid</span><span class="p">;</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">area</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">semid</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">sembuf</span> <span class="n">sbf</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+    <span class="n">semid</span> <span class="o">=</span> <span class="n">semget</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">IPC_CREAT</span> <span class="o">|</span> <span class="mo">0666</span><span class="p">);</span>
 
-#define NLOOPS 1000
-#define SIZE sizeof(long)
+    <span class="k">if</span> <span class="p">((</span><span class="n">area</span> <span class="o">=</span> <span class="n">mmap</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">SIZE</span><span class="p">,</span> <span class="n">PROT_READ</span> <span class="o">|</span> <span class="n">PROT_WRITE</span><span class="p">,</span> <span class="n">MAP_ANON</span> <span class="o">|</span> <span class="n">MAP_SHARED</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                     <span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="n">MAP_FAILED</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">err_sys</span><span class="p">(</span><span class="s">&#34;mmap error&#34;</span><span class="p">);</span>
+    <span class="p">}</span>
 
-static int update(long *ptr) { return ((*ptr)++); }
+    <span class="k">if</span> <span class="p">((</span><span class="n">pid</span> <span class="o">=</span> <span class="n">fork</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">err_sys</span><span class="p">(</span><span class="s">&#34;fork error&#34;</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">pid</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NLOOPS</span><span class="p">;</span> <span class="n">i</span> <span class="o">+=</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">counter</span> <span class="o">=</span> <span class="n">update</span><span class="p">((</span><span class="kt">long</span> <span class="o">*</span><span class="p">)</span><span class="n">area</span><span class="p">))</span> <span class="o">!=</span> <span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">err_quit</span><span class="p">(</span><span class="s">&#34;parent: expected %d, got %d&#34;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">counter</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&#34;update %d from parent</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
 
-int main() {
-    int i, counter;
-    pid_t pid;
-    void *area;
-    int semid;
-    struct sembuf sbf[1];
-    semid = semget(0, 1, IPC_CREAT | 0666);
+            <span class="n">sbf</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">sem_op</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+            <span class="n">semop</span><span class="p">(</span><span class="n">semid</span><span class="p">,</span> <span class="n">sbf</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+            <span class="n">sbf</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">sem_op</span> <span class="o">=</span> <span class="o">-</span><span class="n">i</span> <span class="o">-</span> <span class="mi">2</span><span class="p">;</span>
+            <span class="n">semop</span><span class="p">(</span><span class="n">semid</span><span class="p">,</span> <span class="n">sbf</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NLOOPS</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">+=</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">sbf</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">sem_op</span> <span class="o">=</span> <span class="o">-</span><span class="n">i</span><span class="p">;</span>
+            <span class="n">semop</span><span class="p">(</span><span class="n">semid</span><span class="p">,</span> <span class="n">sbf</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 
-    if ((area = mmap(0, SIZE, PROT_READ | PROT_WRITE, MAP_ANON | MAP_SHARED, -1,
-                     0)) == MAP_FAILED) {
-        err_sys(&quot;mmap error&quot;);
-    }
+            <span class="k">if</span> <span class="p">((</span><span class="n">counter</span> <span class="o">=</span> <span class="n">update</span><span class="p">((</span><span class="kt">long</span> <span class="o">*</span><span class="p">)</span><span class="n">area</span><span class="p">))</span> <span class="o">!=</span> <span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">err_quit</span><span class="p">(</span><span class="s">&#34;child: expected %d, got %d&#34;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">counter</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&#34;update %d from child</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
 
-    if ((pid = fork()) &lt; 0) {
-        err_sys(&quot;fork error&quot;);
-    } else if (pid &gt; 0) {
-        for (i = 0; i &lt; NLOOPS; i += 2) {
-            if ((counter = update((long *)area)) != i) {
-                err_quit(&quot;parent: expected %d, got %d&quot;, i, counter);
-            }
-            printf(&quot;update %d from parent\n&quot;, i);
-
-            sbf[0].sem_op = i + 1;
-            semop(semid, sbf, 1);
-            sbf[0].sem_op = -i - 2;
-            semop(semid, sbf, 1);
-        }
-    } else {
-        for (i = 1; i &lt; NLOOPS + 1; i += 2) {
-            sbf[0].sem_op = -i;
-            semop(semid, sbf, 1);
-
-            if ((counter = update((long *)area)) != i) {
-                err_quit(&quot;child: expected %d, got %d&quot;, i, counter);
-            }
-            printf(&quot;update %d from child\n&quot;, i);
-
-            sbf[0].sem_op = i + 1;
-            semop(semid, sbf, 1);
-        }
-    }
-    exit(0);
-}
-
-</code></pre></article>
+            <span class="n">sbf</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">sem_op</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+            <span class="n">semop</span><span class="p">(</span><span class="n">semid</span><span class="p">,</span> <span class="n">sbf</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div></article>
               </div>
             </div>
           </div>

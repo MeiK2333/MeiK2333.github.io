@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>MacOS 搭建 UNPv1 编译环境 - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -173,7 +174,7 @@
               <div class="file-header d-flex flex-md-items-center flex-items-start">
                 <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
                   <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
-                    749 Words
+                    744 Words
                     
 
                   </div>
@@ -223,116 +224,86 @@
 <p>首先需要去<a href="http://www.unpbook.com/src.html">官网</a>下载所需的头文件，下载之后将其解压。</p>
 
 <p>切换文件夹</p>
-
-<pre><code class="language-shell">cd unpv13e
-vim README
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell"><span class="nb">cd</span> unpv13e
+vim README</code></pre></div>
 <p>其中有 <code>README</code> 文件指示了如何编译这些文件，但是在 MacOS 下直接按照其步骤会出现一些问题。</p>
 
 <h2 id="开始编译">开始编译</h2>
-
-<pre><code class="language-shell">./configure
-cd lib
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">./configure
+<span class="nb">cd</span> lib
 make
 
-cd ../libfree
-make
-</code></pre>
-
+<span class="nb">cd</span> ../libfree
+make</code></pre></div>
 <p>此处出现报错</p>
-
-<pre><code class="language-shell">inet_ntop.c:56:1: error: conflicting types for 'inet_ntop'
-inet_ntop(af, src, dst, size)
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">inet_ntop.c:56:1: error: conflicting types <span class="k">for</span> <span class="s1">&#39;inet_ntop&#39;</span>
+inet_ntop<span class="o">(</span>af, src, dst, size<span class="o">)</span>
 ^
 /usr/include/arpa/inet.h:77:13: note: previous declaration is here
-const char      *inet_ntop(int, const void *, char *, socklen_t);
+const char      *inet_ntop<span class="o">(</span>int, const void *, char *, socklen_t<span class="o">)</span><span class="p">;</span>
                  ^
-1 error generated.
-</code></pre>
-
+<span class="m">1</span> error generated.</code></pre></div>
 <p>找到 <code>inet_ntop.c</code> 文件，把 <code>#include &lt;arpa/inet.h&gt;</code> 这行注释掉，再次执行 <code>make</code>。</p>
 
 <h2 id="测试">测试</h2>
-
-<pre><code class="language-shell">cd ../intro    
-make daytimetcpcli
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell"><span class="nb">cd</span> ../intro    
+make daytimetcpcli</code></pre></div>
 <p>然后执行编译好的 <code>daytimetcpcli</code> 程序，如果你之前没有完成书上 1.5 的“一个简单的时间获取服务器程序”，那么你这里按照 <code>README</code> 中的方法是不行的。（事实上你肯定没有这个程序，因为这个程序需要 <code>unp.h</code> 头文件，而你现在正在编译它&hellip;）</p>
-
-<pre><code class="language-shell">./daytimetcpcli 127.0.0.1
-connect error: Connection refused
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">./daytimetcpcli <span class="m">127</span>.0.0.1
+connect error: Connection refused</code></pre></div>
 <p>这时候我们可以在 <a href="https://tf.nist.gov/tf-cgi/servers.cgi">NIST Internet Time Servers</a> 来找一个可用的时间服务器地址进行测试</p>
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">./daytimetcpcli <span class="m">129</span>.6.15.28
 
-<pre><code class="language-shell">./daytimetcpcli 129.6.15.28
-
-58351 18-08-21 12:38:39 50 0 0 724.4 UTC(NIST) *
-</code></pre>
-
+<span class="m">58351</span> <span class="m">18</span>-08-21 <span class="m">12</span>:38:39 <span class="m">50</span> <span class="m">0</span> <span class="m">0</span> <span class="m">724</span>.4 UTC<span class="o">(</span>NIST<span class="o">)</span> *</code></pre></div>
 <h2 id="使用">使用</h2>
 
 <p>虽然 <code>libunp.a</code> 已经成功编译出来了，但是如果每次编写程序的时候都要将这个文件添加到查找目录里未免过于繁琐。我们可以将静态链接库添加到系统目录中。</p>
 
 <p>回到主目录，首先修改 <code>./lib/unp.h</code>，将其中的 <code>#include &quot;../config.h&quot;</code> 修改为 <code>#include &quot;config.h&quot;</code>，然后拷贝文件。</p>
-
-<pre><code class="language-shell">sudo cp ./config.h  /usr/local/include
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">sudo cp ./config.h  /usr/local/include
 sudo cp ./lib/unp.h  /usr/local/include
 
-sudo cp ./libunp.a  /usr/local/lib
-</code></pre>
-
+sudo cp ./libunp.a  /usr/local/lib</code></pre></div>
 <p>我们用书中 3.4 的确定主机字节序的程序来测试一下。</p>
-
-<pre><code class="language-C">// byteorder.c
-#include &quot;unp.h&quot;
-
-int main(int argc, char *argv[]) {
-    union {
-        short s;
-        char c[sizeof(short)];
-    } un;
-    un.s = 0x0102;
-    printf(&quot;%s: &quot;, CPU_VENDOR_OS);
-    if (sizeof(short) == 2) {
-        if (un.c[0] == 1 &amp;&amp; un.c[1] == 2) {
-            printf(&quot;big-endian\n&quot;);
-        } else if (un.c[0] == 2 &amp;&amp; un.c[1] == 1) {
-            printf(&quot;little-endian\n&quot;);
-        } else {
-            printf(&quot;unknown\n&quot;);
-        }
-    } else {
-        printf(&quot;sizeof(short) = %d\n&quot;, sizeof(short));
-    }
-    exit(0);
-}
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="c1">// byteorder.c
+</span><span class="c1"></span><span class="cp">#include</span> <span class="cpf">&#34;unp.h&#34;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+    <span class="k">union</span> <span class="p">{</span>
+        <span class="kt">short</span> <span class="n">s</span><span class="p">;</span>
+        <span class="kt">char</span> <span class="n">c</span><span class="p">[</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">short</span><span class="p">)];</span>
+    <span class="p">}</span> <span class="n">un</span><span class="p">;</span>
+    <span class="n">un</span><span class="p">.</span><span class="n">s</span> <span class="o">=</span> <span class="mh">0x0102</span><span class="p">;</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%s: &#34;</span><span class="p">,</span> <span class="n">CPU_VENDOR_OS</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">short</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">un</span><span class="p">.</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="n">un</span><span class="p">.</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&#34;big-endian</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">un</span><span class="p">.</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">&amp;&amp;</span> <span class="n">un</span><span class="p">.</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&#34;little-endian</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">&#34;unknown</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;sizeof(short) = %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">short</span><span class="p">));</span>
+    <span class="p">}</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span></code></pre></div>
 <p>编译时指定库文件链接 <code>-lunp</code></p>
-
-<pre><code class="language-shell">gcc byteorder.c -lunp -o byteorder
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">gcc byteorder.c -lunp -o byteorder
 ./byteorder 
-i386-apple-darwin17.7.0: little-endian
-</code></pre>
-
+i386-apple-darwin17.7.0: little-endian</code></pre></div>
 <p>运行成功！</p>
 
 <p>另附一份 CLion 的 CMakeList.txt：</p>
-
-<pre><code class="language-CMake">cmake_minimum_required(VERSION 3.9)
-project(UNPv1 C)
-
-include_directories(/usr/local/include)
-set(CMAKE_C_STANDARD 11)
-
-add_executable(UNPv1 main.c)
-
-target_link_libraries(UNPv1 unp)
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-CMake" data-lang="CMake"><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span> <span class="s">3.9</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="nb">project</span><span class="p">(</span><span class="s">UNPv1</span> <span class="s">C</span><span class="p">)</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nb">include_directories</span><span class="p">(</span><span class="s">/usr/local/include</span><span class="p">)</span><span class="err">
+</span><span class="err"></span><span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_C_STANDARD</span> <span class="s">11</span><span class="p">)</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nb">add_executable</span><span class="p">(</span><span class="s">UNPv1</span> <span class="s">main.c</span><span class="p">)</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">UNPv1</span> <span class="s">unp</span><span class="p">)</span></code></pre></div>
 <h2 id="参考">参考</h2>
 
 <ul>

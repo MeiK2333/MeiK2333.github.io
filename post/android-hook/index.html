@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>Android Hook 技术 - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -150,9 +151,9 @@
 
                   
                   <span class="file-info-divider"></span>
-                  Modified <relative-time datetime="Wed, 16 Dec 2020 14:53:18 &#43;0800"
+                  Modified <relative-time datetime="Thu, 17 Dec 2020 17:21:57 &#43;0800"
                     class="no-wrap">
-                    Wed, 16 Dec 2020 14:53:18 &#43;0800</relative-time>
+                    Thu, 17 Dec 2020 17:21:57 &#43;0800</relative-time>
                   
                 </div>
               </div>
@@ -170,7 +171,7 @@
               <div class="file-header d-flex flex-md-items-center flex-items-start">
                 <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
                   <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
-                    3990 Words
+                    3989 Words
                     
 
                   </div>
@@ -352,31 +353,25 @@
 <h3 id="自造异常读取栈">自造异常读取栈</h3>
 
 <p>绝大部分 Hook 方案都采用 Xposed API，也就是在 Hook 的函数前后添加自定义的逻辑。这时候我们就可以通过触发异常来检查异常栈，查看是否有 Xposed 参与其中。</p>
-
-<pre><code class="language-java">try {
-    throw new Exception(&quot;blah&quot;);
-} catch(Exception e) {
-    for (StackTraceElement stackTraceElement: e.getStackTrace()) {
-        // stackTraceElement.getClassName() stackTraceElement.getMethodName() 是否存 在Xposed
-    }
-}
-</code></pre>
-
-<pre><code class="language-java">E/GEnvironment: no such table: preference (code 1): while compiling: SELECT keyguard_show_livewallpaper FROM preference
-...
-at com.meituan.test.extpackage.ExtPackageManager.checkUpdate(ExtPackageManager.java:127)
-at com.meituan.test.MiFGService$1.run(MiFGService.java:41)
-at android.os.Looper.loop(Looper.java:136)
-at android.app.ActivityThread.main(ActivityThread.java:5072)
-at java.lang.reflect.Method.invokeNative(Native Method)
-at java.lang.reflect.Method.invoke(Method.java:515)
-...
-at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:793)
-at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:609)
-at de.robv.android.xposed.XposedBridge.main(XposedBridge.java:132) //发现Xposed模块
-at dalvik.system.NativeStart.main(Native Method)
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="k">try</span> <span class="p">{</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="n">Exception</span><span class="p">(</span><span class="s">&#34;blah&#34;</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="n">Exception</span> <span class="nf">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">StackTraceElement</span> <span class="nf">stackTraceElement</span><span class="o">:</span> <span class="n">e</span><span class="p">.</span><span class="na">getStackTrace</span><span class="p">())</span> <span class="p">{</span>
+        <span class="c1">// stackTraceElement.getClassName() stackTraceElement.getMethodName() 是否存 在Xposed
+</span><span class="c1"></span>    <span class="p">}</span>
+<span class="p">}</span></code></pre></div><div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="n">E</span><span class="o">/</span><span class="n">GEnvironment</span><span class="o">:</span> <span class="n">no</span> <span class="nf">such</span> <span class="n">table</span><span class="o">:</span> <span class="n">preference</span> <span class="p">(</span><span class="n">code</span> <span class="nf">1</span><span class="p">)</span><span class="o">:</span> <span class="k">while</span> <span class="n">compiling</span><span class="o">:</span> <span class="n">SELECT</span> <span class="nf">keyguard_show_livewallpaper</span> <span class="n">FROM</span> <span class="nf">preference</span>
+<span class="p">...</span>
+<span class="n">at</span> <span class="nf">com</span><span class="p">.</span><span class="na">meituan</span><span class="p">.</span><span class="na">test</span><span class="p">.</span><span class="na">extpackage</span><span class="p">.</span><span class="na">ExtPackageManager</span><span class="p">.</span><span class="na">checkUpdate</span><span class="p">(</span><span class="n">ExtPackageManager</span><span class="p">.</span><span class="na">java</span><span class="o">:</span><span class="n">127</span><span class="p">)</span>
+<span class="n">at</span> <span class="nf">com</span><span class="p">.</span><span class="na">meituan</span><span class="p">.</span><span class="na">test</span><span class="p">.</span><span class="na">MiFGService$1</span><span class="p">.</span><span class="na">run</span><span class="p">(</span><span class="n">MiFGService</span><span class="p">.</span><span class="na">java</span><span class="o">:</span><span class="n">41</span><span class="p">)</span>
+<span class="n">at</span> <span class="nf">android</span><span class="p">.</span><span class="na">os</span><span class="p">.</span><span class="na">Looper</span><span class="p">.</span><span class="na">loop</span><span class="p">(</span><span class="n">Looper</span><span class="p">.</span><span class="na">java</span><span class="o">:</span><span class="n">136</span><span class="p">)</span>
+<span class="n">at</span> <span class="nf">android</span><span class="p">.</span><span class="na">app</span><span class="p">.</span><span class="na">ActivityThread</span><span class="p">.</span><span class="na">main</span><span class="p">(</span><span class="n">ActivityThread</span><span class="p">.</span><span class="na">java</span><span class="o">:</span><span class="n">5072</span><span class="p">)</span>
+<span class="n">at</span> <span class="nf">java</span><span class="p">.</span><span class="na">lang</span><span class="p">.</span><span class="na">reflect</span><span class="p">.</span><span class="na">Method</span><span class="p">.</span><span class="na">invokeNative</span><span class="p">(</span><span class="n">Native</span> <span class="nf">Method</span><span class="p">)</span>
+<span class="n">at</span> <span class="nf">java</span><span class="p">.</span><span class="na">lang</span><span class="p">.</span><span class="na">reflect</span><span class="p">.</span><span class="na">Method</span><span class="p">.</span><span class="na">invoke</span><span class="p">(</span><span class="n">Method</span><span class="p">.</span><span class="na">java</span><span class="o">:</span><span class="n">515</span><span class="p">)</span>
+<span class="p">...</span>
+<span class="n">at</span> <span class="nf">com</span><span class="p">.</span><span class="na">android</span><span class="p">.</span><span class="na">internal</span><span class="p">.</span><span class="na">os</span><span class="p">.</span><span class="na">ZygoteInit$MethodAndArgsCaller</span><span class="p">.</span><span class="na">run</span><span class="p">(</span><span class="n">ZygoteInit</span><span class="p">.</span><span class="na">java</span><span class="o">:</span><span class="n">793</span><span class="p">)</span>
+<span class="n">at</span> <span class="nf">com</span><span class="p">.</span><span class="na">android</span><span class="p">.</span><span class="na">internal</span><span class="p">.</span><span class="na">os</span><span class="p">.</span><span class="na">ZygoteInit</span><span class="p">.</span><span class="na">main</span><span class="p">(</span><span class="n">ZygoteInit</span><span class="p">.</span><span class="na">java</span><span class="o">:</span><span class="n">609</span><span class="p">)</span>
+<span class="n">at</span> <span class="nf">de</span><span class="p">.</span><span class="na">robv</span><span class="p">.</span><span class="na">android</span><span class="p">.</span><span class="na">xposed</span><span class="p">.</span><span class="na">XposedBridge</span><span class="p">.</span><span class="na">main</span><span class="p">(</span><span class="n">XposedBridge</span><span class="p">.</span><span class="na">java</span><span class="o">:</span><span class="n">132</span><span class="p">)</span> <span class="c1">//发现Xposed模块
+</span><span class="c1"></span><span class="n">at</span> <span class="nf">dalvik</span><span class="p">.</span><span class="na">system</span><span class="p">.</span><span class="na">NativeStart</span><span class="p">.</span><span class="na">main</span><span class="p">(</span><span class="n">Native</span> <span class="nf">Method</span><span class="p">)</span></code></pre></div>
 <div style="text-align:center">
     <figcaption style="font-size: 14px; padding-bottom: 4px;">代码来自《Android Hook技术防范漫谈》</figcaption>
 </div>

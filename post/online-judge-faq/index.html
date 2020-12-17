@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>OnlineJudge 评测原理与常见问题解答 - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -263,16 +264,14 @@
 <p>当然， 80% 的可能是你的代码写的有问题，你本地能运行只是你的编译器帮你做了一点优化。</p>
 
 <p>这里列举一些常见的错误：</p>
-
-<pre><code class="language-c++">void main() {}  // 错误！main 的返回值必须为 int
-
-int main() { return 1; }  // 非零返回值的 main 函数可能让你的程序直接判错
-
-printf(&quot;%lf\n&quot;, ans);  // 输出的时候没有 %lf 这种操作，请使用 %f
-
-int cnt; cout &lt;&lt; cnt &lt;&lt; endl;  // 未初始化的变量的值是未定义的，也就是说，它可能是任何值
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-c++" data-lang="c++"><span class="kt">void</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{}</span>  <span class="c1">// 错误！main 的返回值必须为 int
+</span><span class="c1"></span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span> <span class="p">}</span>  <span class="c1">// 非零返回值的 main 函数可能让你的程序直接判错
+</span><span class="c1"></span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&#34;%lf</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">ans</span><span class="p">);</span>  <span class="c1">// 输出的时候没有 %lf 这种操作，请使用 %f
+</span><span class="c1"></span>
+<span class="kt">int</span> <span class="n">cnt</span><span class="p">;</span> <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">cnt</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>  <span class="c1">// 未初始化的变量的值是未定义的，也就是说，它可能是任何值
+</span></code></pre></div>
 <h3 id="为什么我的提交-se-了">为什么我的提交 SE 了</h3>
 
 <p>SE（System Error）顾名思义是系统错误，这个错误一般和你的代码没啥关系。但是如果你发现你的某个代码只要提交就稳定 SE 的话，那么你最好检查一下你的代码里有没有非法字符。</p>

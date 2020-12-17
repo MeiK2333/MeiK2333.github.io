@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>Java web 中几种编码错误的原因及解决方案 - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -196,21 +197,13 @@
                 <article class="markdown-body entry-content container-lg"><p>Java 的编码问题好烦人，写个小项目都能碰见好几个……记录一些我遇到并解决的几个编码问题。</p>
 
 <h3 id="java-获得页面上传的参数乱码">Java 获得页面上传的参数乱码</h3>
-
-<pre><code class="language-java">request.setCharacterEncoding(&quot;utf-8&quot;);
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="n">request</span><span class="p">.</span><span class="na">setCharacterEncoding</span><span class="p">(</span><span class="s">&#34;utf-8&#34;</span><span class="p">);</span></code></pre></div>
 <h3 id="前端的页面显示乱码">前端的页面显示乱码</h3>
-
-<pre><code class="language-java">response.setContentType(&quot;text/html;charset=utf-8&quot;);
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="n">response</span><span class="p">.</span><span class="na">setContentType</span><span class="p">(</span><span class="s">&#34;text/html;charset=utf-8&#34;</span><span class="p">);</span></code></pre></div>
 <h3 id="数据库查询乱码-无法正常查询">数据库查询乱码 &amp;&amp; 无法正常查询</h3>
 
 <p>修改 Java 的数据库连接字符串，添加如下字段</p>
-
-<pre><code class="language-java">?useUnicode=true&amp;amp;characterEncoding=utf8
-</code></pre></article>
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="o">?</span><span class="n">useUnicode</span><span class="o">=</span><span class="kc">true</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="n">characterEncoding</span><span class="o">=</span><span class="n">utf8</span></code></pre></div></article>
               </div>
             </div>
           </div>

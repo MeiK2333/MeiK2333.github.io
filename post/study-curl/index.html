@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>curl 学习 - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -211,17 +212,11 @@
 <p>将要请求的 url, 必须填写的参数.</p>
 
 <p>默认的请求类型为 GET, 默认输出到标准输出</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/get
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/get</code></pre></div>
 <h3 id="c-continue-at">-C, &ndash;continue-at</h3>
 
 <p>使下载支持断点续传, 需要指定偏移量或者 <code>-</code> 自动计算</p>
-
-<pre><code class="language-shell">curl https://httpbin.org/download.zip -O -C -
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl https://httpbin.org/download.zip -O -C -</code></pre></div>
 <p>如果下载中途中断了, 则可以再次执行此命令来进行续传</p>
 
 <h3 id="b-cookie">-b, &ndash;cookie</h3>
@@ -230,39 +225,29 @@
 
 <ul>
 <li><p>从 <code>-c</code> 导出的文件(cookie.txt)中读取</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/cookies -b @cookie.txt
-</code></pre></li>
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/cookies -b @cookie.txt</code></pre></div></li>
 
 <li><p>使用 cookie 字符串</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/cookies -b 'key=value'
-</code></pre></li>
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/cookies -b <span class="s1">&#39;key=value&#39;</span></code></pre></div></li>
 </ul>
 
 <h3 id="c-cookie-jar">-c, &ndash;cookie-jar</h3>
 
 <p>将 cookie 保存到指定的文件</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/cookies/set/key/value -c cookie.txt
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/cookies/set/key/value -c cookie.txt</code></pre></div>
 <h3 id="d-data">-d, &ndash;data</h3>
 
 <p>请求中的 POST 数据, 添加此参数后默认请求类型变为 POST</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/post -d 'key1=value1&amp;key2=value2&amp;key2=value3'
-{
-    &quot;key1&quot;: &quot;value1&quot;,
-    &quot;key2&quot;: [&quot;value2&quot;, &quot;value2&quot;]
-}
-curl http://httpbin.org/post -d 'key1=value1' -d 'key2=value2' -d 'key2=value3'
-{
-    &quot;key1&quot;: &quot;value1&quot;,
-    &quot;key2&quot;: [&quot;value2&quot;, &quot;value2&quot;]
-}
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/post -d <span class="s1">&#39;key1=value1&amp;key2=value2&amp;key2=value3&#39;</span>
+<span class="o">{</span>
+    <span class="s2">&#34;key1&#34;</span>: <span class="s2">&#34;value1&#34;</span>,
+    <span class="s2">&#34;key2&#34;</span>: <span class="o">[</span><span class="s2">&#34;value2&#34;</span>, <span class="s2">&#34;value2&#34;</span><span class="o">]</span>
+<span class="o">}</span>
+curl http://httpbin.org/post -d <span class="s1">&#39;key1=value1&#39;</span> -d <span class="s1">&#39;key2=value2&#39;</span> -d <span class="s1">&#39;key2=value3&#39;</span>
+<span class="o">{</span>
+    <span class="s2">&#34;key1&#34;</span>: <span class="s2">&#34;value1&#34;</span>,
+    <span class="s2">&#34;key2&#34;</span>: <span class="o">[</span><span class="s2">&#34;value2&#34;</span>, <span class="s2">&#34;value2&#34;</span><span class="o">]</span>
+<span class="o">}</span></code></pre></div>
 <h3 id="data-ascii">&ndash;data-ascii</h3>
 
 <p>类似于 -d, 暂时没有发现区别</p>
@@ -270,195 +255,129 @@ curl http://httpbin.org/post -d 'key1=value1' -d 'key2=value2' -d 'key2=value3'
 <h3 id="data-urlencode">&ndash;data-urlencode</h3>
 
 <p>类似于 -d, 参数中的 &lsquo;&amp;&rsquo; 会被转义, 不会切断参数</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/post --data-urlencode 'key1=value1&amp;key2=value2&amp;key2=value3'
-{
-    &quot;key1&quot;: &quot;value1&amp;key2=value2&amp;key2=value3&quot;
-}
-curl http://httpbin.org/post --data-urlencode 'key1=value1' --data-urlencode 'key2=value2' --data-urlencode 'key2=value3'
-{
-    &quot;key1&quot;: &quot;value1&quot;,
-    &quot;key2&quot;: [&quot;value2&quot;, &quot;value2&quot;]
-}
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/post --data-urlencode <span class="s1">&#39;key1=value1&amp;key2=value2&amp;key2=value3&#39;</span>
+<span class="o">{</span>
+    <span class="s2">&#34;key1&#34;</span>: <span class="s2">&#34;value1&amp;key2=value2&amp;key2=value3&#34;</span>
+<span class="o">}</span>
+curl http://httpbin.org/post --data-urlencode <span class="s1">&#39;key1=value1&#39;</span> --data-urlencode <span class="s1">&#39;key2=value2&#39;</span> --data-urlencode <span class="s1">&#39;key2=value3&#39;</span>
+<span class="o">{</span>
+    <span class="s2">&#34;key1&#34;</span>: <span class="s2">&#34;value1&#34;</span>,
+    <span class="s2">&#34;key2&#34;</span>: <span class="o">[</span><span class="s2">&#34;value2&#34;</span>, <span class="s2">&#34;value2&#34;</span><span class="o">]</span>
+<span class="o">}</span></code></pre></div>
 <h3 id="f-form">-F, &ndash;form</h3>
 
 <p>指定 multipart MIME 数据, 可以用来上传文件</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/post -F file=@filename
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/post -F <span class="nv">file</span><span class="o">=</span>@filename</code></pre></div>
 <h3 id="form-string">&ndash;form-string</h3>
 
 <p>以 multipart MIME 格式上传数据</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/post --form-string 'key=value'
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/post --form-string <span class="s1">&#39;key=value&#39;</span></code></pre></div>
 <h3 id="g-get">-G, &ndash;get</h3>
 
 <p>将请求的数据放在 URL 中, 以 <code>GET</code> 形式请求</p>
-
-<pre><code class="language-shell">curl meik$ curl http://httpbin.org/get -d 'key=value' -G
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl meik$ curl http://httpbin.org/get -d <span class="s1">&#39;key=value&#39;</span> -G</code></pre></div>
 <h3 id="g-globoff">-g, &ndash;globoff</h3>
 
 <p>忽略表示范围的 <code>[]</code> 和 <code>{}</code></p>
-
-<pre><code class="language-shell">curl http://httpbin.org/cookies/set/key/value[1-5] -g
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/cookies/set/key/value<span class="o">[</span><span class="m">1</span>-5<span class="o">]</span> -g</code></pre></div>
 <p>关于 <code>[]</code> 和 <code>{}</code> 表示范围的用法, 可以查看下面的&rdquo;拓展用法&rdquo;部分</p>
 
 <h3 id="i-head">-I, &ndash;head</h3>
 
 <p>只请求头部信息, 使用的是 <code>head</code> 请求</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/get -I
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/get -I</code></pre></div>
 <p>可以通过 <code>-v</code> 选项来验证其使用的是 <code>head</code> 请求</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/get -I -v
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/get -I -v
 ...
 &gt; HEAD /get HTTP/1.1
-...
-</code></pre>
-
+...</code></pre></div>
 <h3 id="h-header">-H, &ndash;header</h3>
 
 <p>添加自定义的 <code>header</code> 信息</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/get -H 'Key: value'
-curl http://httpbin.org/get -H @header.txt
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/get -H <span class="s1">&#39;Key: value&#39;</span>
+curl http://httpbin.org/get -H @header.txt</code></pre></div>
 <h3 id="0-http1-0">-0, &ndash;http1.0</h3>
 
 <p>使用 HTTP/1.0</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/get -0
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/get -0</code></pre></div>
 <h3 id="http1-1">&ndash;http1.1</h3>
 
 <p>使用 HTTP/1.1</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/get --http1.1
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/get --http1.1</code></pre></div>
 <h3 id="i-include">-i, &ndash;include</h3>
 
 <p>同时在 <code>stdout</code> 中显示响应的头部信息</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/get -i
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/get -i</code></pre></div>
 <h3 id="l-location">-L, &ndash;location</h3>
 
 <p>自动进行页面跳转</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/status/302 -L
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/status/302 -L</code></pre></div>
 <p>添加 <code>-v</code> 参数查看具体请求过程</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/status/302 -L -v
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/status/302 -L -v
 &gt; GET /status/302 HTTP/1.1
 &gt; Host: httpbin.org
 &gt;
-&lt; HTTP/1.1 302 FOUND
+&lt; HTTP/1.1 <span class="m">302</span> FOUND
 &lt; Location: /redirect/1
 &lt;
 &gt; GET /redirect/1 HTTP/1.1
 &gt; Host: httpbin.org
 &gt;
-&lt; HTTP/1.1 302 FOUND
+&lt; HTTP/1.1 <span class="m">302</span> FOUND
 &lt; Location: /get
 &lt;
 &gt; GET /get HTTP/1.1
 &gt; Host: httpbin.org
 &gt;
-&lt; HTTP/1.1 200 OK
-</code></pre>
-
+&lt; HTTP/1.1 <span class="m">200</span> OK</code></pre></div>
 <p>可以看出, 如果返回的仍然是一个重定向的话, 那么 curl 会继续请求</p>
 
 <p>如果跳转的时候设置了 <code>set-cookie</code>, 那么此选项也不会在后续的请求中添加 <code>cookie</code> 信息</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/cookies/set/key/value -L
-{&quot;cookies&quot;:{}}
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/cookies/set/key/value -L
+<span class="o">{</span><span class="s2">&#34;cookies&#34;</span>:<span class="o">{}}</span></code></pre></div>
 <p>为了在跳转的页面中可以使用 <code>cookie</code>, 可以搭配使用 <code>-c</code> 和 <code>-b</code> 选项</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/cookies/set/key/value -L -c cookie.txt -b @cookie.txt
-{&quot;cookies&quot;:{&quot;key&quot;:&quot;value&quot;}}
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/cookies/set/key/value -L -c cookie.txt -b @cookie.txt
+<span class="o">{</span><span class="s2">&#34;cookies&#34;</span>:<span class="o">{</span><span class="s2">&#34;key&#34;</span>:<span class="s2">&#34;value&#34;</span><span class="o">}}</span></code></pre></div>
 <h3 id="o-output">-o, &ndash;output</h3>
 
 <p>将请求到的数据保存为指定的文件</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/get -o get.html
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/get -o get.html</code></pre></div>
 <h3 id="progress-bar">-#, &ndash;progress-bar</h3>
 
 <p>下载时显示进度条</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/download.zip -O -C - -#
-#####                                    13.7%
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/download.zip -O -C - -#
+<span class="c1">#####                                    13.7%</span></code></pre></div>
 <p>会隐藏其他信息, 显示一个 <code>#</code> 组成的进度条, 以及文件百分比</p>
 
 <h3 id="x-proxy">-x, &ndash;proxy</h3>
 
 <p>使用代理</p>
-
-<pre><code class="language-shell">curl https://www.google.com
-(无响应)
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl https://www.google.com
+<span class="o">(</span>无响应<span class="o">)</span>
 ^C
 curl https://www.google.com -x http://127.0.0.1:6666
-...(请求的结果)
-</code></pre>
-
+...<span class="o">(</span>请求的结果<span class="o">)</span></code></pre></div>
 <h3 id="e-referer">-e, &ndash;referer</h3>
 
 <p>设置 HTTP 头信息的 <code>referer</code></p>
-
-<pre><code class="language-shell">curl http://httpbin.org/get -e 'http://httpbin.org'
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/get -e <span class="s1">&#39;http://httpbin.org&#39;</span></code></pre></div>
 <p>有些网站会验证 <code>referer</code> 字段</p>
 
 <h3 id="o-remote-name">-O, &ndash;remote-name</h3>
 
 <p>将请求到的数据以 URL 中的路径为名保存到本地</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/get -O
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/get -O</code></pre></div>
 <p>请求到的数据会被保存到名为 <code>get</code> 的文件内</p>
 
 <h3 id="x-request">-X, &ndash;request</h3>
 
 <p>指定请求的类型</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/post -X POST
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/post -X POST</code></pre></div>
 <p>请求的类型可以为自定义的类型, 比如</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/post -X POST666 -v
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/post -X POST666 -v
 ...
 &gt; POST666 /post HTTP/1.1
-...
-</code></pre>
-
+...</code></pre></div>
 <h3 id="s-show-error">-S, &ndash;show-error</h3>
 
 <p>在静默模式下也输出错误信息</p>
@@ -470,83 +389,50 @@ curl https://www.google.com -x http://127.0.0.1:6666
 <h3 id="trace">trace</h3>
 
 <p>输出 debug 信息到文件</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/get --trace trace.txt
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/get --trace trace.txt</code></pre></div>
 <h3 id="trace-ascii">trace-ascii</h3>
 
 <p>输出 debug 信息到文件, 不包含 hex 数据</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/get --trace-ascii trace.txt
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/get --trace-ascii trace.txt</code></pre></div>
 <h3 id="trace-time">trace-time</h3>
 
 <p>为 <code>trace</code> 的输出时间</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/get --trace-ascii trace.txt --trace-time
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/get --trace-ascii trace.txt --trace-time</code></pre></div>
 <h3 id="url-1">&ndash;url</h3>
 
 <p>要请求的 URL</p>
-
-<pre><code class="language-shelll">curl --url http://httpbin.org/get
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shelll" data-lang="shelll">curl --url http://httpbin.org/get</code></pre></div>
 <h3 id="a-user-agent">-A, &ndash;user-agent</h3>
 
 <p>修改请求的 UA</p>
-
-<pre><code class="language-shell">curl meik$ curl http://httpbin.org/get -A 'MeiK'
-&quot;User-Agent&quot;: &quot;MeiK&quot;
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl meik$ curl http://httpbin.org/get -A <span class="s1">&#39;MeiK&#39;</span>
+<span class="s2">&#34;User-Agent&#34;</span>: <span class="s2">&#34;MeiK&#34;</span></code></pre></div>
 <h3 id="v-verbose">-v, &ndash;verbose</h3>
 
 <p>让输出更加详细, 会额外输出请求 ip 、请求头、响应头等信息</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/get -v
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/get -v</code></pre></div>
 <h3 id="v-version">-V, &ndash;version</h3>
 
 <p>输出版本信息和版本特性等信息</p>
-
-<pre><code class="language-shell">curl -V
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl -V</code></pre></div>
 <h2 id="拓展用法">拓展用法</h2>
 
 <h3 id="与-表示范围"><code>[]</code> 与 <code>{}</code> 表示范围</h3>
 
 <ul>
 <li><p>用 <code>{}</code> 表示多个 URL</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/cookies/set/key/value{1,2,3}
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/cookies/set/key/value<span class="o">{</span><span class="m">1</span>,2,3<span class="o">}</span></code></pre></div>
 <p>会访问三个 URL</p></li>
 
 <li><p>用 <code>[]</code> 表示范围</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/cookies/set/key/value[1-3]
-curl http://httpbin.org/cookies/set/key/value[a-z]
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/cookies/set/key/value<span class="o">[</span><span class="m">1</span>-3<span class="o">]</span>
+curl http://httpbin.org/cookies/set/key/value<span class="o">[</span>a-z<span class="o">]</span></code></pre></div>
 <p>如果你用过 Python 的话, 那应该对这种用法很熟悉</p>
-
-<pre><code class="language-shell">curl http://httpbin.org/cookies/set/key/value[1-10:2]
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/cookies/set/key/value<span class="o">[</span><span class="m">1</span>-10:2<span class="o">]</span></code></pre></div>
 <p>冒号后边的部分是步长, 表示等差排列的阶跃数</p></li>
 
 <li><p>混合使用 <code>{}</code> 与 <code>[]</code></p>
-
-<pre><code class="language-shell">curl http://httpbin.org/cookies/set/key{1,2,3}/value[1-3]
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">curl http://httpbin.org/cookies/set/key<span class="o">{</span><span class="m">1</span>,2,3<span class="o">}</span>/value<span class="o">[</span><span class="m">1</span>-3<span class="o">]</span></code></pre></div>
 <p>会请求其每种组合(3*3=9)</p></li>
 </ul></article>
               </div>

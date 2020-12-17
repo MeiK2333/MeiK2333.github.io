@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>Django Model field reference - Field options - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -170,7 +171,7 @@
               <div class="file-header d-flex flex-md-items-center flex-items-start">
                 <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
                   <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
-                    2584 Words
+                    2582 Words
                     
 
                   </div>
@@ -237,80 +238,68 @@
 <p>一个可迭代的对象（比如列表或者元组），迭代的项是包括两个项目。例如 [(A, B), (A, B) &hellip;] 。如果给定了此设置，则其对应的默认的表单部件是一个选择框与这些选项，而不是普通的文本字段。</p>
 
 <p>每个元组的第一个元素是要在模型上设置的实际的值，第二个元素是可读的一个名称。例如：</p>
-
-<pre><code class="language-python">YEAR_IN_SCHOOL_CHOICES = (
-    ('FR', 'Freshman'),
-    ('SO', 'Sophomore'),
-    ('JR', 'Junior'),
-    ('SR', 'Senior'),
-)
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="n">YEAR_IN_SCHOOL_CHOICES</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">(</span><span class="s1">&#39;FR&#39;</span><span class="p">,</span> <span class="s1">&#39;Freshman&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;SO&#39;</span><span class="p">,</span> <span class="s1">&#39;Sophomore&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;JR&#39;</span><span class="p">,</span> <span class="s1">&#39;Junior&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;SR&#39;</span><span class="p">,</span> <span class="s1">&#39;Senior&#39;</span><span class="p">),</span>
+<span class="p">)</span></code></pre></div>
 <p>最好在模型类中定义选项，并为每个值定义一个适当命名的常量：</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
 
-<pre><code class="language-python">from django.db import models
+<span class="k">class</span> <span class="nc">Student</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">FRESHMAN</span> <span class="o">=</span> <span class="s1">&#39;FR&#39;</span>
+    <span class="n">SOPHOMORE</span> <span class="o">=</span> <span class="s1">&#39;SO&#39;</span>
+    <span class="n">JUNIOR</span> <span class="o">=</span> <span class="s1">&#39;JR&#39;</span>
+    <span class="n">SENIOR</span> <span class="o">=</span> <span class="s1">&#39;SR&#39;</span>
+    <span class="n">YEAR_IN_SCHOOL_CHOICES</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="n">FRESHMAN</span><span class="p">,</span> <span class="s1">&#39;Freshman&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">SOPHOMORE</span><span class="p">,</span> <span class="s1">&#39;Sophomore&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">JUNIOR</span><span class="p">,</span> <span class="s1">&#39;Junior&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">SENIOR</span><span class="p">,</span> <span class="s1">&#39;Senior&#39;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">year_in_school</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="n">YEAR_IN_SCHOOL_CHOICES</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">FRESHMAN</span><span class="p">,</span>
+    <span class="p">)</span>
 
-class Student(models.Model):
-    FRESHMAN = 'FR'
-    SOPHOMORE = 'SO'
-    JUNIOR = 'JR'
-    SENIOR = 'SR'
-    YEAR_IN_SCHOOL_CHOICES = (
-        (FRESHMAN, 'Freshman'),
-        (SOPHOMORE, 'Sophomore'),
-        (JUNIOR, 'Junior'),
-        (SENIOR, 'Senior'),
-    )
-    year_in_school = models.CharField(
-        max_length=2,
-        choices=YEAR_IN_SCHOOL_CHOICES,
-        default=FRESHMAN,
-    )
-
-    def is_upperclass(self):
-        return self.year_in_school in (self.JUNIOR, self.SENIOR)
-</code></pre>
-
+    <span class="k">def</span> <span class="nf">is_upperclass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">year_in_school</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">JUNIOR</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SENIOR</span><span class="p">)</span></code></pre></div>
 <p>尽管可以在模型类之外定义一个选择列表并且引用它，但在模型类中定义将是的这些信息与类相关联，并且容易引用。</p>
 
 <p>您还可以像下面这样定义它：</p>
-
-<pre><code class="language-python">MEDIA_CHOICES = (
-    ('Audio', (
-            ('vinyl', 'Vinyl'),
-            ('cd', 'CD'),
-        )
-    ),
-    ('Video', (
-            ('vhs', 'VHS Tape'),
-            ('dvd', 'DVD'),
-        )
-    ),
-    ('unknown', 'Unknown'),
-)
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="n">MEDIA_CHOICES</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">(</span><span class="s1">&#39;Audio&#39;</span><span class="p">,</span> <span class="p">(</span>
+            <span class="p">(</span><span class="s1">&#39;vinyl&#39;</span><span class="p">,</span> <span class="s1">&#39;Vinyl&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;cd&#39;</span><span class="p">,</span> <span class="s1">&#39;CD&#39;</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;Video&#39;</span><span class="p">,</span> <span class="p">(</span>
+            <span class="p">(</span><span class="s1">&#39;vhs&#39;</span><span class="p">,</span> <span class="s1">&#39;VHS Tape&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;dvd&#39;</span><span class="p">,</span> <span class="s1">&#39;DVD&#39;</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;unknown&#39;</span><span class="p">,</span> <span class="s1">&#39;Unknown&#39;</span><span class="p">),</span>
+<span class="p">)</span></code></pre></div>
 <p>对于 choices 中设置的每个模型字段， django 将添加一个方法来检索当前字段对应的可读名称，即 get_FOO_display()：</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
 
-<pre><code class="language-python">from django.db import models
+<span class="k">class</span> <span class="nc">Person</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">SHIRT_SIZES</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="s1">&#39;Small&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">,</span> <span class="s1">&#39;Medium&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;L&#39;</span><span class="p">,</span> <span class="s1">&#39;Large&#39;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+    <span class="n">shirt_size</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">SHIRT_SIZES</span><span class="p">)</span>
 
-class Person(models.Model):
-    SHIRT_SIZES = (
-        ('S', 'Small'),
-        ('M', 'Medium'),
-        ('L', 'Large'),
-    )
-    name = models.CharField(max_length=60)
-    shirt_size = models.CharField(max_length=2, choices=SHIRT_SIZES)
-
-&gt;&gt;&gt; p = Person(name=&quot;Fred Flintstone&quot;, shirt_size=&quot;L&quot;)
-&gt;&gt;&gt; p.save()
-&gt;&gt;&gt; p.shirt_size
-'L'
-&gt;&gt;&gt; p.get_shirt_size_display()
-'Large'
-</code></pre>
-
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">Person</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&#34;Fred Flintstone&#34;</span><span class="p">,</span> <span class="n">shirt_size</span><span class="o">=</span><span class="s2">&#34;L&#34;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">shirt_size</span>
+<span class="s1">&#39;L&#39;</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">get_shirt_size_display</span><span class="p">()</span>
+<span class="s1">&#39;Large&#39;</span></code></pre></div>
 <p>选择可以是任何的可迭代对象，不一定是列表或者元组。这让你可以动态的构建选择。但如果你的 choices 是动态的，那么最好有一个合适的数据库表来存储。</p>
 
 <p>除非 blank=False 在字段中被设置，否则选择框默认将显示 default 的标签&rdquo;&mdash;&mdash;&mdash;&ldquo;，要覆盖此行为，请在 choices 元组中添加 None，比如：(None, &lsquo;Your String For Display&rsquo;)。或者，你也可以使用空字符串。</p>
@@ -352,13 +341,10 @@ class Person(models.Model):
 <p>字段的默认值，可以是一个常量值或者一个可调用的对象。如果是一个可调用的对象，则在每次创建新对象的时候都会调用它。</p>
 
 <p>default 的值不能是可变对象（模型实例、list、set等），因为对该对象的同一实例的引用将被用作所有新模型实例中的默认值。除非将所需的默认值包装成一个可调用的对象。例如，如果想要为 JSONField 字段指定一个默认的 dict ，使用函数：</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">contact_default</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&#34;email&#34;</span><span class="p">:</span> <span class="s2">&#34;to1@example.com&#34;</span><span class="p">}</span>
 
-<pre><code class="language-python">def contact_default():
-    return {&quot;email&quot;: &quot;to1@example.com&quot;}
-
-contact_info = JSONField(&quot;ContactInfo&quot;, default=contact_default)
-</code></pre>
-
+<span class="n">contact_info</span> <span class="o">=</span> <span class="n">JSONField</span><span class="p">(</span><span class="s2">&#34;ContactInfo&#34;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">contact_default</span><span class="p">)</span></code></pre></div>
 <p>lambda 不能用于该字段选项，因为他们无法被迁移序列化（关于迁移序列化，详见 django 官网文档）。</p>
 
 <p>对于像ForeignKey映射到模型实例的字段，默认值应该是它们引用的字段的值（pk，除非通过to_field设置引用了其他键），而不是模型实例。</p>
@@ -394,10 +380,7 @@ contact_info = JSONField(&quot;ContactInfo&quot;, default=contact_default)
 <p>使用默认的窗体小部件时显示的额外的“帮助”文本，即使此字段并没有被用于表单，作为字段的文档也很有用。</p>
 
 <p>如果在自动生成的表单中显示的话，则不会被 HTML 转义，如：</p>
-
-<pre><code class="language-python">help_text=&quot;Please use the following format: &lt;em&gt;YYYY-MM-DD&lt;/em&gt;.&quot;
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="n">help_text</span><span class="o">=</span><span class="s2">&#34;Please use the following format: &lt;em&gt;YYYY-MM-DD&lt;/em&gt;.&#34;</span></code></pre></div>
 <p>如果有必要的话，也可以通过 django.utils.html.escape() 来转义 HTML 特殊字符，确保避开来自不受信任的用户的跨站脚本攻击。</p>
 
 <hr />
@@ -471,32 +454,23 @@ contact_info = JSONField(&quot;ContactInfo&quot;, default=contact_default)
 <h2 id="field-validators">Field.validators</h2>
 
 <p>要为此字段运行的验证程序列表。</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">django.core.exceptions</span> <span class="kn">import</span> <span class="n">ValidationError</span>
+<span class="kn">from</span> <span class="nn">django.utils.translation</span> <span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
 
-<pre><code class="language-python">from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
+<span class="k">def</span> <span class="nf">validate_even</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span>
+            <span class="n">_</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%(value)s</span><span class="s1"> is not an even number&#39;</span><span class="p">),</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">value</span><span class="p">},</span>
+        <span class="p">)</span></code></pre></div><div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
 
-def validate_even(value):
-    if value % 2 != 0:
-        raise ValidationError(
-            _('%(value)s is not an even number'),
-            params={'value': value},
-        )
-</code></pre>
-
-<pre><code class="language-python">from django.db import models
-
-class MyModel(models.Model):
-    even_field = models.IntegerField(validators=[validate_even])
-</code></pre>
-
+<span class="k">class</span> <span class="nc">MyModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">even_field</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">validators</span><span class="o">=</span><span class="p">[</span><span class="n">validate_even</span><span class="p">])</span></code></pre></div>
 <p>可以在窗体中使用同样的验证函数</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
 
-<pre><code class="language-python">from django import forms
-
-class MyForm(forms.Form):
-    even_field = forms.IntegerField(validators=[validate_even])
-</code></pre>
-
+<span class="k">class</span> <span class="nc">MyForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">even_field</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">validators</span><span class="o">=</span><span class="p">[</span><span class="n">validate_even</span><span class="p">])</span></code></pre></div>
 <h2 id="registering-and-fetching-lookups">Registering and fetching lookups</h2>
 
 <p>这个我看不懂，就直接放官方文档吧。</p>

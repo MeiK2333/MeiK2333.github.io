@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>Django tutorial - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -170,7 +171,7 @@
               <div class="file-header d-flex flex-md-items-center flex-items-start">
                 <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
                   <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
-                    2039 Words
+                    2038 Words
                     
 
                   </div>
@@ -215,38 +216,23 @@
 <hr />
 
 <h1 id="创建一个项目">创建一个项目</h1>
-
-<pre><code class="language-shell">django-admin startproject &lt;mysite&gt;
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">django-admin startproject &lt;mysite&gt;</code></pre></div>
 <hr />
 
 <h1 id="启动内置的开发服务器">启动内置的开发服务器</h1>
-
-<pre><code class="language-shell">python manage.py runserver
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">python manage.py runserver</code></pre></div>
 <p>注意：django2.0 之后仅支持 Python3，因此在同时有 Python2 和 Python3 环境的电脑下，需要用 python3 来替换 python</p>
 
 <p>默认情况下该命令在内部 ip 的 8000 端口启动开发服务器，如果想要更改其端口，可以修改命令行参数</p>
-
-<pre><code class="language-shell">python3 manage.py runserver 8080
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">python3 manage.py runserver <span class="m">8080</span></code></pre></div>
 <p>该命令将在 8080 端口启动服务，而如果要监听所有的 ip（在其他电脑上访问）：</p>
-
-<pre><code class="language-shell">python manage.py runserver 0:8080
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">python manage.py runserver <span class="m">0</span>:8080</code></pre></div>
 <p>0 是 0.0.0.0 的快捷方式</p>
 
 <hr />
 
 <h1 id="创建一个应用">创建一个应用</h1>
-
-<pre><code class="language-shell">python manage.py startapp &lt;myapp&gt;
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">python manage.py startapp &lt;myapp&gt;</code></pre></div>
 <p>这将创建一个目录 <myapp></p>
 
 <hr />
@@ -254,13 +240,10 @@
 <h1 id="urls">urls</h1>
 
 <p>django 通过一个名为 urlpatterns 的列表来匹配路由，列表中的每一项可以为一个路由对应一个函数（或类），也可以通过 include 的方式包含其他文件里面的路由规则。</p>
-
-<pre><code class="language-python">urlpatterns = [
-    path('', views.index, name='index'),  # 对应 views 里面的 index 函数
-    path('myapp/', include('myapp.urls')),  # 包含 myapp 的路由规则
-]
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">path</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">),</span>  <span class="c1"># 对应 views 里面的 index 函数</span>
+    <span class="n">path</span><span class="p">(</span><span class="s1">&#39;myapp/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s1">&#39;myapp.urls&#39;</span><span class="p">)),</span>  <span class="c1"># 包含 myapp 的路由规则</span>
+<span class="p">]</span></code></pre></div>
 <h2 id="path-的参数">path 的参数</h2>
 
 <h3 id="route">route</h3>
@@ -286,73 +269,59 @@
 <p>django 的数据库设置在 mysite/settings.py 中，默认情况下 django 使用 sqlite3 数据库，这是一个基于文件的轻量级数据库，无需账号密码或端口等配置，可以直接使用。</p>
 
 <p>如果想要使用其他 SQL数据库（如 MySQL 或者 PostgreSQL），那么需要修改 settings.py 中的 DATABASES 设置。当使用 sqlite3 数据库时，只需要填写 engine 与 name 即可，如果要使用其他数据库，则还需要端口、账号与密码等信息。</p>
-
-<pre><code class="language-python"># 使用 sqlite3
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'mydatabase',
-    }
-}
-
-
-# 使用 postgresql
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mydatabase',
-        'USER': 'mydatabaseuser',
-        'PASSWORD': 'mypassword',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
-    }
-}
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="c1"># 使用 sqlite3</span>
+<span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;ENGINE&#39;</span><span class="p">:</span> <span class="s1">&#39;django.db.backends.sqlite3&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;mydatabase&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 
 
-# 一些其他的 engine
-# 'django.db.backends.postgresql'
-# 'django.db.backends.mysql'
-# 'django.db.backends.sqlite3'
-# 'django.db.backends.oracle'
+<span class="c1"># 使用 postgresql</span>
+<span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;ENGINE&#39;</span><span class="p">:</span> <span class="s1">&#39;django.db.backends.postgresql&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;mydatabase&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;USER&#39;</span><span class="p">:</span> <span class="s1">&#39;mydatabaseuser&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;PASSWORD&#39;</span><span class="p">:</span> <span class="s1">&#39;mypassword&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;HOST&#39;</span><span class="p">:</span> <span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;PORT&#39;</span><span class="p">:</span> <span class="s1">&#39;5432&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 
 
-</code></pre>
-
+<span class="c1"># 一些其他的 engine</span>
+<span class="c1"># &#39;django.db.backends.postgresql&#39;</span>
+<span class="c1"># &#39;django.db.backends.mysql&#39;</span>
+<span class="c1"># &#39;django.db.backends.sqlite3&#39;</span>
+<span class="c1"># &#39;django.db.backends.oracle&#39;</span></code></pre></div>
 <p>在完成 settings.py 中的数据库设置后，可以通过 migrate 命令来创建必要的数据库表。要注意， mingrate 命令创建的数据库表同时基于 settings.py 的设置与数据库迁移脚本（之后会介绍如何创建数据库迁移脚本）。</p>
-
-<pre><code class="language-shell">python manage.py migrate
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">python manage.py migrate</code></pre></div>
 <hr />
 
 <h1 id="时区和语言设置">时区和语言设置</h1>
 
 <p>在启动项目之前，需要先修改项目对应的时区与语言。时区的作用不言而喻，而修改默认语言，可以使自带的 admin 后台管理变成中文的。</p>
-
-<pre><code class="language-python">LANGUAGE_CODE = 'zh-Hans'  # 修改语言为中文
-TIME_ZONE = 'Asia/Shanghai'  # 修改时区
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="n">LANGUAGE_CODE</span> <span class="o">=</span> <span class="s1">&#39;zh-Hans&#39;</span>  <span class="c1"># 修改语言为中文</span>
+<span class="n">TIME_ZONE</span> <span class="o">=</span> <span class="s1">&#39;Asia/Shanghai&#39;</span>  <span class="c1"># 修改时区</span></code></pre></div>
 <hr />
 
 <h1 id="创建模型">创建模型</h1>
 
 <p>django 推崇 Don’t repeat yourself (DRY) 原则，数据库迁移脚本中的模型将完全来源于你在代码中定义的模型。数据库迁移脚本将自动从你编写的模型中推断出迁移命令，不需要自己手动编写。此处以 django 的教程 polls 来介绍如何编写模型的定义。</p>
-
-<pre><code class="language-python">from django.db import models
-
-
-class Question(models.Model):
-    question_text = models.CharField(max_length=200)
-    pub_date = models.DateTimeField('date published')
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
 
 
-class Choice(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    choice_text = models.CharField(max_length=200)
-    votes = models.IntegerField(default=0)
-</code></pre>
+<span class="k">class</span> <span class="nc">Question</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">question_text</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="n">pub_date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="s1">&#39;date published&#39;</span><span class="p">)</span>
 
+
+<span class="k">class</span> <span class="nc">Choice</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">question</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Question</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
+    <span class="n">choice_text</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="n">votes</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></code></pre></div>
 <p>关于这些字段的意思和使用方法，可以参考我的另一篇博客 <a href="http://meik2333.com/index.php/archives/4/">Field types</a> 。</p>
 
 <p>django 通过这些模型的定义代码来创建数据库表和创建访问 API ，但是首先，我们需要告诉我们的项目，我们创建了一个新的应用。</p>
@@ -362,33 +331,21 @@ class Choice(models.Model):
 <h1 id="激活模型">激活模型</h1>
 
 <p>为了将应用包含在我们的项目中，我们需要在 settings.py 中添加其配置。以 polls 应用为例： polls 的 PollsConfig 包含在 polls/apps.py 文件中，其对应的路径为 &lsquo;polls.apps.PollsConfig&rsquo; ，编辑 settings.py 文件，将其添加至 INSTALLED_APPS 中：</p>
-
-<pre><code class="language-python">INSTALLED_APPS  =  [ 
-    'polls.apps.PollsConfig' ，
-    'django.contrib.admin' ，
-    'django.contrib.auth' ，
-    'django.contrib.contenttypes' ，
-    'django.contrib.sessions' ，
-    'django.contrib.messages' ，
-    'django.contrib.staticfiles' ，
-]
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="n">INSTALLED_APPS</span>  <span class="o">=</span>  <span class="p">[</span> 
+    <span class="s1">&#39;polls.apps.PollsConfig&#39;</span> <span class="err">，</span>
+    <span class="s1">&#39;django.contrib.admin&#39;</span> <span class="err">，</span>
+    <span class="s1">&#39;django.contrib.auth&#39;</span> <span class="err">，</span>
+    <span class="s1">&#39;django.contrib.contenttypes&#39;</span> <span class="err">，</span>
+    <span class="s1">&#39;django.contrib.sessions&#39;</span> <span class="err">，</span>
+    <span class="s1">&#39;django.contrib.messages&#39;</span> <span class="err">，</span>
+    <span class="s1">&#39;django.contrib.staticfiles&#39;</span> <span class="err">，</span>
+<span class="p">]</span></code></pre></div>
 <p>现在 django 项目已经知道应该包含 polls 应用，此时运行另一个命令：</p>
-
-<pre><code class="language-shell">python manage.py makemigrations polls
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">python manage.py makemigrations polls</code></pre></div>
 <p>通知 django 已经对模型进行了修改，重新生成数据库迁移脚本，可以通过以下命令进行查看：</p>
-
-<pre><code class="language-shell">python manage.py sqlmigrate polls 0001
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">python manage.py sqlmigrate polls <span class="m">0001</span></code></pre></div>
 <p>之后，重新运行数据库迁移脚本以使刚刚对模型的修改生效。</p>
-
-<pre><code class="language-shell">python manage.py migrate
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">python manage.py migrate</code></pre></div>
 <p>请记住进行模型修改需要做的三个步骤：</p>
 
 <ol>
@@ -406,10 +363,7 @@ class Choice(models.Model):
 <hr />
 
 <h1 id="创建管理员用户">创建管理员用户</h1>
-
-<pre><code class="language-shell">python manage.py createsuperuser
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">python manage.py createsuperuser</code></pre></div>
 <p>按照提示输入账号密码与邮箱即可。</p>
 
 <hr />
@@ -417,90 +371,72 @@ class Choice(models.Model):
 <h1 id="在管理页面显示自己的模型">在管理页面显示自己的模型</h1>
 
 <p>为了在 django 自带的 admin 中管理我们自己创建的模型，需要将模型注册到 admin ，修改 polls/admin.py</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">admin</span>
 
-<pre><code class="language-python">from django.contrib import admin
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Question</span>
 
-from .models import Question
-
-admin.site.register(Question)
-</code></pre>
-
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">Question</span><span class="p">)</span></code></pre></div>
 <hr />
 
 <h1 id="render">render()</h1>
 
 <p>一个视图的函数应该返回一个 Response 对象，然而在返回一个渲染后的模板时，我们却不需要费力去自己构建一个 Response 对象。</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span>
 
-<pre><code class="language-python">from django.shortcuts import render
-
-from .models import Question
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Question</span>
 
 
-def index(request):
-    latest_question_list = Question.objects.order_by('-pub_date')[:5]
-    context = {'latest_question_list': latest_question_list}
-    return render(request, 'polls/index.html', context)
-</code></pre>
-
+<span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">latest_question_list</span> <span class="o">=</span> <span class="n">Question</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-pub_date&#39;</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;latest_question_list&#39;</span><span class="p">:</span> <span class="n">latest_question_list</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;polls/index.html&#39;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></code></pre></div>
 <hr />
 
 <h1 id="get-object-or-404">get_object_or_404()</h1>
 
 <p>我们可能会需要在没有找到一个对象的时候给出 404 的错误，这时候 get_object_or_404() 就很有用了。</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">get_object_or_404</span><span class="p">,</span> <span class="n">render</span>
 
-<pre><code class="language-python">from django.shortcuts import get_object_or_404, render
-
-from .models import Question
-# ...
-def detail(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request, 'polls/detail.html', {'question': question})
-</code></pre>
-
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Question</span>
+<span class="c1"># ...</span>
+<span class="k">def</span> <span class="nf">detail</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">question_id</span><span class="p">):</span>
+    <span class="n">question</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Question</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">question_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;polls/detail.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;question&#39;</span><span class="p">:</span> <span class="n">question</span><span class="p">})</span></code></pre></div>
 <hr />
 
 <h1 id="为-urls-模块命名">为 urls 模块命名</h1>
 
 <p>如果您开发的项目中包含多个应用，那么这些应用之中可能包含了相同 name 的 url ，可以通过给 urls 命名的方式防止在模板中引用的时候冲突。</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="c1"># polls/urls.py</span>
+<span class="kn">from</span> <span class="nn">django.urls</span> <span class="kn">import</span> <span class="n">path</span>
 
-<pre><code class="language-python"># polls/urls.py
-from django.urls import path
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">views</span>
 
-from . import views
-
-app_name = 'polls'
-urlpatterns = [
-    path('', views.index, name='index'),
-    path('&lt;int:question_id&gt;/', views.detail, name='detail'),
-    path('&lt;int:question_id&gt;/results/', views.results, name='results'),
-    path('&lt;int:question_id&gt;/vote/', views.vote, name='vote'),
-]
-</code></pre>
-
-<pre><code class="language-html"># polls/templates/polls/index.html
-&lt;li&gt;&lt;a href=&quot;{% url 'polls:detail' question.id %}&quot;&gt;{{ question.question_text }}&lt;/a&gt;&lt;/li&gt;
-</code></pre>
-
+<span class="n">app_name</span> <span class="o">=</span> <span class="s1">&#39;polls&#39;</span>
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">path</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s1">&#39;&lt;int:question_id&gt;/&#39;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">detail</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;detail&#39;</span><span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s1">&#39;&lt;int:question_id&gt;/results/&#39;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;results&#39;</span><span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s1">&#39;&lt;int:question_id&gt;/vote/&#39;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">vote</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;vote&#39;</span><span class="p">),</span>
+<span class="p">]</span></code></pre></div><div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"># polls/templates/polls/index.html
+<span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&#34;{% url &#39;polls:detail&#39; question.id %}&#34;</span><span class="p">&gt;</span>{{ question.question_text }}<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span></code></pre></div>
 <hr />
 
 <h1 id="一个简单的-form-示例">一个简单的 form 示例</h1>
 
 <p>{% raw %}</p>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>{{ question.question_text }}<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
 
-<pre><code class="language-html">&lt;h1&gt;{{ question.question_text }}&lt;/h1&gt;
+{% if error_message %}<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;&lt;</span><span class="nt">strong</span><span class="p">&gt;</span>{{ error_message }}<span class="p">&lt;/</span><span class="nt">strong</span><span class="p">&gt;&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>{% endif %}
 
-{% if error_message %}&lt;p&gt;&lt;strong&gt;{{ error_message }}&lt;/strong&gt;&lt;/p&gt;{% endif %}
-
-&lt;form action=&quot;{% url 'polls:vote' question.id %}&quot; method=&quot;post&quot;&gt;
+<span class="p">&lt;</span><span class="nt">form</span> <span class="na">action</span><span class="o">=</span><span class="s">&#34;{% url &#39;polls:vote&#39; question.id %}&#34;</span> <span class="na">method</span><span class="o">=</span><span class="s">&#34;post&#34;</span><span class="p">&gt;</span>
 {% csrf_token %}
 {% for choice in question.choice_set.all %}
-    &lt;input type=&quot;radio&quot; name=&quot;choice&quot; id=&quot;choice{{ forloop.counter }}&quot; value=&quot;{{ choice.id }}&quot; /&gt;
-    &lt;label for=&quot;choice{{ forloop.counter }}&quot;&gt;{{ choice.choice_text }}&lt;/label&gt;&lt;br /&gt;
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&#34;radio&#34;</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;choice&#34;</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;choice{{ forloop.counter }}&#34;</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;{{ choice.id }}&#34;</span> <span class="p">/&gt;</span>
+    <span class="p">&lt;</span><span class="nt">label</span> <span class="na">for</span><span class="o">=</span><span class="s">&#34;choice{{ forloop.counter }}&#34;</span><span class="p">&gt;</span>{{ choice.choice_text }}<span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;&lt;</span><span class="nt">br</span> <span class="p">/&gt;</span>
 {% endfor %}
-&lt;input type=&quot;submit&quot; value=&quot;Vote&quot; /&gt;
-&lt;/form&gt;
-</code></pre>
-
+<span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&#34;submit&#34;</span> <span class="na">value</span><span class="o">=</span><span class="s">&#34;Vote&#34;</span> <span class="p">/&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span></code></pre></div>
 <p>django 的表单提交默认有 csrf 防跨站检测，需要在 form 中添加 {% csrf_token %} 以自动添加一个隐藏的 csrf 字段。
 {% endraw %}</p>
 

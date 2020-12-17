@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>面经答案整理一 - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -388,25 +389,19 @@
 <p>内连接也叫连接，是最早的一种连接。还可以被称为普通连接或者自然连接，内连接是从结果表中删除与其他被连接表中没有匹配行的所有行，所以内连接可能会丢失信息。</p>
 
 <p>连接时也可以指定条件为 <code>&gt;</code>、<code>&lt;</code> 等。</p>
-
-<pre><code class="language-sql">select
-  student.name as student,
-  score.name,
-  score
-from student, score
-where student.student_id = score.student_id;
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">select</span>
+  <span class="n">student</span><span class="p">.</span><span class="n">name</span> <span class="k">as</span> <span class="n">student</span><span class="p">,</span>
+  <span class="n">score</span><span class="p">.</span><span class="n">name</span><span class="p">,</span>
+  <span class="n">score</span>
+<span class="k">from</span> <span class="n">student</span><span class="p">,</span> <span class="n">score</span>
+<span class="k">where</span> <span class="n">student</span><span class="p">.</span><span class="n">student_id</span> <span class="o">=</span> <span class="n">score</span><span class="p">.</span><span class="n">student_id</span><span class="p">;</span></code></pre></div>
 <p>or</p>
-
-<pre><code class="language-sql">select
-  student.name as student,
-  score.name,
-  score
-from student
-  inner join score on student.student_id = score.student_id;
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">select</span>
+  <span class="n">student</span><span class="p">.</span><span class="n">name</span> <span class="k">as</span> <span class="n">student</span><span class="p">,</span>
+  <span class="n">score</span><span class="p">.</span><span class="n">name</span><span class="p">,</span>
+  <span class="n">score</span>
+<span class="k">from</span> <span class="n">student</span>
+  <span class="k">inner</span> <span class="k">join</span> <span class="n">score</span> <span class="k">on</span> <span class="n">student</span><span class="p">.</span><span class="n">student_id</span> <span class="o">=</span> <span class="n">score</span><span class="p">.</span><span class="n">student_id</span><span class="p">;</span></code></pre></div>
 <p>查询结果</p>
 
 <pre><code>student	name	score
@@ -417,15 +412,12 @@ from student
 <h4 id="左连接">左连接</h4>
 
 <p>以左表为基准进行连接，会显示左表的所有列。如果右表无相应数据，则显示 null。</p>
-
-<pre><code class="language-sql">select
-  student.name as student,
-  score.name,
-  score
-from student
-  left join score on student.student_id = score.student_id;
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">select</span>
+  <span class="n">student</span><span class="p">.</span><span class="n">name</span> <span class="k">as</span> <span class="n">student</span><span class="p">,</span>
+  <span class="n">score</span><span class="p">.</span><span class="n">name</span><span class="p">,</span>
+  <span class="n">score</span>
+<span class="k">from</span> <span class="n">student</span>
+  <span class="k">left</span> <span class="k">join</span> <span class="n">score</span> <span class="k">on</span> <span class="n">student</span><span class="p">.</span><span class="n">student_id</span> <span class="o">=</span> <span class="n">score</span><span class="p">.</span><span class="n">student_id</span><span class="p">;</span></code></pre></div>
 <p>查询结果</p>
 
 <pre><code>student	name	score
@@ -437,15 +429,12 @@ from student
 <h4 id="右连接">右连接</h4>
 
 <p>与左连接相反，显示右表所有列。</p>
-
-<pre><code class="language-sql">select
-  student.name as student,
-  score.name,
-  score
-from student
-  right join score on student.student_id = score.student_id;
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">select</span>
+  <span class="n">student</span><span class="p">.</span><span class="n">name</span> <span class="k">as</span> <span class="n">student</span><span class="p">,</span>
+  <span class="n">score</span><span class="p">.</span><span class="n">name</span><span class="p">,</span>
+  <span class="n">score</span>
+<span class="k">from</span> <span class="n">student</span>
+  <span class="k">right</span> <span class="k">join</span> <span class="n">score</span> <span class="k">on</span> <span class="n">student</span><span class="p">.</span><span class="n">student_id</span> <span class="o">=</span> <span class="n">score</span><span class="p">.</span><span class="n">student_id</span><span class="p">;</span></code></pre></div>
 <pre><code>student	name	score
 张三	英语	38
 李四	英语	59.5

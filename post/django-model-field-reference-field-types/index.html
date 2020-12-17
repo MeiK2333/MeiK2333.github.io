@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>Django Model field reference - Field types - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -293,15 +294,9 @@
 <p>用数字存储的小数位数。</p>
 
 <p>例如，存储数字 999 ，精确到小数点后两位：</p>
-
-<pre><code class="language-python">models.DecimalField(..., max_digits=5, decimal_places=2)
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="n">models</span><span class="o">.</span><span class="n">DecimalField</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">max_digits</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">decimal_places</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></code></pre></div>
 <p>存可能到十亿的数字，精确到小数点后十位：</p>
-
-<pre><code class="language-python">models.DecimalField(..., max_digits=19, decimal_places=10)
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="n">models</span><span class="o">.</span><span class="n">DecimalField</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">max_digits</span><span class="o">=</span><span class="mi">19</span><span class="p">,</span> <span class="n">decimal_places</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span></code></pre></div>
 <p>该字段的默认表单控件为 NumberInput 。</p>
 
 <hr />
@@ -330,15 +325,12 @@
 
 <p>该属性提供了设置上传目录和文件名的方法，有两种设置方式：
 您可以指定一个字符串值，它可以包含 strftime() 格式，将会被上传的时间所取代。例如：</p>
-
-<pre><code class="language-python">class MyModel(models.Model):
-    # file will be uploaded to MEDIA_ROOT/uploads
-    upload = models.FileField(upload_to='uploads/')
-    # or...
-    # file will be saved to MEDIA_ROOT/uploads/2017/02/21
-    upload = models.FileField(upload_to='uploads/%Y/%m/%d/')
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">MyModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c1"># file will be uploaded to MEDIA_ROOT/uploads</span>
+    <span class="n">upload</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">FileField</span><span class="p">(</span><span class="n">upload_to</span><span class="o">=</span><span class="s1">&#39;uploads/&#39;</span><span class="p">)</span>
+    <span class="c1"># or...</span>
+    <span class="c1"># file will be saved to MEDIA_ROOT/uploads/2017/02/21</span>
+    <span class="n">upload</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">FileField</span><span class="p">(</span><span class="n">upload_to</span><span class="o">=</span><span class="s1">&#39;uploads/%Y/%m/</span><span class="si">%d</span><span class="s1">/&#39;</span><span class="p">)</span></code></pre></div>
 <p>您也可以使用默认值 FileSystemStorage ，然而我没看懂使用默认值会如何处理。</p>
 
 <p>upload_to 可以被调用，返回上传路径。关于此项更详细的介绍，可以查看官方文档。</p>
@@ -398,20 +390,15 @@
 <p>此方法获取文件名和文件内容，并将它们传递给字段的存储类。</p>
 
 <p>coutent 参数 应该是 django.core.files 对象的一个实例：</p>
-
-<pre><code class="language-python">from django.core.files import File
-# Open an existing file using Python's built-in open()
-f = open('/path/to/hello.world')
-myfile = File(f)
-
-
-# 使用 Python 字符串构造
-from django.core.files.base import ContentFile
-myfile = ContentFile(&quot;hello world&quot;)
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">django.core.files</span> <span class="kn">import</span> <span class="n">File</span>
+<span class="c1"># Open an existing file using Python&#39;s built-in open()</span>
+<span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;/path/to/hello.world&#39;</span><span class="p">)</span>
+<span class="n">myfile</span> <span class="o">=</span> <span class="n">File</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
 
-</code></pre>
-
+<span class="c1"># 使用 Python 字符串构造</span>
+<span class="kn">from</span> <span class="nn">django.core.files.base</span> <span class="kn">import</span> <span class="n">ContentFile</span>
+<span class="n">myfile</span> <span class="o">=</span> <span class="n">ContentFile</span><span class="p">(</span><span class="s2">&#34;hello world&#34;</span><span class="p">)</span></code></pre></div>
 <h3 id="fieldfile-delete-save-true">FieldFile.delete(save=True)</h3>
 
 <p>删除与此实例相关联的文件并清除字段上的所有属性，可选参数 save 空值在删除文件后是否保存模型实例，默认为 True 。</p>
@@ -523,14 +510,12 @@ myfile = ContentFile(&quot;hello world&quot;)
 <p>用于存储通用唯一标识符的字段，使用 Python 的 uuid 类。</p>
 
 <p>可用于 AutoField 的 primary_key</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
 
-<pre><code class="language-python">import uuid
-from django.db import models
-
-class MyUUIDModel(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    # other fields
-</code></pre></article>
+<span class="k">class</span> <span class="nc">MyUUIDModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">UUIDField</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">,</span> <span class="n">editable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="c1"># other fields</span></code></pre></div></article>
               </div>
             </div>
           </div>

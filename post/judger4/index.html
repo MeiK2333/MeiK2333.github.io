@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>如何写一个评测姬 - 第四篇 - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -170,7 +171,7 @@
               <div class="file-header d-flex flex-md-items-center flex-items-start">
                 <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
                   <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
-                    1264 Words
+                    1262 Words
                     
 
                   </div>
@@ -211,25 +212,19 @@
 <p>用户可能因为失误而提交了占用过多资源的代码，比如死循环、占用过多内存、输出过多等。为了解决这些问题，我们需要限制用户程序的时间、内存以及输出数据的大小。</p>
 
 <p>Linux 有系统函数可以解决这个问题：<a href="https://linux.die.net/man/3/setrlimit"><code>setrlimit</code></a>。这个函数可以限制程序的 CPU 时间、内存占用、输出数据等，用法大致如下：</p>
-
-<pre><code class="language-c">#include &lt;sys/resource.h&gt;
-int main() {
-    struct rlimit rl;
-    rl.rlim_cur = rl.rlim_max = 1;
-    setrlimit(RLIMIT_CPU, &amp;rl);
-    while (1) {
-    }
-}
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;sys/resource.h&gt;</span><span class="cp">
+</span><span class="cp"></span><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">rlimit</span> <span class="n">rl</span><span class="p">;</span>
+    <span class="n">rl</span><span class="p">.</span><span class="n">rlim_cur</span> <span class="o">=</span> <span class="n">rl</span><span class="p">.</span><span class="n">rlim_max</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="n">setrlimit</span><span class="p">(</span><span class="n">RLIMIT_CPU</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">rl</span><span class="p">);</span>
+    <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></div>
 <p>执行：</p>
-
-<pre><code class="language-bash">$ gcc main.c
-$ time ./a.out 
-[2]    3057 cpu limit exceeded  ./a.out
-./a.out  0.98s user 0.02s system 96% cpu 1.034 total
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ gcc main.c
+$ <span class="nb">time</span> ./a.out 
+<span class="o">[</span><span class="m">2</span><span class="o">]</span>    <span class="m">3057</span> cpu limit exceeded  ./a.out
+./a.out  <span class="m">0</span>.98s user <span class="m">0</span>.02s system <span class="m">96</span>% cpu <span class="m">1</span>.034 total</code></pre></div>
 <p>可以看到，虽然我们在代码中写了个死循环，但是这个程序只运行一秒就结束了。<code>setrlimit</code> 可以对进程添加资源限制，并在超出限制时触发信号，父进程可以捕获这个信号。同时 <code>exec</code> 会继承这些限制，因此可以使用与流重定向类似的方法来添加资源限制。</p>
 
 <p>有关限制的实际代码，可以查看 <a href="https://github.com/MeiK2333/ZeroJudger/blob/master/limit/main.c">https://github.com/MeiK2333/ZeroJudger/blob/master/limit/main.c</a>。</p>
@@ -245,39 +240,32 @@ $ time ./a.out
 <h3 id="include-攻击">include 攻击</h3>
 
 <p>利用 OJ 会返回编译错误的特点，使用 C/C++ 语言使用 <code>#include</code> 来导入一个敏感的文件，然后通过编译错误的信息来获得其中敏感的数据。</p>
-
-<pre><code class="language-bash">$ echo 'password' &gt; password.txt
-$ echo '#include &lt;password.txt&gt;' &gt; main.c 
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ <span class="nb">echo</span> <span class="s1">&#39;password&#39;</span> &gt; password.txt
+$ <span class="nb">echo</span> <span class="s1">&#39;#include &lt;password.txt&gt;&#39;</span> &gt; main.c 
 $ gcc main.c 
-main.c:1:10: error: 'password.txt' file not found with &lt;angled&gt; include; use &quot;quotes&quot; instead
-#include &lt;password.txt&gt;
+main.c:1:10: error: <span class="s1">&#39;password.txt&#39;</span> file not found with &lt;angled&gt; include<span class="p">;</span> use <span class="s2">&#34;quotes&#34;</span> instead
+<span class="c1">#include &lt;password.txt&gt;</span>
          ^~~~~~~~~~~~~~
-         &quot;password.txt&quot;
+         <span class="s2">&#34;password.txt&#34;</span>
 In file included from main.c:1:
-./password.txt:1:1: error: unknown type name 'password'
+./password.txt:1:1: error: unknown <span class="nb">type</span> name <span class="s1">&#39;password&#39;</span>
 password
 ^
-main.c:1:24: error: expected identifier or '('
-#include &lt;password.txt&gt;
+main.c:1:24: error: expected identifier or <span class="s1">&#39;(&#39;</span>
+<span class="c1">#include &lt;password.txt&gt;</span>
                        ^
-3 errors generated.
-</code></pre>
-
+<span class="m">3</span> errors generated.</code></pre></div>
 <p>解决方案为配置好评测用户权限，使用低权限的用户进行评测，以防止此类攻击。同时可以考虑使用 Docker 等进行评测，Docker 环境内不放任何敏感的数据。</p>
 
 <h3 id="编译超时-编译产生巨大文件-编译产生巨量错误信息">编译超时 &amp;&amp; 编译产生巨大文件 &amp;&amp; 编译产生巨量错误信息</h3>
 
 <ul>
 <li><p>编译超时</p>
-
-<pre><code class="language-c">#include &lt;/dev/random&gt;或者#include &lt;/dev/tty&gt; //(Linux)
-#include &lt;CON&gt; //(Windows)
-</code></pre></li>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;/dev/random&gt;或者#include &lt;/dev/tty&gt; //(Linux)</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;CON&gt; //(Windows)</span></code></pre></div></li>
 
 <li><p>编译产生巨大文件</p>
-
-<pre><code class="language-c">main[-1u]={1};
-</code></pre></li>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="n">main</span><span class="p">[</span><span class="o">-</span><span class="mi">1u</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span></code></pre></div></li>
 
 <li><p>编译产生巨量错误信息</p></li>
 </ul>
@@ -289,17 +277,11 @@ main.c:1:24: error: expected identifier or '('
 <h3 id="shell-攻击-fork-炸弹-其他系统调用攻击-网络模块攻击">shell 攻击 &amp;&amp; fork 炸弹 &amp;&amp; 其他系统调用攻击 &amp;&amp; 网络模块攻击</h3>
 
 <p>shell 攻击：</p>
-
-<pre><code class="language-c">system(&quot;reboot&quot;);
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="n">system</span><span class="p">(</span><span class="s">&#34;reboot&#34;</span><span class="p">);</span></code></pre></div>
 <p><code>fork</code> 炸弹：</p>
-
-<pre><code class="language-c">while (1) {
-    fork();
-}
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">fork</span><span class="p">();</span>
+<span class="p">}</span></code></pre></div>
 <p>网络模块攻击：如果评测姬没有限制联网的话，攻击的程序可以通过网络做到很多的攻击方式，程序可能会收集很多运行时评测姬和服务器的信息，然后提交到某处。</p>
 
 <p>这几种攻击方式，如果只是简单的禁用 <code>system</code> 和 <code>fork</code> 等这些函数是没有用的，因为 C/C++ 的宏可以轻易的绕过这些限制。可以考虑在系统调用的层面进行限制，大多开源的评测机都是通过限制系统调用来保证评测安全的。</p>

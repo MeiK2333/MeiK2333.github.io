@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>WebBench 源码分析 [不推荐阅读] - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -173,7 +174,7 @@ Webbench是Radim Kolar在1997年写的一个在linux下使用的非常简单的�
               <div class="file-header d-flex flex-md-items-center flex-items-start">
                 <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
                   <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
-                    3049 Words
+                    3031 Words
                     
 
                   </div>
@@ -238,648 +239,641 @@ Webbench是Radim Kolar在1997年写的一个在linux下使用的非常简单的�
 <p>我居然用了一个多小时的时间看完了他的源代码并且加上了注释&hellip;&hellip;</p>
 
 <h3 id="socket-c">socket.c</h3>
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="cm">/* $Id: socket.c 1.1 1995/01/01 07:11:14 cthuang Exp $
+</span><span class="cm"> *
+</span><span class="cm"> * This module has been modified by Radim Kolar for OS/2 emx
+</span><span class="cm"> */</span>
 
-<pre><code class="language-C">/* $Id: socket.c 1.1 1995/01/01 07:11:14 cthuang Exp $
- *
- * This module has been modified by Radim Kolar for OS/2 emx
- */
+<span class="cm">/***********************************************************************
+</span><span class="cm">  module:       socket.c
+</span><span class="cm">  program:      popclient
+</span><span class="cm">  SCCS ID:      @(#)socket.c    1.5  4/1/94
+</span><span class="cm">  programmer:   Virginia Tech Computing Center
+</span><span class="cm">  compiler:     DEC RISC C compiler (Ultrix 4.1)
+</span><span class="cm">  environment:  DEC Ultrix 4.3
+</span><span class="cm">  description:  UNIX sockets code.
+</span><span class="cm"> ***********************************************************************/</span>
 
-/***********************************************************************
-  module:       socket.c
-  program:      popclient
-  SCCS ID:      @(#)socket.c    1.5  4/1/94
-  programmer:   Virginia Tech Computing Center
-  compiler:     DEC RISC C compiler (Ultrix 4.1)
-  environment:  DEC Ultrix 4.3
-  description:  UNIX sockets code.
- ***********************************************************************/
+<span class="cp">#include</span> <span class="cpf">&lt;arpa/inet.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;fcntl.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;netdb.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;netinet/in.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;stdarg.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;string.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;sys/socket.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;sys/time.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;sys/types.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="kt">int</span> <span class="nf">Socket</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">host</span><span class="p">,</span> <span class="kt">int</span> <span class="n">clientPort</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">sock</span><span class="p">;</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">inaddr</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="n">ad</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">hostent</span> <span class="o">*</span><span class="n">hp</span><span class="p">;</span>
 
-#include &lt;arpa/inet.h&gt;
-#include &lt;fcntl.h&gt;
-#include &lt;netdb.h&gt;
-#include &lt;netinet/in.h&gt;
-#include &lt;stdarg.h&gt;
-#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-#include &lt;string.h&gt;
-#include &lt;sys/socket.h&gt;
-#include &lt;sys/time.h&gt;
-#include &lt;sys/types.h&gt;
-#include &lt;unistd.h&gt;
+    <span class="n">memset</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ad</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">ad</span><span class="p">));</span>
+    <span class="n">ad</span><span class="p">.</span><span class="n">sin_family</span> <span class="o">=</span> <span class="n">AF_INET</span><span class="p">;</span>
 
-int Socket(const char *host, int clientPort) {
-    int sock;
-    unsigned long inaddr;
-    struct sockaddr_in ad;
-    struct hostent *hp;
+    <span class="cm">/* 尝试以 IP 形式解析 */</span>
+    <span class="n">inaddr</span> <span class="o">=</span> <span class="n">inet_addr</span><span class="p">(</span><span class="n">host</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">inaddr</span> <span class="o">!=</span> <span class="n">INADDR_NONE</span><span class="p">)</span>
+        <span class="n">memcpy</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ad</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">inaddr</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">inaddr</span><span class="p">));</span>
+    <span class="k">else</span> <span class="p">{</span> <span class="cm">/* 如果解析失败, 则尝试通过 DNS 进行转换 */</span>
+        <span class="cm">/* gethostbyname 是过时的函数, 应当使用 getaddrinfo 替换掉它 */</span>
+        <span class="n">hp</span> <span class="o">=</span> <span class="n">gethostbyname</span><span class="p">(</span><span class="n">host</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">hp</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+        <span class="n">memcpy</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ad</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">,</span> <span class="n">hp</span><span class="o">-&gt;</span><span class="n">h_addr</span><span class="p">,</span> <span class="n">hp</span><span class="o">-&gt;</span><span class="n">h_length</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">ad</span><span class="p">.</span><span class="n">sin_port</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="n">clientPort</span><span class="p">);</span>
 
-    memset(&amp;ad, 0, sizeof(ad));
-    ad.sin_family = AF_INET;
-
-    /* 尝试以 IP 形式解析 */
-    inaddr = inet_addr(host);
-    if (inaddr != INADDR_NONE)
-        memcpy(&amp;ad.sin_addr, &amp;inaddr, sizeof(inaddr));
-    else { /* 如果解析失败, 则尝试通过 DNS 进行转换 */
-        /* gethostbyname 是过时的函数, 应当使用 getaddrinfo 替换掉它 */
-        hp = gethostbyname(host);
-        if (hp == NULL) return -1;
-        memcpy(&amp;ad.sin_addr, hp-&gt;h_addr, hp-&gt;h_length);
-    }
-    ad.sin_port = htons(clientPort);
-
-    /* 创建 socket 连接 */
-    sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock &lt; 0) return sock;
-    if (connect(sock, (struct sockaddr *)&amp;ad, sizeof(ad)) &lt; 0) return -1;
-    return sock;
-}
-
-</code></pre>
-
+    <span class="cm">/* 创建 socket 连接 */</span>
+    <span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">sock</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="n">sock</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">connect</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">ad</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">ad</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">sock</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
 <h3 id="webbench-c">webbench.c</h3>
-
-<pre><code class="language-C">/*
- * (C) Radim Kolar 1997-2004
- * This is free software, see GNU Public License version 2 for
- * details.
- *
- * Simple forking WWW Server benchmark:
- *
- * Usage:
- *   webbench --help
- *
- * Return codes:
- *    0 - sucess
- *    1 - benchmark failed (server is not on-line)
- *    2 - bad param
- *    3 - internal error, fork failed
- *
- */
-
-#include &lt;getopt.h&gt;
-#include &lt;rpc/types.h&gt;
-#include &lt;signal.h&gt;
-#include &lt;strings.h&gt;
-#include &lt;sys/param.h&gt;
-#include &lt;time.h&gt;
-#include &lt;unistd.h&gt;
-#include &quot;socket.c&quot;
-
-/* values */
-volatile int timerexpired = 0;
-int speed = 0;
-int failed = 0;
-int bytes = 0;
-
-/* globals */
-int http10 = 1; /* 0 - http/0.9, 1 - http/1.0, 2 - http/1.1 */
-/* Allow: GET, HEAD, OPTIONS, TRACE */
-#define METHOD_GET 0
-#define METHOD_HEAD 1
-#define METHOD_OPTIONS 2
-#define METHOD_TRACE 3
-#define PROGRAM_VERSION &quot;1.5&quot;
-int method = METHOD_GET;
-int clients = 1;
-int force = 0;
-int force_reload = 0;
-int proxyport = 80;
-char *proxyhost = NULL;
-int benchtime = 30;
-
-/* internal */
-int mypipe[2];
-char host[MAXHOSTNAMELEN];
-#define REQUEST_SIZE 2048
-char request[REQUEST_SIZE];
-
-static const struct option long_options[] = {
-    {&quot;force&quot;, no_argument, &amp;force, 1},
-    {&quot;reload&quot;, no_argument, &amp;force_reload, 1},
-    {&quot;time&quot;, required_argument, NULL, 't'},
-    {&quot;help&quot;, no_argument, NULL, '?'},
-    {&quot;http09&quot;, no_argument, NULL, '9'},
-    {&quot;http10&quot;, no_argument, NULL, '1'},
-    {&quot;http11&quot;, no_argument, NULL, '2'},
-    /* 绑定命令行参数与变量 */
-    {&quot;get&quot;, no_argument, &amp;method, METHOD_GET},
-    {&quot;head&quot;, no_argument, &amp;method, METHOD_HEAD},
-    {&quot;options&quot;, no_argument, &amp;method, METHOD_OPTIONS},
-    {&quot;trace&quot;, no_argument, &amp;method, METHOD_TRACE},
-    {&quot;version&quot;, no_argument, NULL, 'V'},
-    {&quot;proxy&quot;, required_argument, NULL, 'p'},
-    {&quot;clients&quot;, required_argument, NULL, 'c'},
-    {NULL, 0, NULL, 0}};
-
-/* prototypes */
-static void benchcore(const char *host, const int port, const char *request);
-static int bench(void);
-static void build_request(const char *url);
-
-static void alarm_handler(int signal) { timerexpired = 1; }
-
-static void usage(void) {
-    fprintf(
-        stderr,
-        &quot;webbench [option]... URL\n&quot;
-        &quot;  -f|--force               Don't wait for reply from server.\n&quot;
-        &quot;  -r|--reload              Send reload request - Pragma: no-cache.\n&quot;
-        &quot;  -t|--time &lt;sec&gt;          Run benchmark for &lt;sec&gt; seconds. Default &quot;
-        &quot;30.\n&quot;
-        &quot;  -p|--proxy &lt;server:port&gt; Use proxy server for request.\n&quot;
-        &quot;  -c|--clients &lt;n&gt;         Run &lt;n&gt; HTTP clients at once. Default &quot;
-        &quot;one.\n&quot;
-        &quot;  -9|--http09              Use HTTP/0.9 style requests.\n&quot;
-        &quot;  -1|--http10              Use HTTP/1.0 protocol.\n&quot;
-        &quot;  -2|--http11              Use HTTP/1.1 protocol.\n&quot;
-        &quot;  --get                    Use GET request method.\n&quot;
-        &quot;  --head                   Use HEAD request method.\n&quot;
-        &quot;  --options                Use OPTIONS request method.\n&quot;
-        &quot;  --trace                  Use TRACE request method.\n&quot;
-        &quot;  -?|-h|--help             This information.\n&quot;
-        &quot;  -V|--version             Display program version.\n&quot;);
-}
-
-int main(int argc, char *argv[]) {
-    /* 读取命令行参数 */
-    int opt = 0;
-    int options_index = 0;
-    char *tmp = NULL;
-
-    if (argc == 1) {
-        usage();
-        return 2;
-    }
-
-    while ((opt = getopt_long(argc, argv, &quot;912Vfrt:p:c:?h&quot;, long_options,
-                              &amp;options_index)) != EOF) {
-        switch (opt) {
-            case 0:
-                break;
-            case 'f':
-                /* 设置 force 模式 */
-                force = 1;
-                break;
-            case 'r':
-                /* 设置 reload 模式 */
-                force_reload = 1;
-                break;
-            case '9':
-                /* HTTP/0.9 */
-                http10 = 0;
-                break;
-            case '1':
-                /* HTTP/1.0 */
-                http10 = 1;
-                break;
-            case '2':
-                /* HTTP/1.1 */
-                http10 = 2;
-                break;
-            case 'V':
-                /* 打印版本信息并退出 */
-                printf(PROGRAM_VERSION &quot;\n&quot;);
-                exit(0);
-            case 't':
-                /* 设置运行时间 */
-                benchtime = atoi(optarg);
-                break;
-            case 'p':
-                /* proxy server parsing server:port */
-                /**
-                 * 解析代理设置, 使用 &quot;:&quot; 分割代理字符串
-                 * eg: -p 127.0.0.1:1080
-                 * proxyhost(char *): &quot;127.0.0.1&quot;
-                 * proxyport(int): 1080
-                 * */
-                tmp = strrchr(optarg, ':');
-                proxyhost = optarg;
-                if (tmp == NULL) {
-                    break;
-                }
-                /* 判断是否提供 hostname */
-                if (tmp == optarg) {
-                    fprintf(stderr,
-                            &quot;Error in option --proxy %s: Missing hostname.\n&quot;,
-                            optarg);
-                    return 2;
-                }
-                /* 判断是否提供 port */
-                if (tmp == optarg + strlen(optarg) - 1) {
-                    fprintf(
-                        stderr,
-                        &quot;Error in option --proxy %s Port number is missing.\n&quot;,
-                        optarg);
-                    return 2;
-                }
-                *tmp = '\0';
-                proxyport = atoi(tmp + 1);
-                break;
-            case ':':
-            case 'h':
-            case '?':
-                /* 打印帮助 */
-                usage();
-                return 2;
-                break;
-            case 'c':
-                /* 设置客户端个数 */
-                clients = atoi(optarg);
-                break;
-        }
-    }
-
-    /**
-     * 当所有带选项的参数都已读取结束, optind
-     * 应当指向第一个不包含选项的命令行参数 若 optind == argc,
-     * 则代表没有不包含选项的命令行参数
-     * */
-    if (optind == argc) {
-        fprintf(stderr, &quot;webbench: Missing URL!\n&quot;);
-        usage();
-        return 2;
-    }
-
-    /* 设置 clients 和 benchtime 的默认值 */
-    if (clients == 0) clients = 1;
-    if (benchtime == 0) benchtime = 30;
-
-    /* Copyright */
-    /* 打印 Copyright */
-    fprintf(stderr,
-            &quot;Webbench - Simple Web Benchmark &quot; PROGRAM_VERSION
-            &quot;\n&quot;
-            &quot;Copyright (c) Radim Kolar 1997-2004, GPL Open Source Software.\n&quot;);
-
-    build_request(argv[optind]);
-
-    // print request info ,do it in function build_request
-    /*printf(&quot;Benchmarking: &quot;);
-
-    switch(method)
-    {
-        case METHOD_GET:
-        default:
-        printf(&quot;GET&quot;);break;
-        case METHOD_OPTIONS:
-        printf(&quot;OPTIONS&quot;);break;
-        case METHOD_HEAD:
-        printf(&quot;HEAD&quot;);break;
-        case METHOD_TRACE:
-        printf(&quot;TRACE&quot;);break;
-    }
-
-    printf(&quot; %s&quot;,argv[optind]);
-
-    switch(http10)
-    {
-        case 0: printf(&quot; (using HTTP/0.9)&quot;);break;
-        case 2: printf(&quot; (using HTTP/1.1)&quot;);break;
-    }
-
-    printf(&quot;\n&quot;);
-    */
-
-    /* 打印配置 */
-    printf(&quot;Runing info: &quot;);
-
-    if (clients == 1)
-        printf(&quot;1 client&quot;);
-    else
-        printf(&quot;%d clients&quot;, clients);
-
-    printf(&quot;, running %d sec&quot;, benchtime);
-
-    if (force) printf(&quot;, early socket close&quot;);
-    if (proxyhost != NULL)
-        printf(&quot;, via proxy server %s:%d&quot;, proxyhost, proxyport);
-    if (force_reload) printf(&quot;, forcing reload&quot;);
-
-    printf(&quot;.\n&quot;);
-
-    /* 开始执行 */
-    return bench();
-}
-
-void build_request(const char *url) {
-    char tmp[10];
-    int i;
-
-    // bzero(host,MAXHOSTNAMELEN);
-    // bzero(request,REQUEST_SIZE);
-    memset(host, 0, MAXHOSTNAMELEN);
-    memset(request, 0, REQUEST_SIZE);
-
-    /* 根据 reload 和 method 等参数调整 HTTP */
-    if (force_reload &amp;&amp; proxyhost != NULL &amp;&amp; http10 &lt; 1) http10 = 1;
-    if (method == METHOD_HEAD &amp;&amp; http10 &lt; 1) http10 = 1;
-    if (method == METHOD_OPTIONS &amp;&amp; http10 &lt; 2) http10 = 2;
-    if (method == METHOD_TRACE &amp;&amp; http10 &lt; 2) http10 = 2;
-
-    switch (method) {
-        default:
-        case METHOD_GET:
-            strcpy(request, &quot;GET&quot;);
-            break;
-        case METHOD_HEAD:
-            strcpy(request, &quot;HEAD&quot;);
-            break;
-        case METHOD_OPTIONS:
-            strcpy(request, &quot;OPTIONS&quot;);
-            break;
-        case METHOD_TRACE:
-            strcpy(request, &quot;TRACE&quot;);
-            break;
-    }
-
-    strcat(request, &quot; &quot;);
-
-    /* 检查 URL 是否合法 */
-    if (NULL == strstr(url, &quot;://&quot;)) {
-        fprintf(stderr, &quot;\n%s: is not a valid URL.\n&quot;, url);
-        exit(2);
-    }
-    /* 检查 URL 长度 */
-    if (strlen(url) &gt; 1500) {
-        fprintf(stderr, &quot;URL is too long.\n&quot;);
-        exit(2);
-    }
-    /* 忽略大小写对比两个字符串的前 n 个字符 */
-    /* 仅支持 HTTP 协议 */
-    if (0 != strncasecmp(&quot;http://&quot;, url, 7)) {
-        fprintf(stderr,
-                &quot;\nOnly HTTP protocol is directly supported, set --proxy for &quot;
-                &quot;others.\n&quot;);
-        exit(2);
-    }
-
-    /* protocol/host delimiter */
-    /* 获得去掉协议后的 URL */
-    i = strstr(url, &quot;://&quot;) - url + 3;
-
-    /* 判断 '/' 是否在 URL 中出现过 */
-    if (strchr(url + i, '/') == NULL) {
-        fprintf(stderr,
-                &quot;\nInvalid URL syntax - hostname don't ends with '/'.\n&quot;);
-        exit(2);
-    }
-
-    /* url + i 指向 URL 去掉协议后的开头 */
-    if (proxyhost == NULL) {
-        /* get port from hostname */
-        /**
-         * 如果没有使用代理, 则解析 URL 到 host 和 proxyport
-         * eg: http://127.0.0.1:8080/
-         * host(char *): 127.0.0.1
-         * proxyport(int): 8080
-         * */
-        if (index(url + i, ':') != NULL &amp;&amp;
-            index(url + i, ':') &lt; index(url + i, '/')) { /* 如果指定了端口 */
-            strncpy(host, url + i, strchr(url + i, ':') - url - i);
-            // bzero(tmp,10);
-            memset(tmp, 0, 10);
-            strncpy(tmp, index(url + i, ':') + 1,
-                    strchr(url + i, '/') - index(url + i, ':') - 1);
-            /* printf(&quot;tmp=%s\n&quot;,tmp); */
-            proxyport = atoi(tmp);
-            if (proxyport == 0) proxyport = 80;
-        } else { /* 没有指定端口 */
-            strncpy(host, url + i, strcspn(url + i, &quot;/&quot;));
-        }
-        // printf(&quot;Host=%s\n&quot;,host);
-        /**
-         * 这个 request + strlen(request) 我实在是没看懂
-         * strlen 获得 request 后第一个 '\0' 的位置
-         * strcat 替换 request 后第一个 '\0' 并追加字符串, 在末尾添加 '\0'
-         * 那为什么要先找到 '\0' 的位置再去 strcat......
-         * */
-        strcat(request + strlen(request), url + i + strcspn(url + i, &quot;/&quot;));
-    } else {
-        // printf(&quot;ProxyHost=%s\nProxyPort=%d\n&quot;,proxyhost,proxyport);
-        strcat(request, url);
-    }
-
-    /* 拼接 HTTP 协议 */
-    if (http10 == 1)
-        strcat(request, &quot; HTTP/1.0&quot;);
-    else if (http10 == 2)
-        strcat(request, &quot; HTTP/1.1&quot;);
-
-    strcat(request, &quot;\r\n&quot;);
-
-    /* 拼接 UA */
-    if (http10 &gt; 0)
-        strcat(request, &quot;User-Agent: WebBench &quot; PROGRAM_VERSION &quot;\r\n&quot;);
-    /* 拼接 Host */
-    if (proxyhost == NULL &amp;&amp; http10 &gt; 0) {
-        strcat(request, &quot;Host: &quot;);
-        strcat(request, host);
-        strcat(request, &quot;\r\n&quot;);
-    }
-
-    /* 拼接其余字段 */
-    if (force_reload &amp;&amp; proxyhost != NULL) {
-        strcat(request, &quot;Pragma: no-cache\r\n&quot;);
-    }
-
-    if (http10 &gt; 1) strcat(request, &quot;Connection: close\r\n&quot;);
-
-    /* add empty line at end */
-    if (http10 &gt; 0) strcat(request, &quot;\r\n&quot;);
-
-    printf(&quot;\nRequest:\n%s\n&quot;, request);
-}
-
-/* vraci system rc error kod */
-static int bench(void) {
-    int i, j, k;
-    pid_t pid = 0;
-    FILE *f;
-
-    /* check avaibility of target server */
-    i = Socket(proxyhost == NULL ? host : proxyhost, proxyport);
-    if (i &lt; 0) {
-        fprintf(stderr, &quot;\nConnect to server failed. Aborting benchmark.\n&quot;);
-        return 1;
-    }
-    close(i);
-
-    /* create pipe */
-    /* 创建管道 */
-    if (pipe(mypipe)) {
-        perror(&quot;pipe failed.&quot;);
-        return 3;
-    }
-
-    /* not needed, since we have alarm() in childrens */
-    /* wait 4 next system clock tick */
-    /*
-    cas=time(NULL);
-    while(time(NULL)==cas)
-    sched_yield();
-    */
-
-    /* fork childs */
-    /* 创建处理子进程 */
-    for (i = 0; i &lt; clients; i++) {
-        pid = fork();
-        /* 不推荐将 fork 成功和失败的情况放在一起处理 */
-        if (pid &lt;= (pid_t)0) {
-            /* child process or error*/
-            /* 你不能确定进程将于何时中断 */
-            /* 因此这种方法并不推荐使用 */
-            sleep(1); /* make childs faster */
-            break;
-        }
-    }
-
-    /* 这是? 创建了多个子进程, 然后判断最后一个 fork 是否成功? */
-    if (pid &lt; (pid_t)0) {
-        fprintf(stderr, &quot;problems forking worker no. %d\n&quot;, i);
-        perror(&quot;fork failed.&quot;);
-        return 3;
-    }
-
-    if (pid == (pid_t)0) {
-        /* I am a child */
-        /* 开始发送请求 */
-        /* 取全局变量中的 request 作为参数传给本文件内的另一个函数 */
-        /* 什么写法...... */
-        if (proxyhost == NULL)
-            benchcore(host, proxyport, request);
-        else
-            benchcore(proxyhost, proxyport, request);
-
-        /* write results to pipe */
-        /* 将结果写入 pipe */
-        /* 此处没有关闭 mypipe[0] */
-        /* 不知是何用意 */
-        f = fdopen(mypipe[1], &quot;w&quot;);
-        if (f == NULL) {
-            perror(&quot;open pipe for writing failed.&quot;);
-            return 3;
-        }
-        /* fprintf(stderr,&quot;Child - %d %d\n&quot;,speed,failed); */
-        fprintf(f, &quot;%d %d %d\n&quot;, speed, failed, bytes);
-        fclose(f);
-
-        return 0;
-    } else {
-        /* 同样的, 此处没有关闭 mypipe[1] */
-        f = fdopen(mypipe[0], &quot;r&quot;);
-        if (f == NULL) {
-            perror(&quot;open pipe for reading failed.&quot;);
-            return 3;
-        }
-
-        /* 设置无缓冲 */
-        setvbuf(f, NULL, _IONBF, 0);
-
-        speed = 0;
-        failed = 0;
-        bytes = 0;
-
-        while (1) {
-            pid = fscanf(f, &quot;%d %d %d&quot;, &amp;i, &amp;j, &amp;k);
-            if (pid &lt; 2) {
-                fprintf(stderr, &quot;Some of our childrens died.\n&quot;);
-                break;
-            }
-
-            speed += i;
-            failed += j;
-            bytes += k;
-
-            /* fprintf(stderr,&quot;*Knock* %d %d read=%d\n&quot;,speed,failed,pid); */
-            if (--clients == 0) break;
-        }
-
-        fclose(f);
-
-        printf(
-            &quot;\nSpeed=%d pages/min, %d bytes/sec.\nRequests: %d susceed, %d &quot;
-            &quot;failed.\n&quot;,
-            (int)((speed + failed) / (benchtime / 60.0f)),
-            (int)(bytes / (float)benchtime), speed, failed);
-    }
-
-    return i;
-}
-
-void benchcore(const char *host, const int port, const char *req) {
-    int rlen;
-    char buf[1500];
-    int s, i;
-    struct sigaction sa;
-
-    /* setup alarm signal handler */
-    /* 设置 SIGALRM 信号的处理程序 */
-    sa.sa_handler = alarm_handler;
-    sa.sa_flags = 0;
-    if (sigaction(SIGALRM, &amp;sa, NULL)) exit(3);
-
-    /* 设置定时器, 超时产生 SIGALRM 信号 */
-    alarm(benchtime);  // after benchtime,then exit
-
-    rlen = strlen(req);
-nexttry:
-    while (1) {
-        /**
-         * 一直重试(重新发送一遍)
-         * 直到超时
-         * 如果超时的话, 把 failed--(是说被计时器中断的那个不算错误吗?)
-         * */
-        if (timerexpired) {
-            if (failed &gt; 0) {
-                /* fprintf(stderr,&quot;Correcting failed by signal\n&quot;); */
-                failed--;
-            }
-            return;
-        }
-
-        s = Socket(host, port);
-        if (s &lt; 0) {
-            failed++;
-            continue;
-        }
-        if (rlen != write(s, req, rlen)) {
-            failed++;
-            close(s);
-            continue;
-        }
-        if (http10 == 0)
-            if (shutdown(s, 1)) {
-                failed++;
-                close(s);
-                continue;
-            }
-        if (force == 0) {
-            /* read all available data from socket */
-            /* 读取服务器响应 */
-            while (1) {
-                if (timerexpired) break;
-                i = read(s, buf, 1500);
-                /* fprintf(stderr,&quot;%d\n&quot;,i); */
-                if (i &lt; 0) {
-                    failed++;
-                    close(s);
-                    goto nexttry;
-                } else if (i == 0)
-                    break;
-                else
-                    bytes += i;
-            }
-        }
-        if (close(s)) {
-            failed++;
-            continue;
-        }
-        speed++;
-    }
-}
-
-</code></pre></article>
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="cm">/*
+</span><span class="cm"> * (C) Radim Kolar 1997-2004
+</span><span class="cm"> * This is free software, see GNU Public License version 2 for
+</span><span class="cm"> * details.
+</span><span class="cm"> *
+</span><span class="cm"> * Simple forking WWW Server benchmark:
+</span><span class="cm"> *
+</span><span class="cm"> * Usage:
+</span><span class="cm"> *   webbench --help
+</span><span class="cm"> *
+</span><span class="cm"> * Return codes:
+</span><span class="cm"> *    0 - sucess
+</span><span class="cm"> *    1 - benchmark failed (server is not on-line)
+</span><span class="cm"> *    2 - bad param
+</span><span class="cm"> *    3 - internal error, fork failed
+</span><span class="cm"> *
+</span><span class="cm"> */</span>
+
+<span class="cp">#include</span> <span class="cpf">&lt;getopt.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;rpc/types.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;signal.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;strings.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;sys/param.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;time.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&#34;socket.c&#34;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="cm">/* values */</span>
+<span class="k">volatile</span> <span class="kt">int</span> <span class="n">timerexpired</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">speed</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">failed</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">bytes</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="cm">/* globals */</span>
+<span class="kt">int</span> <span class="n">http10</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="cm">/* 0 - http/0.9, 1 - http/1.0, 2 - http/1.1 */</span>
+<span class="cm">/* Allow: GET, HEAD, OPTIONS, TRACE */</span>
+<span class="cp">#define METHOD_GET 0
+</span><span class="cp">#define METHOD_HEAD 1
+</span><span class="cp">#define METHOD_OPTIONS 2
+</span><span class="cp">#define METHOD_TRACE 3
+</span><span class="cp">#define PROGRAM_VERSION &#34;1.5&#34;
+</span><span class="cp"></span><span class="kt">int</span> <span class="n">method</span> <span class="o">=</span> <span class="n">METHOD_GET</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">clients</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">force</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">force_reload</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">proxyport</span> <span class="o">=</span> <span class="mi">80</span><span class="p">;</span>
+<span class="kt">char</span> <span class="o">*</span><span class="n">proxyhost</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">benchtime</span> <span class="o">=</span> <span class="mi">30</span><span class="p">;</span>
+
+<span class="cm">/* internal */</span>
+<span class="kt">int</span> <span class="n">mypipe</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<span class="kt">char</span> <span class="n">host</span><span class="p">[</span><span class="n">MAXHOSTNAMELEN</span><span class="p">];</span>
+<span class="cp">#define REQUEST_SIZE 2048
+</span><span class="cp"></span><span class="kt">char</span> <span class="n">request</span><span class="p">[</span><span class="n">REQUEST_SIZE</span><span class="p">];</span>
+
+<span class="k">static</span> <span class="k">const</span> <span class="k">struct</span> <span class="n">option</span> <span class="n">long_options</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">{</span><span class="s">&#34;force&#34;</span><span class="p">,</span> <span class="n">no_argument</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">force</span><span class="p">,</span> <span class="mi">1</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">&#34;reload&#34;</span><span class="p">,</span> <span class="n">no_argument</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">force_reload</span><span class="p">,</span> <span class="mi">1</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">&#34;time&#34;</span><span class="p">,</span> <span class="n">required_argument</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="sc">&#39;t&#39;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">&#34;help&#34;</span><span class="p">,</span> <span class="n">no_argument</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="sc">&#39;?&#39;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">&#34;http09&#34;</span><span class="p">,</span> <span class="n">no_argument</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="sc">&#39;9&#39;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">&#34;http10&#34;</span><span class="p">,</span> <span class="n">no_argument</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="sc">&#39;1&#39;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">&#34;http11&#34;</span><span class="p">,</span> <span class="n">no_argument</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="sc">&#39;2&#39;</span><span class="p">},</span>
+    <span class="cm">/* 绑定命令行参数与变量 */</span>
+    <span class="p">{</span><span class="s">&#34;get&#34;</span><span class="p">,</span> <span class="n">no_argument</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">method</span><span class="p">,</span> <span class="n">METHOD_GET</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">&#34;head&#34;</span><span class="p">,</span> <span class="n">no_argument</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">method</span><span class="p">,</span> <span class="n">METHOD_HEAD</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">&#34;options&#34;</span><span class="p">,</span> <span class="n">no_argument</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">method</span><span class="p">,</span> <span class="n">METHOD_OPTIONS</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">&#34;trace&#34;</span><span class="p">,</span> <span class="n">no_argument</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">method</span><span class="p">,</span> <span class="n">METHOD_TRACE</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">&#34;version&#34;</span><span class="p">,</span> <span class="n">no_argument</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="sc">&#39;V&#39;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">&#34;proxy&#34;</span><span class="p">,</span> <span class="n">required_argument</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="sc">&#39;p&#39;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">&#34;clients&#34;</span><span class="p">,</span> <span class="n">required_argument</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="sc">&#39;c&#39;</span><span class="p">},</span>
+    <span class="p">{</span><span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">}};</span>
+
+<span class="cm">/* prototypes */</span>
+<span class="k">static</span> <span class="kt">void</span> <span class="nf">benchcore</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">host</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">port</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">request</span><span class="p">);</span>
+<span class="k">static</span> <span class="kt">int</span> <span class="nf">bench</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="k">static</span> <span class="kt">void</span> <span class="nf">build_request</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">url</span><span class="p">);</span>
+
+<span class="k">static</span> <span class="kt">void</span> <span class="nf">alarm_handler</span><span class="p">(</span><span class="kt">int</span> <span class="n">signal</span><span class="p">)</span> <span class="p">{</span> <span class="n">timerexpired</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="p">}</span>
+
+<span class="k">static</span> <span class="kt">void</span> <span class="nf">usage</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">fprintf</span><span class="p">(</span>
+        <span class="n">stderr</span><span class="p">,</span>
+        <span class="s">&#34;webbench [option]... URL</span><span class="se">\n</span><span class="s">&#34;</span>
+        <span class="s">&#34;  -f|--force               Don&#39;t wait for reply from server.</span><span class="se">\n</span><span class="s">&#34;</span>
+        <span class="s">&#34;  -r|--reload              Send reload request - Pragma: no-cache.</span><span class="se">\n</span><span class="s">&#34;</span>
+        <span class="s">&#34;  -t|--time &lt;sec&gt;          Run benchmark for &lt;sec&gt; seconds. Default &#34;</span>
+        <span class="s">&#34;30.</span><span class="se">\n</span><span class="s">&#34;</span>
+        <span class="s">&#34;  -p|--proxy &lt;server:port&gt; Use proxy server for request.</span><span class="se">\n</span><span class="s">&#34;</span>
+        <span class="s">&#34;  -c|--clients &lt;n&gt;         Run &lt;n&gt; HTTP clients at once. Default &#34;</span>
+        <span class="s">&#34;one.</span><span class="se">\n</span><span class="s">&#34;</span>
+        <span class="s">&#34;  -9|--http09              Use HTTP/0.9 style requests.</span><span class="se">\n</span><span class="s">&#34;</span>
+        <span class="s">&#34;  -1|--http10              Use HTTP/1.0 protocol.</span><span class="se">\n</span><span class="s">&#34;</span>
+        <span class="s">&#34;  -2|--http11              Use HTTP/1.1 protocol.</span><span class="se">\n</span><span class="s">&#34;</span>
+        <span class="s">&#34;  --get                    Use GET request method.</span><span class="se">\n</span><span class="s">&#34;</span>
+        <span class="s">&#34;  --head                   Use HEAD request method.</span><span class="se">\n</span><span class="s">&#34;</span>
+        <span class="s">&#34;  --options                Use OPTIONS request method.</span><span class="se">\n</span><span class="s">&#34;</span>
+        <span class="s">&#34;  --trace                  Use TRACE request method.</span><span class="se">\n</span><span class="s">&#34;</span>
+        <span class="s">&#34;  -?|-h|--help             This information.</span><span class="se">\n</span><span class="s">&#34;</span>
+        <span class="s">&#34;  -V|--version             Display program version.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+    <span class="cm">/* 读取命令行参数 */</span>
+    <span class="kt">int</span> <span class="n">opt</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">options_index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="o">*</span><span class="n">tmp</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">usage</span><span class="p">();</span>
+        <span class="k">return</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">while</span> <span class="p">((</span><span class="n">opt</span> <span class="o">=</span> <span class="n">getopt_long</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">,</span> <span class="s">&#34;912Vfrt:p:c:?h&#34;</span><span class="p">,</span> <span class="n">long_options</span><span class="p">,</span>
+                              <span class="o">&amp;</span><span class="n">options_index</span><span class="p">))</span> <span class="o">!=</span> <span class="n">EOF</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">switch</span> <span class="p">(</span><span class="n">opt</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">case</span> <span class="mi">0</span><span class="o">:</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="sc">&#39;f&#39;</span><span class="o">:</span>
+                <span class="cm">/* 设置 force 模式 */</span>
+                <span class="n">force</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="sc">&#39;r&#39;</span><span class="o">:</span>
+                <span class="cm">/* 设置 reload 模式 */</span>
+                <span class="n">force_reload</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="sc">&#39;9&#39;</span><span class="o">:</span>
+                <span class="cm">/* HTTP/0.9 */</span>
+                <span class="n">http10</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="sc">&#39;1&#39;</span><span class="o">:</span>
+                <span class="cm">/* HTTP/1.0 */</span>
+                <span class="n">http10</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="sc">&#39;2&#39;</span><span class="o">:</span>
+                <span class="cm">/* HTTP/1.1 */</span>
+                <span class="n">http10</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="sc">&#39;V&#39;</span><span class="o">:</span>
+                <span class="cm">/* 打印版本信息并退出 */</span>
+                <span class="n">printf</span><span class="p">(</span><span class="n">PROGRAM_VERSION</span> <span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+                <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+            <span class="k">case</span> <span class="sc">&#39;t&#39;</span><span class="o">:</span>
+                <span class="cm">/* 设置运行时间 */</span>
+                <span class="n">benchtime</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">optarg</span><span class="p">);</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="sc">&#39;p&#39;</span><span class="o">:</span>
+                <span class="cm">/* proxy server parsing server:port */</span>
+                <span class="cm">/**
+</span><span class="cm">                 * 解析代理设置, 使用 &#34;:&#34; 分割代理字符串
+</span><span class="cm">                 * eg: -p 127.0.0.1:1080
+</span><span class="cm">                 * proxyhost(char *): &#34;127.0.0.1&#34;
+</span><span class="cm">                 * proxyport(int): 1080
+</span><span class="cm">                 * */</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="n">strrchr</span><span class="p">(</span><span class="n">optarg</span><span class="p">,</span> <span class="sc">&#39;:&#39;</span><span class="p">);</span>
+                <span class="n">proxyhost</span> <span class="o">=</span> <span class="n">optarg</span><span class="p">;</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">tmp</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="k">break</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="cm">/* 判断是否提供 hostname */</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">tmp</span> <span class="o">==</span> <span class="n">optarg</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span>
+                            <span class="s">&#34;Error in option --proxy %s: Missing hostname.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span>
+                            <span class="n">optarg</span><span class="p">);</span>
+                    <span class="k">return</span> <span class="mi">2</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="cm">/* 判断是否提供 port */</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">tmp</span> <span class="o">==</span> <span class="n">optarg</span> <span class="o">+</span> <span class="n">strlen</span><span class="p">(</span><span class="n">optarg</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="n">fprintf</span><span class="p">(</span>
+                        <span class="n">stderr</span><span class="p">,</span>
+                        <span class="s">&#34;Error in option --proxy %s Port number is missing.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span>
+                        <span class="n">optarg</span><span class="p">);</span>
+                    <span class="k">return</span> <span class="mi">2</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="o">*</span><span class="n">tmp</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
+                <span class="n">proxyport</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">tmp</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="sc">&#39;:&#39;</span><span class="o">:</span>
+            <span class="k">case</span> <span class="sc">&#39;h&#39;</span><span class="o">:</span>
+            <span class="k">case</span> <span class="sc">&#39;?&#39;</span><span class="o">:</span>
+                <span class="cm">/* 打印帮助 */</span>
+                <span class="n">usage</span><span class="p">();</span>
+                <span class="k">return</span> <span class="mi">2</span><span class="p">;</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="sc">&#39;c&#39;</span><span class="o">:</span>
+                <span class="cm">/* 设置客户端个数 */</span>
+                <span class="n">clients</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">optarg</span><span class="p">);</span>
+                <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="cm">/**
+</span><span class="cm">     * 当所有带选项的参数都已读取结束, optind
+</span><span class="cm">     * 应当指向第一个不包含选项的命令行参数 若 optind == argc,
+</span><span class="cm">     * 则代表没有不包含选项的命令行参数
+</span><span class="cm">     * */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">optind</span> <span class="o">==</span> <span class="n">argc</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&#34;webbench: Missing URL!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+        <span class="n">usage</span><span class="p">();</span>
+        <span class="k">return</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="cm">/* 设置 clients 和 benchtime 的默认值 */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">clients</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="n">clients</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">benchtime</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="n">benchtime</span> <span class="o">=</span> <span class="mi">30</span><span class="p">;</span>
+
+    <span class="cm">/* Copyright */</span>
+    <span class="cm">/* 打印 Copyright */</span>
+    <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span>
+            <span class="s">&#34;Webbench - Simple Web Benchmark &#34;</span> <span class="n">PROGRAM_VERSION</span>
+            <span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span>
+            <span class="s">&#34;Copyright (c) Radim Kolar 1997-2004, GPL Open Source Software.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+
+    <span class="n">build_request</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">optind</span><span class="p">]);</span>
+
+    <span class="c1">// print request info ,do it in function build_request
+</span><span class="c1"></span>    <span class="cm">/*printf(&#34;Benchmarking: &#34;);
+</span><span class="cm">
+</span><span class="cm">    switch(method)
+</span><span class="cm">    {
+</span><span class="cm">        case METHOD_GET:
+</span><span class="cm">        default:
+</span><span class="cm">        printf(&#34;GET&#34;);break;
+</span><span class="cm">        case METHOD_OPTIONS:
+</span><span class="cm">        printf(&#34;OPTIONS&#34;);break;
+</span><span class="cm">        case METHOD_HEAD:
+</span><span class="cm">        printf(&#34;HEAD&#34;);break;
+</span><span class="cm">        case METHOD_TRACE:
+</span><span class="cm">        printf(&#34;TRACE&#34;);break;
+</span><span class="cm">    }
+</span><span class="cm">
+</span><span class="cm">    printf(&#34; %s&#34;,argv[optind]);
+</span><span class="cm">
+</span><span class="cm">    switch(http10)
+</span><span class="cm">    {
+</span><span class="cm">        case 0: printf(&#34; (using HTTP/0.9)&#34;);break;
+</span><span class="cm">        case 2: printf(&#34; (using HTTP/1.1)&#34;);break;
+</span><span class="cm">    }
+</span><span class="cm">
+</span><span class="cm">    printf(&#34;\n&#34;);
+</span><span class="cm">    */</span>
+
+    <span class="cm">/* 打印配置 */</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;Runing info: &#34;</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">clients</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;1 client&#34;</span><span class="p">);</span>
+    <span class="k">else</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%d clients&#34;</span><span class="p">,</span> <span class="n">clients</span><span class="p">);</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;, running %d sec&#34;</span><span class="p">,</span> <span class="n">benchtime</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">force</span><span class="p">)</span> <span class="n">printf</span><span class="p">(</span><span class="s">&#34;, early socket close&#34;</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">proxyhost</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">&#34;, via proxy server %s:%d&#34;</span><span class="p">,</span> <span class="n">proxyhost</span><span class="p">,</span> <span class="n">proxyport</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">force_reload</span><span class="p">)</span> <span class="n">printf</span><span class="p">(</span><span class="s">&#34;, forcing reload&#34;</span><span class="p">);</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+
+    <span class="cm">/* 开始执行 */</span>
+    <span class="k">return</span> <span class="n">bench</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">build_request</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">url</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">char</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+
+    <span class="c1">// bzero(host,MAXHOSTNAMELEN);
+</span><span class="c1"></span>    <span class="c1">// bzero(request,REQUEST_SIZE);
+</span><span class="c1"></span>    <span class="n">memset</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">MAXHOSTNAMELEN</span><span class="p">);</span>
+    <span class="n">memset</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">REQUEST_SIZE</span><span class="p">);</span>
+
+    <span class="cm">/* 根据 reload 和 method 等参数调整 HTTP */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">force_reload</span> <span class="o">&amp;&amp;</span> <span class="n">proxyhost</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="o">&amp;&amp;</span> <span class="n">http10</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="n">http10</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">method</span> <span class="o">==</span> <span class="n">METHOD_HEAD</span> <span class="o">&amp;&amp;</span> <span class="n">http10</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="n">http10</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">method</span> <span class="o">==</span> <span class="n">METHOD_OPTIONS</span> <span class="o">&amp;&amp;</span> <span class="n">http10</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="n">http10</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">method</span> <span class="o">==</span> <span class="n">METHOD_TRACE</span> <span class="o">&amp;&amp;</span> <span class="n">http10</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="n">http10</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+
+    <span class="k">switch</span> <span class="p">(</span><span class="n">method</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">default</span><span class="o">:</span>
+        <span class="k">case</span> <span class="nl">METHOD_GET</span><span class="p">:</span>
+            <span class="n">strcpy</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#34;GET&#34;</span><span class="p">);</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="k">case</span> <span class="nl">METHOD_HEAD</span><span class="p">:</span>
+            <span class="n">strcpy</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#34;HEAD&#34;</span><span class="p">);</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="k">case</span> <span class="nl">METHOD_OPTIONS</span><span class="p">:</span>
+            <span class="n">strcpy</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#34;OPTIONS&#34;</span><span class="p">);</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="k">case</span> <span class="nl">METHOD_TRACE</span><span class="p">:</span>
+            <span class="n">strcpy</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#34;TRACE&#34;</span><span class="p">);</span>
+            <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">strcat</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#34; &#34;</span><span class="p">);</span>
+
+    <span class="cm">/* 检查 URL 是否合法 */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">strstr</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s">&#34;://&#34;</span><span class="p">))</span> <span class="p">{</span>
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&#34;</span><span class="se">\n</span><span class="s">%s: is not a valid URL.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">url</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="cm">/* 检查 URL 长度 */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">strlen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1500</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&#34;URL is too long.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="cm">/* 忽略大小写对比两个字符串的前 n 个字符 */</span>
+    <span class="cm">/* 仅支持 HTTP 协议 */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">!=</span> <span class="n">strncasecmp</span><span class="p">(</span><span class="s">&#34;http://&#34;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span> <span class="p">{</span>
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span>
+                <span class="s">&#34;</span><span class="se">\n</span><span class="s">Only HTTP protocol is directly supported, set --proxy for &#34;</span>
+                <span class="s">&#34;others.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="cm">/* protocol/host delimiter */</span>
+    <span class="cm">/* 获得去掉协议后的 URL */</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">strstr</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s">&#34;://&#34;</span><span class="p">)</span> <span class="o">-</span> <span class="n">url</span> <span class="o">+</span> <span class="mi">3</span><span class="p">;</span>
+
+    <span class="cm">/* 判断 &#39;/&#39; 是否在 URL 中出现过 */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">strchr</span><span class="p">(</span><span class="n">url</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="sc">&#39;/&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span>
+                <span class="s">&#34;</span><span class="se">\n</span><span class="s">Invalid URL syntax - hostname don&#39;t ends with &#39;/&#39;.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="cm">/* url + i 指向 URL 去掉协议后的开头 */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">proxyhost</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="cm">/* get port from hostname */</span>
+        <span class="cm">/**
+</span><span class="cm">         * 如果没有使用代理, 则解析 URL 到 host 和 proxyport
+</span><span class="cm">         * eg: http://127.0.0.1:8080/
+</span><span class="cm">         * host(char *): 127.0.0.1
+</span><span class="cm">         * proxyport(int): 8080
+</span><span class="cm">         * */</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">index</span><span class="p">(</span><span class="n">url</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="sc">&#39;:&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">NULL</span> <span class="o">&amp;&amp;</span>
+            <span class="n">index</span><span class="p">(</span><span class="n">url</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="sc">&#39;:&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">index</span><span class="p">(</span><span class="n">url</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="sc">&#39;/&#39;</span><span class="p">))</span> <span class="p">{</span> <span class="cm">/* 如果指定了端口 */</span>
+            <span class="n">strncpy</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">url</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">strchr</span><span class="p">(</span><span class="n">url</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="sc">&#39;:&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="n">url</span> <span class="o">-</span> <span class="n">i</span><span class="p">);</span>
+            <span class="c1">// bzero(tmp,10);
+</span><span class="c1"></span>            <span class="n">memset</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+            <span class="n">strncpy</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">index</span><span class="p">(</span><span class="n">url</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="sc">&#39;:&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="n">strchr</span><span class="p">(</span><span class="n">url</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="sc">&#39;/&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="n">index</span><span class="p">(</span><span class="n">url</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="sc">&#39;:&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+            <span class="cm">/* printf(&#34;tmp=%s\n&#34;,tmp); */</span>
+            <span class="n">proxyport</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">tmp</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">proxyport</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="n">proxyport</span> <span class="o">=</span> <span class="mi">80</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="cm">/* 没有指定端口 */</span>
+            <span class="n">strncpy</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">url</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">strcspn</span><span class="p">(</span><span class="n">url</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="s">&#34;/&#34;</span><span class="p">));</span>
+        <span class="p">}</span>
+        <span class="c1">// printf(&#34;Host=%s\n&#34;,host);
+</span><span class="c1"></span>        <span class="cm">/**
+</span><span class="cm">         * 这个 request + strlen(request) 我实在是没看懂
+</span><span class="cm">         * strlen 获得 request 后第一个 &#39;\0&#39; 的位置
+</span><span class="cm">         * strcat 替换 request 后第一个 &#39;\0&#39; 并追加字符串, 在末尾添加 &#39;\0&#39;
+</span><span class="cm">         * 那为什么要先找到 &#39;\0&#39; 的位置再去 strcat......
+</span><span class="cm">         * */</span>
+        <span class="n">strcat</span><span class="p">(</span><span class="n">request</span> <span class="o">+</span> <span class="n">strlen</span><span class="p">(</span><span class="n">request</span><span class="p">),</span> <span class="n">url</span> <span class="o">+</span> <span class="n">i</span> <span class="o">+</span> <span class="n">strcspn</span><span class="p">(</span><span class="n">url</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="s">&#34;/&#34;</span><span class="p">));</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="c1">// printf(&#34;ProxyHost=%s\nProxyPort=%d\n&#34;,proxyhost,proxyport);
+</span><span class="c1"></span>        <span class="n">strcat</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">url</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="cm">/* 拼接 HTTP 协议 */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">http10</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">strcat</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#34; HTTP/1.0&#34;</span><span class="p">);</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">http10</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">strcat</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#34; HTTP/1.1&#34;</span><span class="p">);</span>
+
+    <span class="n">strcat</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#34;</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+
+    <span class="cm">/* 拼接 UA */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">http10</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">strcat</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#34;User-Agent: WebBench &#34;</span> <span class="n">PROGRAM_VERSION</span> <span class="s">&#34;</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+    <span class="cm">/* 拼接 Host */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">proxyhost</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="o">&amp;&amp;</span> <span class="n">http10</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">strcat</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#34;Host: &#34;</span><span class="p">);</span>
+        <span class="n">strcat</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">host</span><span class="p">);</span>
+        <span class="n">strcat</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#34;</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="cm">/* 拼接其余字段 */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">force_reload</span> <span class="o">&amp;&amp;</span> <span class="n">proxyhost</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">strcat</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#34;Pragma: no-cache</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">http10</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="n">strcat</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#34;Connection: close</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+
+    <span class="cm">/* add empty line at end */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">http10</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="n">strcat</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#34;</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">);</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;</span><span class="se">\n</span><span class="s">Request:</span><span class="se">\n</span><span class="s">%s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">request</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="cm">/* vraci system rc error kod */</span>
+<span class="k">static</span> <span class="kt">int</span> <span class="nf">bench</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">;</span>
+    <span class="n">pid_t</span> <span class="n">pid</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">FILE</span> <span class="o">*</span><span class="n">f</span><span class="p">;</span>
+
+    <span class="cm">/* check avaibility of target server */</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">Socket</span><span class="p">(</span><span class="n">proxyhost</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="o">?</span> <span class="nl">host</span> <span class="p">:</span> <span class="n">proxyhost</span><span class="p">,</span> <span class="n">proxyport</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&#34;</span><span class="se">\n</span><span class="s">Connect to server failed. Aborting benchmark.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">close</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+
+    <span class="cm">/* create pipe */</span>
+    <span class="cm">/* 创建管道 */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">pipe</span><span class="p">(</span><span class="n">mypipe</span><span class="p">))</span> <span class="p">{</span>
+        <span class="n">perror</span><span class="p">(</span><span class="s">&#34;pipe failed.&#34;</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">3</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="cm">/* not needed, since we have alarm() in childrens */</span>
+    <span class="cm">/* wait 4 next system clock tick */</span>
+    <span class="cm">/*
+</span><span class="cm">    cas=time(NULL);
+</span><span class="cm">    while(time(NULL)==cas)
+</span><span class="cm">    sched_yield();
+</span><span class="cm">    */</span>
+
+    <span class="cm">/* fork childs */</span>
+    <span class="cm">/* 创建处理子进程 */</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">clients</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">pid</span> <span class="o">=</span> <span class="n">fork</span><span class="p">();</span>
+        <span class="cm">/* 不推荐将 fork 成功和失败的情况放在一起处理 */</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">pid</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="n">pid_t</span><span class="p">)</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="cm">/* child process or error*/</span>
+            <span class="cm">/* 你不能确定进程将于何时中断 */</span>
+            <span class="cm">/* 因此这种方法并不推荐使用 */</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="cm">/* make childs faster */</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="cm">/* 这是? 创建了多个子进程, 然后判断最后一个 fork 是否成功? */</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">pid</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">pid_t</span><span class="p">)</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&#34;problems forking worker no. %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+        <span class="n">perror</span><span class="p">(</span><span class="s">&#34;fork failed.&#34;</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">3</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">pid</span> <span class="o">==</span> <span class="p">(</span><span class="n">pid_t</span><span class="p">)</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="cm">/* I am a child */</span>
+        <span class="cm">/* 开始发送请求 */</span>
+        <span class="cm">/* 取全局变量中的 request 作为参数传给本文件内的另一个函数 */</span>
+        <span class="cm">/* 什么写法...... */</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">proxyhost</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+            <span class="n">benchcore</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">proxyport</span><span class="p">,</span> <span class="n">request</span><span class="p">);</span>
+        <span class="k">else</span>
+            <span class="n">benchcore</span><span class="p">(</span><span class="n">proxyhost</span><span class="p">,</span> <span class="n">proxyport</span><span class="p">,</span> <span class="n">request</span><span class="p">);</span>
+
+        <span class="cm">/* write results to pipe */</span>
+        <span class="cm">/* 将结果写入 pipe */</span>
+        <span class="cm">/* 此处没有关闭 mypipe[0] */</span>
+        <span class="cm">/* 不知是何用意 */</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">fdopen</span><span class="p">(</span><span class="n">mypipe</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s">&#34;w&#34;</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">f</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">perror</span><span class="p">(</span><span class="s">&#34;open pipe for writing failed.&#34;</span><span class="p">);</span>
+            <span class="k">return</span> <span class="mi">3</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="cm">/* fprintf(stderr,&#34;Child - %d %d\n&#34;,speed,failed); */</span>
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&#34;%d %d %d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span> <span class="n">failed</span><span class="p">,</span> <span class="n">bytes</span><span class="p">);</span>
+        <span class="n">fclose</span><span class="p">(</span><span class="n">f</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="cm">/* 同样的, 此处没有关闭 mypipe[1] */</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">fdopen</span><span class="p">(</span><span class="n">mypipe</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&#34;r&#34;</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">f</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">perror</span><span class="p">(</span><span class="s">&#34;open pipe for reading failed.&#34;</span><span class="p">);</span>
+            <span class="k">return</span> <span class="mi">3</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="cm">/* 设置无缓冲 */</span>
+        <span class="n">setvbuf</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">_IONBF</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+
+        <span class="n">speed</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="n">failed</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="n">bytes</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+        <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">pid</span> <span class="o">=</span> <span class="n">fscanf</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">&#34;%d %d %d&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">j</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">k</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">pid</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&#34;Some of our childrens died.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="n">speed</span> <span class="o">+=</span> <span class="n">i</span><span class="p">;</span>
+            <span class="n">failed</span> <span class="o">+=</span> <span class="n">j</span><span class="p">;</span>
+            <span class="n">bytes</span> <span class="o">+=</span> <span class="n">k</span><span class="p">;</span>
+
+            <span class="cm">/* fprintf(stderr,&#34;*Knock* %d %d read=%d\n&#34;,speed,failed,pid); */</span>
+            <span class="k">if</span> <span class="p">(</span><span class="o">--</span><span class="n">clients</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="n">fclose</span><span class="p">(</span><span class="n">f</span><span class="p">);</span>
+
+        <span class="n">printf</span><span class="p">(</span>
+            <span class="s">&#34;</span><span class="se">\n</span><span class="s">Speed=%d pages/min, %d bytes/sec.</span><span class="se">\n</span><span class="s">Requests: %d susceed, %d &#34;</span>
+            <span class="s">&#34;failed.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span>
+            <span class="p">(</span><span class="kt">int</span><span class="p">)((</span><span class="n">speed</span> <span class="o">+</span> <span class="n">failed</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">benchtime</span> <span class="o">/</span> <span class="mf">60.0f</span><span class="p">)),</span>
+            <span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">bytes</span> <span class="o">/</span> <span class="p">(</span><span class="kt">float</span><span class="p">)</span><span class="n">benchtime</span><span class="p">),</span> <span class="n">speed</span><span class="p">,</span> <span class="n">failed</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">i</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">benchcore</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">host</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">port</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">req</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">rlen</span><span class="p">;</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1500</span><span class="p">];</span>
+    <span class="kt">int</span> <span class="n">s</span><span class="p">,</span> <span class="n">i</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">sigaction</span> <span class="n">sa</span><span class="p">;</span>
+
+    <span class="cm">/* setup alarm signal handler */</span>
+    <span class="cm">/* 设置 SIGALRM 信号的处理程序 */</span>
+    <span class="n">sa</span><span class="p">.</span><span class="n">sa_handler</span> <span class="o">=</span> <span class="n">alarm_handler</span><span class="p">;</span>
+    <span class="n">sa</span><span class="p">.</span><span class="n">sa_flags</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">sigaction</span><span class="p">(</span><span class="n">SIGALRM</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">sa</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">))</span> <span class="n">exit</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+
+    <span class="cm">/* 设置定时器, 超时产生 SIGALRM 信号 */</span>
+    <span class="n">alarm</span><span class="p">(</span><span class="n">benchtime</span><span class="p">);</span>  <span class="c1">// after benchtime,then exit
+</span><span class="c1"></span>
+    <span class="n">rlen</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
+<span class="nl">nexttry</span><span class="p">:</span>
+    <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="cm">/**
+</span><span class="cm">         * 一直重试(重新发送一遍)
+</span><span class="cm">         * 直到超时
+</span><span class="cm">         * 如果超时的话, 把 failed--(是说被计时器中断的那个不算错误吗?)
+</span><span class="cm">         * */</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">timerexpired</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">failed</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                <span class="cm">/* fprintf(stderr,&#34;Correcting failed by signal\n&#34;); */</span>
+                <span class="n">failed</span><span class="o">--</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="n">Socket</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">s</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">failed</span><span class="o">++</span><span class="p">;</span>
+            <span class="k">continue</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">rlen</span> <span class="o">!=</span> <span class="n">write</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">rlen</span><span class="p">))</span> <span class="p">{</span>
+            <span class="n">failed</span><span class="o">++</span><span class="p">;</span>
+            <span class="n">close</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+            <span class="k">continue</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">http10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">shutdown</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="p">{</span>
+                <span class="n">failed</span><span class="o">++</span><span class="p">;</span>
+                <span class="n">close</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+                <span class="k">continue</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">force</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="cm">/* read all available data from socket */</span>
+            <span class="cm">/* 读取服务器响应 */</span>
+            <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">timerexpired</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="mi">1500</span><span class="p">);</span>
+                <span class="cm">/* fprintf(stderr,&#34;%d\n&#34;,i); */</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="n">failed</span><span class="o">++</span><span class="p">;</span>
+                    <span class="n">close</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+                    <span class="k">goto</span> <span class="n">nexttry</span><span class="p">;</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+                    <span class="k">break</span><span class="p">;</span>
+                <span class="k">else</span>
+                    <span class="n">bytes</span> <span class="o">+=</span> <span class="n">i</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">close</span><span class="p">(</span><span class="n">s</span><span class="p">))</span> <span class="p">{</span>
+            <span class="n">failed</span><span class="o">++</span><span class="p">;</span>
+            <span class="k">continue</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">speed</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></div></article>
               </div>
             </div>
           </div>

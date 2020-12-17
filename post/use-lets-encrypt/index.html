@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>CentOS 7 &#43; Nginx 配置 HTTPS （使用 Let&#39;s Encrypt ） - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -227,35 +228,23 @@
 <p>以我的系统为例：</p>
 
 <h3 id="下载到本地">下载到本地</h3>
-
-<pre><code class="language-shell">wget https://dl.eff.org/certbot-auto
-chmod a+x certbot-auto
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">wget https://dl.eff.org/certbot-auto
+chmod a+x certbot-auto</code></pre></div>
 <h3 id="安装-1">安装</h3>
-
-<pre><code class="language-shell">$ sudo ./certbot-auto --nginx
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">$ sudo ./certbot-auto --nginx</code></pre></div>
 <p>中间会让你填邮箱地址和选择网站，依次填写完成即可。</p>
 
 <h3 id="自动更新">自动更新</h3>
 
 <p>Let&rsquo;s Encrypt 的证书有效期为 90 天，不过并不是说每过 90 天就要重新配置一遍， certbot-auto 提供了 renew 命令以检查证书有效期并自动更新，只要将定时任务添加至系统即可。</p>
-
-<pre><code class="language-shell">sudo vim /etc/crontab
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">sudo vim /etc/crontab</code></pre></div>
 <p>将下面的任务添加至文件底部</p>
 
 <pre><code>0 0,12 * * * python -c 'import random; import time; time.sleep(random.random() * 3600)' &amp;&amp; ./path/to/certbot-auto renew 
 </code></pre>
 
 <p>然后更新定时任务</p>
-
-<pre><code class="language-shell">sudo crontab /etc/crontab
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">sudo crontab /etc/crontab</code></pre></div>
 <p>大功告成！</p>
 
 <p>可以去<a href="https://www.ssllabs.com/ssltest/index.html">这个网站</a>检测 ssl 证书。</p>

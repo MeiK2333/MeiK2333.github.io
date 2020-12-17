@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>C/C&#43;&#43; 中 static 与 const 的用法与区别 - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -170,7 +171,7 @@
               <div class="file-header d-flex flex-md-items-center flex-items-start">
                 <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
                   <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
-                    1181 Words
+                    1178 Words
                     
 
                   </div>
@@ -215,57 +216,53 @@
 <p>当修饰变量时，这个变量无法进行修改。而当修饰函数时，代表这个函数的返回值无法进行修改。</p>
 
 <p>要额外注意一下，在修饰指针变量时的用法：</p>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">string1</span> <span class="o">=</span> <span class="s">&#34;Hello World!&#34;</span><span class="p">;</span>
+<span class="c1">// *string1 = &#39;h&#39;;  错误，string1 指针所指向的内容无法修改
+</span><span class="c1"></span><span class="n">string1</span> <span class="o">=</span> <span class="s">&#34;other string&#34;</span><span class="p">;</span>
 
-<pre><code class="language-C++">const char *string1 = &quot;Hello World!&quot;;
-// *string1 = 'h';  错误，string1 指针所指向的内容无法修改
-string1 = &quot;other string&quot;;
+<span class="kt">char</span> <span class="k">const</span> <span class="o">*</span><span class="n">string2</span> <span class="o">=</span> <span class="s">&#34;Hello World!&#34;</span><span class="p">;</span>
+<span class="c1">// *string2 = &#39;h&#39;;  错误，这种写法和第一种相同
+</span><span class="c1"></span><span class="n">string2</span> <span class="o">=</span> <span class="s">&#34;other string&#34;</span><span class="p">;</span>
 
-char const *string2 = &quot;Hello World!&quot;;
-// *string2 = 'h';  错误，这种写法和第一种相同
-string2 = &quot;other string&quot;;
-
-char *const string3 = &quot;Hello World!&quot;;
-string3[0] = 'h';
-// string3 = &quot;other string&quot;;  错误，string3 指针的指向无法修改
-
-const char * const string4 = &quot;Hello World!&quot;;
-// 这种写法既不能修改指针指向，也不能通过这个指针修改指向的内容
-</code></pre>
-
+<span class="kt">char</span> <span class="o">*</span><span class="k">const</span> <span class="n">string3</span> <span class="o">=</span> <span class="s">&#34;Hello World!&#34;</span><span class="p">;</span>
+<span class="n">string3</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;h&#39;</span><span class="p">;</span>
+<span class="c1">// string3 = &#34;other string&#34;;  错误，string3 指针的指向无法修改
+</span><span class="c1"></span>
+<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="k">const</span> <span class="n">string4</span> <span class="o">=</span> <span class="s">&#34;Hello World!&#34;</span><span class="p">;</span>
+<span class="c1">// 这种写法既不能修改指针指向，也不能通过这个指针修改指向的内容
+</span></code></pre></div>
 <h3 id="修饰类的成员函数">修饰类的成员函数</h3>
 
 <p>const 可以修饰基本类型如 char 等，也可以修饰自己创建的类的对象。在 const 修饰类的对象时，必须保证被修饰的对象无法对类中的内容作出修改。C++ 中规定，被 const 修饰的对象只能调用类里的 const 成员函数。</p>
 
 <p>声明类的 const 成员函数与声明 const 变量不一样（如果一样放在前面的话，就会变成修饰返回值了），在修饰类的成员函数时，const 应当在函数名的后面，如：</p>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="k">class</span><span class="err"> </span><span class="nc">Date</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="n">Date</span><span class="p">(</span><span class="kt">int</span> <span class="n">mn</span><span class="p">,</span> <span class="kt">int</span> <span class="n">dy</span><span class="p">,</span> <span class="kt">int</span> <span class="n">yr</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">}</span>
 
-<pre><code class="language-C++">class Date {
-public:
-    Date(int mn, int dy, int yr) {
-    }
+    <span class="kt">int</span> <span class="n">getMonth</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>     <span class="c1">// A read-only function
+</span><span class="c1"></span>    <span class="kt">void</span> <span class="nf">setMonth</span><span class="p">(</span><span class="kt">int</span> <span class="n">mn</span><span class="p">);</span>   <span class="c1">// A write function; can&#39;t be const
+</span><span class="c1"></span><span class="k">private</span><span class="o">:</span>
+    <span class="kt">int</span> <span class="n">month</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">};</span>
 
-    int getMonth() const;     // A read-only function
-    void setMonth(int mn);   // A write function; can't be const
-private:
-    int month = 0;
-};
+<span class="kt">int</span> <span class="n">Date</span><span class="o">::</span><span class="n">getMonth</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">month</span><span class="p">;</span>        <span class="c1">// Doesn&#39;t modify anything
+</span><span class="c1"></span><span class="p">}</span>
 
-int Date::getMonth() const {
-    return month;        // Doesn't modify anything
-}
+<span class="kt">void</span> <span class="n">Date</span><span class="o">::</span><span class="n">setMonth</span><span class="p">(</span><span class="kt">int</span> <span class="n">mn</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">month</span> <span class="o">=</span> <span class="n">mn</span><span class="p">;</span>          <span class="c1">// Modifies data member
+</span><span class="c1"></span><span class="p">}</span>
 
-void Date::setMonth(int mn) {
-    month = mn;          // Modifies data member
-}
-
-int main() {
-    Date MyDate(7, 4, 1998);
-    const Date BirthDate(1, 18, 1953);
-    MyDate.setMonth(4);    // Okay
-    BirthDate.getMonth();    // Okay
-    BirthDate.setMonth(4); // C2662 Error
-}
-</code></pre>
-
+<span class="kt">int</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">Date</span> <span class="n">MyDate</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1998</span><span class="p">);</span>
+    <span class="k">const</span> <span class="n">Date</span> <span class="nf">BirthDate</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">1953</span><span class="p">);</span>
+    <span class="n">MyDate</span><span class="p">.</span><span class="n">setMonth</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>    <span class="c1">// Okay
+</span><span class="c1"></span>    <span class="n">BirthDate</span><span class="p">.</span><span class="n">getMonth</span><span class="p">();</span>    <span class="c1">// Okay
+</span><span class="c1"></span>    <span class="n">BirthDate</span><span class="p">.</span><span class="n">setMonth</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span> <span class="c1">// C2662 Error
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div>
 <p>示例代码来自 MSDN，能够看出来，被 const 修饰的对象无法调用非 const 的成员函数，而在 const 修饰的成员函数中，也不能调用非 const 的成员函数，或者修改任何非静态的数据成员。</p>
 
 <h2 id="static-的用法">static 的用法</h2>
@@ -275,103 +272,88 @@ int main() {
 <p>如果是在函数内定义的 static 变量，那么即使在函数外，这个变量依旧存在（但只能在其作用域内使用）。</p>
 
 <p>未赋值的 static 变量会被被初始化为 0，static 修饰的变量具有内部链接性，无法在其他文件使用。如果用 static 修饰一个全局变量的话，那么它的作用就是限制这个变量只能在当前文件（模块）使用。</p>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
 
-<pre><code class="language-C++">#include &lt;iostream&gt;
+<span class="kt">void</span> <span class="nf">showstat</span><span class="p">(</span><span class="kt">int</span> <span class="n">curr</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">static</span> <span class="kt">int</span> <span class="n">nStatic</span><span class="p">;</span>    <span class="c1">// Value of nStatic is retained
+</span><span class="c1"></span>    <span class="c1">// between each function call
+</span><span class="c1"></span>    <span class="n">nStatic</span> <span class="o">+=</span> <span class="n">curr</span><span class="p">;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;nStatic is &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">nStatic</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
 
-using namespace std;
-
-void showstat(int curr) {
-    static int nStatic;    // Value of nStatic is retained
-    // between each function call
-    nStatic += curr;
-    cout &lt;&lt; &quot;nStatic is &quot; &lt;&lt; nStatic &lt;&lt; endl;
-}
-
-int main() {
-    for (int i = 0; i &lt; 5; i++)
-        showstat(i);
-}
-</code></pre>
-
-<pre><code class="language-bash">nStatic is 0
-nStatic is 1
-nStatic is 3
-nStatic is 6
-nStatic is 10
-</code></pre>
-
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+        <span class="n">showstat</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">nStatic is <span class="m">0</span>
+nStatic is <span class="m">1</span>
+nStatic is <span class="m">3</span>
+nStatic is <span class="m">6</span>
+nStatic is <span class="m">10</span></code></pre></div>
 <p>依旧是 MSDN 的示例代码，这个代码就已经很好的表明了 static 的一些特性。</p>
 
 <p>在类中使用 static 变量：</p>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+<span class="k">class</span><span class="err"> </span><span class="nc">CMyClass</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+   <span class="k">static</span> <span class="kt">int</span> <span class="n">m_i</span><span class="p">;</span>
+<span class="p">};</span>
 
-<pre><code class="language-C++">#include &lt;iostream&gt;
+<span class="kt">int</span> <span class="n">CMyClass</span><span class="o">::</span><span class="n">m_i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="n">CMyClass</span> <span class="n">myObject1</span><span class="p">;</span>
+<span class="n">CMyClass</span> <span class="n">myObject2</span><span class="p">;</span>
 
-using namespace std;
-class CMyClass {
-public:
-   static int m_i;
-};
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+   <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">myObject1</span><span class="p">.</span><span class="n">m_i</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+   <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">myObject2</span><span class="p">.</span><span class="n">m_i</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
 
-int CMyClass::m_i = 0;
-CMyClass myObject1;
-CMyClass myObject2;
+   <span class="n">myObject1</span><span class="p">.</span><span class="n">m_i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+   <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">myObject1</span><span class="p">.</span><span class="n">m_i</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+   <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">myObject2</span><span class="p">.</span><span class="n">m_i</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
 
-int main() {
-   cout &lt;&lt; myObject1.m_i &lt;&lt; endl;
-   cout &lt;&lt; myObject2.m_i &lt;&lt; endl;
+   <span class="n">myObject2</span><span class="p">.</span><span class="n">m_i</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+   <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">myObject1</span><span class="p">.</span><span class="n">m_i</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+   <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">myObject2</span><span class="p">.</span><span class="n">m_i</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
 
-   myObject1.m_i = 1;
-   cout &lt;&lt; myObject1.m_i &lt;&lt; endl;
-   cout &lt;&lt; myObject2.m_i &lt;&lt; endl;
-
-   myObject2.m_i = 2;
-   cout &lt;&lt; myObject1.m_i &lt;&lt; endl;
-   cout &lt;&lt; myObject2.m_i &lt;&lt; endl;
-
-   CMyClass::m_i = 3;
-   cout &lt;&lt; myObject1.m_i &lt;&lt; endl;
-   cout &lt;&lt; myObject2.m_i &lt;&lt; endl;
-}
-</code></pre>
-
-<pre><code class="language-bash">0
-0
-1
-1
-2
-2
-3
-3
-</code></pre>
-
+   <span class="n">CMyClass</span><span class="o">::</span><span class="n">m_i</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+   <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">myObject1</span><span class="p">.</span><span class="n">m_i</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+   <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">myObject2</span><span class="p">.</span><span class="n">m_i</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="m">0</span>
+<span class="m">0</span>
+<span class="m">1</span>
+<span class="m">1</span>
+<span class="m">2</span>
+<span class="m">2</span>
+<span class="m">3</span>
+<span class="m">3</span></code></pre></div>
 <p>在类的成员函数中使用 static 变量：</p>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span><span class="cp"></span><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+<span class="k">struct</span> <span class="n">C</span> <span class="p">{</span>
+   <span class="kt">void</span> <span class="n">Test</span><span class="p">(</span><span class="kt">int</span> <span class="n">value</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">static</span> <span class="kt">int</span> <span class="n">var</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">var</span> <span class="o">==</span> <span class="n">value</span><span class="p">)</span>
+         <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;var == value&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+      <span class="k">else</span>
+         <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;var != value&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
 
-<pre><code class="language-C++">#include &lt;iostream&gt;
-using namespace std;
-struct C {
-   void Test(int value) {
-      static int var = 0;
-      if (var == value)
-         cout &lt;&lt; &quot;var == value&quot; &lt;&lt; endl;
-      else
-         cout &lt;&lt; &quot;var != value&quot; &lt;&lt; endl;
+      <span class="n">var</span> <span class="o">=</span> <span class="n">value</span><span class="p">;</span>
+   <span class="p">}</span>
+<span class="p">};</span>
 
-      var = value;
-   }
-};
-
-int main() {
-   C c1;
-   C c2;
-   c1.Test(100);
-   c2.Test(100);
-}
-</code></pre>
-
-<pre><code class="language-bash">var != value
-var == value
-</code></pre>
-
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+   <span class="n">C</span> <span class="n">c1</span><span class="p">;</span>
+   <span class="n">C</span> <span class="n">c2</span><span class="p">;</span>
+   <span class="n">c1</span><span class="p">.</span><span class="n">Test</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
+   <span class="n">c2</span><span class="p">.</span><span class="n">Test</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">var !<span class="o">=</span> value
+<span class="nv">var</span> <span class="o">==</span> value</code></pre></div>
 <h2 id="参考">参考</h2>
 
 <ul>

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>Linux 中多个进程操作同一个文件时会发生什么 - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -215,53 +216,44 @@
 <p>我们通过两个简单的 Go 语言程序来测试一下在读文件的同时修改文件会发生什么：</p>
 
 <p><strong>testwrite.go</strong></p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">writeFile</span><span class="p">(</span><span class="nx">filename</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">data</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">f</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">os</span><span class="p">.</span><span class="nf">OpenFile</span><span class="p">(</span><span class="nx">filename</span><span class="p">,</span> <span class="nx">os</span><span class="p">.</span><span class="nx">O_CREATE</span><span class="p">|</span><span class="nx">os</span><span class="p">.</span><span class="nx">O_WRONLY</span><span class="p">,</span> <span class="mo">0644</span><span class="p">)</span>
+	<span class="k">defer</span> <span class="nx">f</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
+	<span class="nx">body</span> <span class="o">:=</span> <span class="p">[]</span><span class="nb">byte</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+	<span class="nx">_</span><span class="p">,</span> <span class="nx">_</span> <span class="p">=</span> <span class="nx">f</span><span class="p">.</span><span class="nf">Write</span><span class="p">(</span><span class="nx">body</span><span class="p">)</span>
+<span class="p">}</span>
 
-<pre><code class="language-go">func writeFile(filename string, data string) {
-	f, _ := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY, 0644)
-	defer f.Close()
-	body := []byte(data)
-	_, _ = f.Write(body)
-}
-
-func main() {
-	// 首先向文件中写入 “Hello World!”
-	writeFile(&quot;test.txt&quot;, &quot;Hello World!&quot;)
-	time.Sleep(7 * time.Second)
-	// 七秒后，修改文件内容，写入 “Author MeiK!”
-	writeFile(&quot;test.txt&quot;, &quot;Author MeiK!&quot;)
-}
-</code></pre>
-
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="c1">// 首先向文件中写入 “Hello World!”
+</span><span class="c1"></span>	<span class="nf">writeFile</span><span class="p">(</span><span class="s">&#34;test.txt&#34;</span><span class="p">,</span> <span class="s">&#34;Hello World!&#34;</span><span class="p">)</span>
+	<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">7</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+	<span class="c1">// 七秒后，修改文件内容，写入 “Author MeiK!”
+</span><span class="c1"></span>	<span class="nf">writeFile</span><span class="p">(</span><span class="s">&#34;test.txt&#34;</span><span class="p">,</span> <span class="s">&#34;Author MeiK!&#34;</span><span class="p">)</span>
+<span class="p">}</span></code></pre></div>
 <p><strong>testread.go</strong></p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">readFile</span><span class="p">(</span><span class="nx">filename</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">f</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">os</span><span class="p">.</span><span class="nf">OpenFile</span><span class="p">(</span><span class="nx">filename</span><span class="p">,</span> <span class="nx">unix</span><span class="p">.</span><span class="nx">O_RDONLY</span><span class="p">,</span> <span class="mo">0644</span><span class="p">)</span>
+	<span class="k">defer</span> <span class="nx">f</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
 
-<pre><code class="language-go">func readFile(filename string) {
-	f, _ := os.OpenFile(filename, unix.O_RDONLY, 0644)
-	defer f.Close()
+	<span class="nx">body</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">byte</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+	<span class="nx">n</span> <span class="o">:=</span> <span class="mi">1</span>
+	<span class="k">for</span> <span class="nx">n</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+		<span class="kd">var</span> <span class="nx">err</span> <span class="kt">error</span>
+		<span class="nx">n</span><span class="p">,</span> <span class="nx">err</span> <span class="p">=</span> <span class="nx">f</span><span class="p">.</span><span class="nf">Read</span><span class="p">(</span><span class="nx">body</span><span class="p">)</span>
+		<span class="k">if</span> <span class="nx">err</span> <span class="o">==</span> <span class="nx">io</span><span class="p">.</span><span class="nx">EOF</span> <span class="p">{</span>
+			<span class="k">break</span>
+		<span class="p">}</span>
+		<span class="nx">s</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">f</span><span class="p">.</span><span class="nf">Seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">os</span><span class="p">.</span><span class="nx">SEEK_CUR</span><span class="p">)</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%c %d\n&#34;</span><span class="p">,</span> <span class="nx">body</span><span class="p">,</span> <span class="nx">s</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span>
 
-	body := make([]byte, 1)
-	n := 1
-	for n != 0 {
-		time.Sleep(time.Second)
-		var err error
-		n, err = f.Read(body)
-		if err == io.EOF {
-			break
-		}
-		s, _ := f.Seek(0, os.SEEK_CUR)
-		fmt.Printf(&quot;%c %d\n&quot;, body, s)
-	}
-}
-
-func main() {
-	readFile(&quot;test.txt&quot;)
-}
-</code></pre>
-
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nf">readFile</span><span class="p">(</span><span class="s">&#34;test.txt&#34;</span><span class="p">)</span>
+<span class="p">}</span></code></pre></div>
 <p>同时执行两个程序：</p>
-
-<pre><code class="language-shell">./testwrite &amp; ./testread
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-shell" data-lang="shell">./testwrite <span class="p">&amp;</span> ./testread</code></pre></div>
 <p>输出：</p>
 
 <pre><code>[H] 1
@@ -287,67 +279,61 @@ func main() {
 <p>我们对刚刚的文件稍作修改，使用 <code>fcntl</code> 进行加锁：</p>
 
 <p><strong>testwrite.go</strong></p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">writeFile</span><span class="p">(</span><span class="nx">filename</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">data</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;write start&#34;</span><span class="p">)</span>
+	<span class="nx">f</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">os</span><span class="p">.</span><span class="nf">OpenFile</span><span class="p">(</span><span class="nx">filename</span><span class="p">,</span> <span class="nx">os</span><span class="p">.</span><span class="nx">O_CREATE</span><span class="p">|</span><span class="nx">os</span><span class="p">.</span><span class="nx">O_WRONLY</span><span class="p">,</span> <span class="mo">0644</span><span class="p">)</span>
+	<span class="k">defer</span> <span class="nx">f</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
 
-<pre><code class="language-go">func writeFile(filename string, data string) {
-	fmt.Println(&quot;write start&quot;)
-	f, _ := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY, 0644)
-	defer f.Close()
+	<span class="nx">flockT</span> <span class="o">:=</span> <span class="nx">unix</span><span class="p">.</span><span class="nx">Flock_t</span><span class="p">{</span>
+		<span class="nx">Type</span><span class="p">:</span>   <span class="nx">unix</span><span class="p">.</span><span class="nx">F_WRLCK</span><span class="p">,</span>
+		<span class="nx">Whence</span><span class="p">:</span> <span class="nx">io</span><span class="p">.</span><span class="nx">SeekStart</span><span class="p">,</span>
+		<span class="nx">Start</span><span class="p">:</span>  <span class="mi">0</span><span class="p">,</span>
+		<span class="nx">Len</span><span class="p">:</span>    <span class="mi">0</span><span class="p">,</span>
+	<span class="p">}</span>
+	<span class="nx">_</span> <span class="p">=</span> <span class="nx">unix</span><span class="p">.</span><span class="nf">FcntlFlock</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nf">Fd</span><span class="p">(),</span> <span class="nx">unix</span><span class="p">.</span><span class="nx">F_SETLKW</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">flockT</span><span class="p">)</span>
 
-	flockT := unix.Flock_t{
-		Type:   unix.F_WRLCK,
-		Whence: io.SeekStart,
-		Start:  0,
-		Len:    0,
-	}
-	_ = unix.FcntlFlock(f.Fd(), unix.F_SETLKW, &amp;flockT)
+	<span class="nx">body</span> <span class="o">:=</span> <span class="p">[]</span><span class="nb">byte</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+	<span class="nx">_</span><span class="p">,</span> <span class="nx">_</span> <span class="p">=</span> <span class="nx">f</span><span class="p">.</span><span class="nf">Write</span><span class="p">(</span><span class="nx">body</span><span class="p">)</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;write end&#34;</span><span class="p">)</span>
+<span class="p">}</span>
 
-	body := []byte(data)
-	_, _ = f.Write(body)
-	fmt.Println(&quot;write end&quot;)
-}
-
-func main() {
-	// 首先向文件中写入 “Hello World!”
-	writeFile(&quot;test.txt&quot;, &quot;Hello World!&quot;)
-	time.Sleep(7 * time.Second)
-	// 七秒后，修改文件内容，写入 “Author MeiK!”
-	writeFile(&quot;test.txt&quot;, &quot;Author MeiK!&quot;)
-}
-</code></pre>
-
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="c1">// 首先向文件中写入 “Hello World!”
+</span><span class="c1"></span>	<span class="nf">writeFile</span><span class="p">(</span><span class="s">&#34;test.txt&#34;</span><span class="p">,</span> <span class="s">&#34;Hello World!&#34;</span><span class="p">)</span>
+	<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">7</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+	<span class="c1">// 七秒后，修改文件内容，写入 “Author MeiK!”
+</span><span class="c1"></span>	<span class="nf">writeFile</span><span class="p">(</span><span class="s">&#34;test.txt&#34;</span><span class="p">,</span> <span class="s">&#34;Author MeiK!&#34;</span><span class="p">)</span>
+<span class="p">}</span></code></pre></div>
 <p><strong>testread.go</strong></p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nf">readFile</span><span class="p">(</span><span class="nx">filename</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+	<span class="nx">f</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">os</span><span class="p">.</span><span class="nf">OpenFile</span><span class="p">(</span><span class="nx">filename</span><span class="p">,</span> <span class="nx">unix</span><span class="p">.</span><span class="nx">O_RDONLY</span><span class="p">,</span> <span class="mo">0644</span><span class="p">)</span>
+	<span class="k">defer</span> <span class="nx">f</span><span class="p">.</span><span class="nf">Close</span><span class="p">()</span>
 
-<pre><code class="language-go">func readFile(filename string) {
-	f, _ := os.OpenFile(filename, unix.O_RDONLY, 0644)
-	defer f.Close()
+	<span class="nx">flockT</span> <span class="o">:=</span> <span class="nx">unix</span><span class="p">.</span><span class="nx">Flock_t</span><span class="p">{</span>
+		<span class="nx">Type</span><span class="p">:</span>   <span class="nx">unix</span><span class="p">.</span><span class="nx">F_RDLCK</span><span class="p">,</span>
+		<span class="nx">Whence</span><span class="p">:</span> <span class="nx">io</span><span class="p">.</span><span class="nx">SeekStart</span><span class="p">,</span>
+		<span class="nx">Start</span><span class="p">:</span>  <span class="mi">0</span><span class="p">,</span>
+		<span class="nx">Len</span><span class="p">:</span>    <span class="mi">0</span><span class="p">,</span>
+	<span class="p">}</span>
+	<span class="nx">_</span> <span class="p">=</span> <span class="nx">unix</span><span class="p">.</span><span class="nf">FcntlFlock</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nf">Fd</span><span class="p">(),</span> <span class="nx">unix</span><span class="p">.</span><span class="nx">F_SETLKW</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">flockT</span><span class="p">)</span>
 
-	flockT := unix.Flock_t{
-		Type:   unix.F_RDLCK,
-		Whence: io.SeekStart,
-		Start:  0,
-		Len:    0,
-	}
-	_ = unix.FcntlFlock(f.Fd(), unix.F_SETLKW, &amp;flockT)
+	<span class="nx">body</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">byte</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+	<span class="nx">n</span> <span class="o">:=</span> <span class="mi">1</span>
+	<span class="k">for</span> <span class="nx">n</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+		<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+		<span class="kd">var</span> <span class="nx">err</span> <span class="kt">error</span>
+		<span class="nx">n</span><span class="p">,</span> <span class="nx">err</span> <span class="p">=</span> <span class="nx">f</span><span class="p">.</span><span class="nf">Read</span><span class="p">(</span><span class="nx">body</span><span class="p">)</span>
+		<span class="k">if</span> <span class="nx">err</span> <span class="o">==</span> <span class="nx">io</span><span class="p">.</span><span class="nx">EOF</span> <span class="p">{</span>
+			<span class="k">break</span>
+		<span class="p">}</span>
+		<span class="nx">s</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">f</span><span class="p">.</span><span class="nf">Seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">os</span><span class="p">.</span><span class="nx">SEEK_CUR</span><span class="p">)</span>
+		<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%c %d\n&#34;</span><span class="p">,</span> <span class="nx">body</span><span class="p">,</span> <span class="nx">s</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span>
 
-	body := make([]byte, 1)
-	n := 1
-	for n != 0 {
-		time.Sleep(time.Second)
-		var err error
-		n, err = f.Read(body)
-		if err == io.EOF {
-			break
-		}
-		s, _ := f.Seek(0, os.SEEK_CUR)
-		fmt.Printf(&quot;%c %d\n&quot;, body, s)
-	}
-}
-
-func main() {
-	readFile(&quot;test.txt&quot;)
-}
-</code></pre>
-
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nf">readFile</span><span class="p">(</span><span class="s">&#34;test.txt&#34;</span><span class="p">)</span>
+<span class="p">}</span></code></pre></div>
 <p>额外添加 <code>write start</code> 和 <code>write end</code> 来标识当前进度，执行结果如下：</p>
 
 <pre><code>write start

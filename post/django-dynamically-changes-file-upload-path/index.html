@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>Django 动态更改文件上传路径 - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -232,18 +233,15 @@
 </table>
 
 <p>一个例子：</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">django.contrib.auth</span> <span class="kn">import</span> <span class="n">get_user_model</span>
 
-<pre><code class="language-python">from django.contrib.auth import get_user_model
+<span class="k">def</span> <span class="nf">user_directory_path</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="c1"># file will be uploaded to MEDIA_ROOT/user_&lt;id&gt;/&lt;filename&gt;</span>
+    <span class="k">return</span> <span class="s1">&#39;user_{0}/{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
 
-def user_directory_path(instance, filename):
-    # file will be uploaded to MEDIA_ROOT/user_&lt;id&gt;/&lt;filename&gt;
-    return 'user_{0}/{1}'.format(instance.user.id, filename)
-
-class MyModel(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    upload = models.FileField(upload_to=user_directory_path)
-</code></pre>
-
+<span class="k">class</span> <span class="nc">MyModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">get_user_model</span><span class="p">(),</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
+    <span class="n">upload</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">FileField</span><span class="p">(</span><span class="n">upload_to</span><span class="o">=</span><span class="n">user_directory_path</span><span class="p">)</span></code></pre></div>
 <p>这样可以把文件动态的存储为 <code>user_{user_id}/{filename}</code> ，这是一个对于 <code>setting.py</code> 中设置的 <code>MEDIA_ROOT</code> 目录的相对路径。</p>
 
 <p>在设置时也可以使用模型中定义的其他字段，但是要注意的是，这个路径的计算是在对象存到数据库之前进行的，因此，如果模型中定义了 <code>AutoField</code> 自增字段，那么，在设置路径时，这个字段还没有值。</p></article>

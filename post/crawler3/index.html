@@ -9,6 +9,7 @@
     <link rel="stylesheet" href='https://meik2333.com/css/github-style.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/light.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
+    <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>如何写一个爬虫 - 第三篇 - MeiK&#39;s blog</title>
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
     <meta name="theme-color" content="#1e2327">
@@ -170,7 +171,7 @@
               <div class="file-header d-flex flex-md-items-center flex-items-start">
                 <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
                   <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
-                    1659 Words
+                    1653 Words
                     
 
                   </div>
@@ -220,66 +221,54 @@
 <p><code>Request</code> 沿用之前 <code>fetch</code> 的参数，而对于 <code>Response</code> ，我们先简单的做一下响应的解析。因此，两个类的定义分别如下：</p>
 
 <p><strong>models.py/Request</strong></p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Request</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
+        <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
+        <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
+        <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="s2">&#34;&#34;</span> <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">data</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">headers</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">headers</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">params</span>
 
-<pre><code class="language-python">class Request(object):
-    def __init__(
-        self,
-        method: str = None,
-        url: str = None,
-        headers: dict = None,
-        data: str = None,
-        params: dict = None,
-    ):
-        data = &quot;&quot; if data is None else data
-        headers = {} if headers is None else headers
-        params = {} if params is None else params
-
-        self.method = method
-        self.url = url
-        self.headers = headers
-        self.data = data
-        self.params = params
-</code></pre>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">headers</span> <span class="o">=</span> <span class="n">headers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span></code></pre></div>
 <p><strong>models.py/Response</strong></p>
-
-<pre><code class="language-python">class Response(object):
-    def __init__(self, request, raw_content):
-        self.raw_content = raw_content  # 原始的响应内容
-        self.headers = {}  # 响应的 headers
-        self.content = None  # 响应的正文内容
-        self.status_code = None  # 响应的 HTTP 状态码
-        self.request = request  # 对应的 Request
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Response</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">raw_content</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">raw_content</span> <span class="o">=</span> <span class="n">raw_content</span>  <span class="c1"># 原始的响应内容</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">headers</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># 响应的 headers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="bp">None</span>  <span class="c1"># 响应的正文内容</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status_code</span> <span class="o">=</span> <span class="bp">None</span>  <span class="c1"># 响应的 HTTP 状态码</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="o">=</span> <span class="n">request</span>  <span class="c1"># 对应的 Request</span></code></pre></div>
 <p><code>Request</code> 与 <code>Response</code> 分别对应请求与响应的内容，我们认为一次（或同一站点的多次）与网站的交互为一次会话，请求与响应通过会话联系起来。因此为了将两个类联系起来，我们引入一个新的类 <code>Session</code> 。一个 <code>Session</code> 可能关联多个 <code>Request</code> 与 <code>Response</code> 。</p>
 
 <p><strong>sessions.py/Session</strong></p>
-
-<pre><code class="language-python">class Session(object):
-    def send(self, request: Request) -&gt; Response:
-        # 利用 fetch 函数，发送 Request 并返回 Response
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Session</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+        <span class="c1"># 利用 fetch 函数，发送 Request 并返回 Response</span></code></pre></div>
 <p>从这个版本开始，我们的代码量已经比较大了，因此在博客中将只介绍部分代码，具体代码需要读者去 <a href="https://github.com/MeiK2333/ZeroCrawler">GitHub</a> 上自行查看。我也推荐读者能自己敲一下完整的代码，从而对我们的爬虫框架有更深刻的理解。</p>
 
 <p>实现了以上三个类的内容后，用户使用我们的框架的画风将是这样的：</p>
-
-<pre><code class="language-python">&gt;&gt;&gt; from ZeroCrawler.models import Request, Response
-&gt;&gt;&gt; from ZeroCrawler.sessions import Session
-&gt;&gt;&gt; session = Session()  # 实例化 Session
-&gt;&gt;&gt; req = Request(method='get', url='http://httpbin.org/get')  # 实例 Request
-&gt;&gt;&gt; resp = session.send(req)  # 发起请求
-&gt;&gt;&gt; print(resp)
-&lt;Response [200]&gt;
-&gt;&gt;&gt; resp.status_code
-200
-&gt;&gt;&gt; resp.headers
-{'Access-Control-Allow-Credentials': 'true', 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json', 'Date': 'Fri, 16 Aug 2019 07:40:38 GMT', 'Referrer-Policy': 'no-referrer-when-downgrade', 'Server': 'nginx', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'X-XSS-Protection': '1; mode=block', 'Content-Length': '146', 'Connection': 'Close'}
-&gt;&gt;&gt; resp.content
-'{\n  &quot;args&quot;: {}, \n  &quot;headers&quot;: {\n    &quot;Host&quot;: &quot;httpbin.org&quot;\n  }, \n  &quot;origin&quot;: &quot;36.110.78.251, 36.110.78.251&quot;, \n  &quot;url&quot;: &quot;https://httpbin.org/get&quot;\n}\n'
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">ZeroCrawler.models</span> <span class="kn">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">ZeroCrawler.sessions</span> <span class="kn">import</span> <span class="n">Session</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>  <span class="c1"># 实例化 Session</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s1">&#39;http://httpbin.org/get&#39;</span><span class="p">)</span>  <span class="c1"># 实例 Request</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">resp</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>  <span class="c1"># 发起请求</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span>
+<span class="o">&lt;</span><span class="n">Response</span> <span class="p">[</span><span class="mi">200</span><span class="p">]</span><span class="o">&gt;</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span>
+<span class="mi">200</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">resp</span><span class="o">.</span><span class="n">headers</span>
+<span class="p">{</span><span class="s1">&#39;Access-Control-Allow-Credentials&#39;</span><span class="p">:</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="s1">&#39;Access-Control-Allow-Origin&#39;</span><span class="p">:</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">,</span> <span class="s1">&#39;Date&#39;</span><span class="p">:</span> <span class="s1">&#39;Fri, 16 Aug 2019 07:40:38 GMT&#39;</span><span class="p">,</span> <span class="s1">&#39;Referrer-Policy&#39;</span><span class="p">:</span> <span class="s1">&#39;no-referrer-when-downgrade&#39;</span><span class="p">,</span> <span class="s1">&#39;Server&#39;</span><span class="p">:</span> <span class="s1">&#39;nginx&#39;</span><span class="p">,</span> <span class="s1">&#39;X-Content-Type-Options&#39;</span><span class="p">:</span> <span class="s1">&#39;nosniff&#39;</span><span class="p">,</span> <span class="s1">&#39;X-Frame-Options&#39;</span><span class="p">:</span> <span class="s1">&#39;DENY&#39;</span><span class="p">,</span> <span class="s1">&#39;X-XSS-Protection&#39;</span><span class="p">:</span> <span class="s1">&#39;1; mode=block&#39;</span><span class="p">,</span> <span class="s1">&#39;Content-Length&#39;</span><span class="p">:</span> <span class="s1">&#39;146&#39;</span><span class="p">,</span> <span class="s1">&#39;Connection&#39;</span><span class="p">:</span> <span class="s1">&#39;Close&#39;</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">resp</span><span class="o">.</span><span class="n">content</span>
+<span class="s1">&#39;{</span><span class="se">\n</span><span class="s1">  &#34;args&#34;: {}, </span><span class="se">\n</span><span class="s1">  &#34;headers&#34;: {</span><span class="se">\n</span><span class="s1">    &#34;Host&#34;: &#34;httpbin.org&#34;</span><span class="se">\n</span><span class="s1">  }, </span><span class="se">\n</span><span class="s1">  &#34;origin&#34;: &#34;36.110.78.251, 36.110.78.251&#34;, </span><span class="se">\n</span><span class="s1">  &#34;url&#34;: &#34;https://httpbin.org/get&#34;</span><span class="se">\n</span><span class="s1">}</span><span class="se">\n</span><span class="s1">&#39;</span></code></pre></div>
 <p>除了 <code>Response</code> 已经帮我们把数据解析出来了以外，看起来好像并没有比以前简洁多少。别慌，让我们再加点东西。</p>
 
 <h2 id="人类可用的-api">人类可用的 API</h2>
@@ -289,65 +278,47 @@
 </blockquote>
 
 <p>首先我们为 <code>Session</code> 添加两个函数，让我们可以在 <code>Session</code> 中使用 <code>with</code> ：</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Session</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
 
-<pre><code class="language-python">class Session(object):
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *args):
-        pass
-</code></pre>
-
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">pass</span></code></pre></div>
 <p>这让我们可以这样使用：</p>
-
-<pre><code class="language-python">with sessions.Session() as session:
-    resp = session.send(req)
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">with</span> <span class="n">sessions</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+    <span class="n">resp</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">req</span><span class="p">)</span></code></pre></div>
 <p>代码的缩进关系可以让我们更容易看出类之间的包含关系，当然这并不是我们修改的主要原因，下一章将具体介绍这段代码的作用，具体的优化在后面。</p>
 
 <p>创建文件 <code>api.py</code> ，并写入如下内容：</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">sessions</span>
 
-<pre><code class="language-python">from . import sessions
-
-def request(method: str, url: str, **kwargs):
-    with sessions.Session() as session:
-        return session.request(method=method, url=url, **kwargs)
-</code></pre>
-
+<span class="k">def</span> <span class="nf">request</span><span class="p">(</span><span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">sessions</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">session</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code></pre></div>
 <p>现在我们使用它的方法变成了这样：</p>
-
-<pre><code class="language-python">&gt;&gt;&gt; from ZeroCrawler.api import request
-&gt;&gt;&gt; resp = request('get', 'http://httpbin.org/get')
-&gt;&gt;&gt; resp.status_code
-200
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">ZeroCrawler.api</span> <span class="kn">import</span> <span class="n">request</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">resp</span> <span class="o">=</span> <span class="n">request</span><span class="p">(</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;http://httpbin.org/get&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span>
+<span class="mi">200</span></code></pre></div>
 <p>是不是很简单？我们还能让它更简单一点。在上一章中我们介绍了 HTTP 的请求方法，目前共有九种，我们可以为这九种（其实是七种，因为有两种 <code>CONNECT</code> 和 <code>TRACE</code> 是用于 HTTP 调试的）来创建“快捷方式”：</p>
 
 <p><strong>api.py</strong></p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">request</span><span class="p">(</span><span class="s2">&#34;get&#34;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<pre><code class="language-python">def get(url: str, params: dict = None, **kwargs):
-    return request(&quot;get&quot;, url, params=params, **kwargs)
+<span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">request</span><span class="p">(</span><span class="s2">&#34;post&#34;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-def post(url: str, data: str = None, **kwargs):
-    return request(&quot;post&quot;, url, data=data, **kwargs)
-
-def options(url: str, **kwargs):  # ...
-def head(url: str, **kwargs):  # ...
-def put(url: str, data: str = None, **kwargs):  # ...
-def patch(url: str, data: str = None, **kwargs):  # ...
-def delete(url: str, **kwargs):  # ...
-</code></pre>
-
+<span class="k">def</span> <span class="nf">options</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># ...</span>
+<span class="k">def</span> <span class="nf">head</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># ...</span>
+<span class="k">def</span> <span class="nf">put</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># ...</span>
+<span class="k">def</span> <span class="nf">patch</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># ...</span>
+<span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># ...</span></code></pre></div>
 <p>最终，我们的用法变成了这样：</p>
-
-<pre><code class="language-python">&gt;&gt;&gt; from ZeroCrawler.api import get
-&gt;&gt;&gt; resp = get('http://httpbin.org/get')
-&gt;&gt;&gt; resp.status_code
-200
-</code></pre>
-
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">ZeroCrawler.api</span> <span class="kn">import</span> <span class="n">get</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">resp</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="s1">&#39;http://httpbin.org/get&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span>
+<span class="mi">200</span></code></pre></div>
 <p>简单明了，符合我们的期望。</p>
 
 <h2 id="总结">总结</h2>
