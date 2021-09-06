@@ -11,7 +11,9 @@
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>OnlineJudge 评测原理与常见问题解答 - MeiK&#39;s blog</title>
+    
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
+    
     <meta name="theme-color" content="#1e2327">
 
     
@@ -127,6 +129,8 @@
   </header>
 </div>
   
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/tippy.js@6"></script>
 <div>
   <main>
     <div class="gisthead pagehead bg-gray-light pb-0 pt-3 mb-4">
@@ -171,10 +175,16 @@
         <div>
           <div class="js-gist-file-update-container js-task-list-container file-box">
             <div id="file-pytest" class="file my-2">
-              <div class="file-header d-flex flex-md-items-center flex-items-start">
+              <div id="post-header" class="file-header d-flex flex-md-items-center flex-items-start sticky-header">
                 <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
                   <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
-                    1556 Words
+                    
+                    <summary id="toc-toggle" class="btn btn-octicon m-0 mr-2 p-2" aria-haspopup="menu" aria-label="Table of Contents" role="button">
+                      <svg aria-hidden="true" viewBox="0 0 16 16" height="16" width="16" class="octicon octicon-list-unordered">
+                        <path fill-rule="evenodd" d="M2 4a1 1 0 100-2 1 1 0 000 2zm3.75-1.5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zm0 5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zm0 5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zM3 8a1 1 0 11-2 0 1 1 0 012 0zm-1 6a1 1 0 100-2 1 1 0 000 2z"></path>
+                      </svg>
+                    </summary>
+                          1556 Words
                     
 
                   </div>
@@ -298,6 +308,70 @@ C/C++ 代码风格指导》</a>，里面有配置环境的方法与一些敲代�
     </div>
   </main>
 </div>
+<script>
+ 
+ 
+ 
+ window.onload = function () {
+   const header = document.getElementById('post-header');
+   const headerHeight = header.offsetHeight;
+   
+   document.documentElement.style.scrollPaddingTop = headerHeight + 10 + "px";
+ }
+
+ const tocToggleButton = document.getElementById("toc-toggle");
+
+ const tippyInstance = tippy('#toc-toggle', {
+  trigger: 'click',
+  content: '<div id="table-of-contents">\x3cnav id=\x22TableOfContents\x22\x3e\n\x3cul\x3e\n\x3cli\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#onlinejudge-的评测原理\x22\x3eOnlineJudge 的评测原理\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#资源限制\x22\x3e资源限制\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#权限限制\x22\x3e权限限制\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#输入输出\x22\x3e输入输出\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#对比答案\x22\x3e对比答案\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#完整实现\x22\x3e完整实现\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#常见问题解答\x22\x3e常见问题解答\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#为什么我本地-ac-提交却-wa-了\x22\x3e为什么我本地 AC，提交却 WA 了\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#为什么我本地-ac-提交却-ce-了\x22\x3e为什么我本地 AC，提交却 CE 了\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#为什么我的提交-se-了\x22\x3e为什么我的提交 SE 了\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#为什么我本地-wa-提交却-ac-了\x22\x3e为什么我本地 WA，提交却 AC 了\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#道理我都懂但是我要怎么减少这些错误\x22\x3e道理我都懂但是我要怎么减少这些错误\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\n\x3c\/nav\x3e</div>',
+  allowHTML: true,
+  placement: 'bottom-start',
+  interactive: true,
+  arrow: false,
+  maxWidth: "none",
+  onHide: function () { tocToggleButton.classList.remove("hover"); },
+  onShow: function () { tocToggleButton.classList.add("hover"); },
+  onShown: function () {
+    selectTableOfContentsOption();
+
+    if (window.hasSetupTableOfContentsListeners) {
+      return;
+    }
+
+    const tableOfContents = document.getElementById("table-of-contents");
+    tableOfContents.addEventListener('click', function () {
+      
+      tippyInstance[0].hide();
+    });
+
+    window.hasSetupTableOfContentsListeners = true;
+  }
+ });
+
+ function selectTableOfContentsOption () {
+   const optionSelectedClass = 'table-of-contents-option-selected';
+
+   const tableOfContentsOptions = document.querySelectorAll("#table-of-contents > nav > ul li");
+
+   for (const option of tableOfContentsOptions) {
+     
+
+     const [child] = option.children;
+     if (child.tagName.toLowerCase() !== 'a') {
+       continue;
+     }
+
+     if (window.location.href === child.href) {
+       child.classList.add(optionSelectedClass);
+     } else {
+       child.classList.remove(optionSelectedClass);
+     }
+   }
+ }
+
+ window.onhashchange = selectTableOfContentsOption;
+</script>
+
 
   <div class="footer container-xl width-full p-responsive">
   <div

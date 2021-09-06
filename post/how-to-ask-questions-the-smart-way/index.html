@@ -11,7 +11,9 @@
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>（转）提问的智慧 - MeiK&#39;s blog</title>
+    
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
+    
     <meta name="theme-color" content="#1e2327">
 
     
@@ -124,6 +126,8 @@
   </header>
 </div>
   
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/tippy.js@6"></script>
 <div>
   <main>
     <div class="gisthead pagehead bg-gray-light pb-0 pt-3 mb-4">
@@ -168,10 +172,16 @@
         <div>
           <div class="js-gist-file-update-container js-task-list-container file-box">
             <div id="file-pytest" class="file my-2">
-              <div class="file-header d-flex flex-md-items-center flex-items-start">
+              <div id="post-header" class="file-header d-flex flex-md-items-center flex-items-start sticky-header">
                 <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
                   <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
-                    19994 Words
+                    
+                    <summary id="toc-toggle" class="btn btn-octicon m-0 mr-2 p-2" aria-haspopup="menu" aria-label="Table of Contents" role="button">
+                      <svg aria-hidden="true" viewBox="0 0 16 16" height="16" width="16" class="octicon octicon-list-unordered">
+                        <path fill-rule="evenodd" d="M2 4a1 1 0 100-2 1 1 0 000 2zm3.75-1.5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zm0 5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zm0 5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zM3 8a1 1 0 11-2 0 1 1 0 012 0zm-1 6a1 1 0 100-2 1 1 0 000 2z"></path>
+                      </svg>
+                    </summary>
+                          19994 Words
                     
 
                   </div>
@@ -943,6 +953,70 @@ I&rsquo;ll be glad to translate responses, if you only use one or the other.</p>
     </div>
   </main>
 </div>
+<script>
+ 
+ 
+ 
+ window.onload = function () {
+   const header = document.getElementById('post-header');
+   const headerHeight = header.offsetHeight;
+   
+   document.documentElement.style.scrollPaddingTop = headerHeight + 10 + "px";
+ }
+
+ const tocToggleButton = document.getElementById("toc-toggle");
+
+ const tippyInstance = tippy('#toc-toggle', {
+  trigger: 'click',
+  content: '<div id="table-of-contents">\x3cnav id=\x22TableOfContents\x22\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#提问的智慧\x22\x3e提问的智慧\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#原文版本历史-https-github-com-ryanhanwu-smartquestions-blob-master-history-md\x22\x3e\x3ca href=\x22https:\/\/github.com\/ryanhanwu\/smartquestions\/blob\/master\/history.md\x22\x3e原文版本历史\x3c\/a\x3e\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#目录\x22\x3e目录\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#声明\x22\x3e声明\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#简介\x22\x3e简介\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#在提问之前\x22\x3e在提问之前\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#当你提问时\x22\x3e当你提问时\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#慎选提问的论坛\x22\x3e慎选提问的论坛\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#stack-overflow\x22\x3eStack Overflow\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#网站和-irc-论坛\x22\x3e网站和 IRC 论坛\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#第二步-使用项目邮件列表\x22\x3e第二步，使用项目邮件列表\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#使用有意义且描述明确的标题\x22\x3e使用有意义且描述明确的标题\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#使问题容易回复\x22\x3e使问题容易回复\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#用清晰-正确-精准并语法正确的语句\x22\x3e用清晰、正确、精准并语法正确的语句\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#使用易于读取且标准的文件格式发送问题\x22\x3e使用易于读取且标准的文件格式发送问题\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#精确的描述问题并言之有物\x22\x3e精确的描述问题并言之有物\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#话不在多而在精\x22\x3e话不在多而在精\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#别动辄声称找到-bug\x22\x3e别动辄声称找到 Bug\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#低声下气不能代替你的功课\x22\x3e低声下气不能代替你的功课\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#描述问题症状而非你的猜测\x22\x3e描述问题症状而非你的猜测\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#按发生时间先后列出问题症状\x22\x3e按发生时间先后列出问题症状\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#描述目标而不是过程\x22\x3e描述目标而不是过程\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#别要求使用私人电邮回复\x22\x3e别要求使用私人电邮回复\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#清楚明确的表达你的问题以及需求\x22\x3e清楚明确的表达你的问题以及需求\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#询问有关代码的问题时\x22\x3e询问有关代码的问题时\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#别把自己家庭作业的问题贴上来\x22\x3e别把自己家庭作业的问题贴上来\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#去掉无意义的提问句\x22\x3e去掉无意义的提问句\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#即使你很急也不要在标题写-紧急\x22\x3e即使你很急也不要在标题写\x3ccode\x3e紧急\x3c\/code\x3e\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#礼多人不怪-而且有时还很有帮助\x22\x3e礼多人不怪，而且有时还很有帮助\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#问题解决后-加个简短的补充说明\x22\x3e问题解决后，加个简短的补充说明\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#如何解读答案\x22\x3e如何解读答案\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#rtfm-和-stfw-如何知道你已完全搞砸了\x22\x3eRTFM 和 STFW：如何知道你已完全搞砸了\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#如果还是搞不懂\x22\x3e如果还是搞不懂\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#处理无礼的回应\x22\x3e处理无礼的回应\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#如何避免扮演失败者\x22\x3e如何避免扮演失败者\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#不该问的问题\x22\x3e不该问的问题\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#好问题与蠢问题\x22\x3e好问题与蠢问题\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#如果得不到回答\x22\x3e如果得不到回答\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#如何更好地回答问题\x22\x3e如何更好地回答问题\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#相关资源\x22\x3e相关资源\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#鸣谢\x22\x3e鸣谢\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\n\x3c\/nav\x3e</div>',
+  allowHTML: true,
+  placement: 'bottom-start',
+  interactive: true,
+  arrow: false,
+  maxWidth: "none",
+  onHide: function () { tocToggleButton.classList.remove("hover"); },
+  onShow: function () { tocToggleButton.classList.add("hover"); },
+  onShown: function () {
+    selectTableOfContentsOption();
+
+    if (window.hasSetupTableOfContentsListeners) {
+      return;
+    }
+
+    const tableOfContents = document.getElementById("table-of-contents");
+    tableOfContents.addEventListener('click', function () {
+      
+      tippyInstance[0].hide();
+    });
+
+    window.hasSetupTableOfContentsListeners = true;
+  }
+ });
+
+ function selectTableOfContentsOption () {
+   const optionSelectedClass = 'table-of-contents-option-selected';
+
+   const tableOfContentsOptions = document.querySelectorAll("#table-of-contents > nav > ul li");
+
+   for (const option of tableOfContentsOptions) {
+     
+
+     const [child] = option.children;
+     if (child.tagName.toLowerCase() !== 'a') {
+       continue;
+     }
+
+     if (window.location.href === child.href) {
+       child.classList.add(optionSelectedClass);
+     } else {
+       child.classList.remove(optionSelectedClass);
+     }
+   }
+ }
+
+ window.onhashchange = selectTableOfContentsOption;
+</script>
+
 
   <div class="footer container-xl width-full p-responsive">
   <div

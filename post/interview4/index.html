@@ -11,7 +11,9 @@
     <link rel="stylesheet" href='https://meik2333.com/css/dark.css' />
     <link rel="stylesheet" href='https://meik2333.com/css/syntax.css' />
     <title>面经答案整理四 - MeiK&#39;s blog</title>
+    
     <link rel="icon" type="image/x-icon" href='https://meik2333.com/images/favicon.ico'>
+    
     <meta name="theme-color" content="#1e2327">
 
     
@@ -130,6 +132,8 @@
   </header>
 </div>
   
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/tippy.js@6"></script>
 <div>
   <main>
     <div class="gisthead pagehead bg-gray-light pb-0 pt-3 mb-4">
@@ -174,10 +178,16 @@
         <div>
           <div class="js-gist-file-update-container js-task-list-container file-box">
             <div id="file-pytest" class="file my-2">
-              <div class="file-header d-flex flex-md-items-center flex-items-start">
+              <div id="post-header" class="file-header d-flex flex-md-items-center flex-items-start sticky-header">
                 <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
                   <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
-                    7993 Words
+                    
+                    <summary id="toc-toggle" class="btn btn-octicon m-0 mr-2 p-2" aria-haspopup="menu" aria-label="Table of Contents" role="button">
+                      <svg aria-hidden="true" viewBox="0 0 16 16" height="16" width="16" class="octicon octicon-list-unordered">
+                        <path fill-rule="evenodd" d="M2 4a1 1 0 100-2 1 1 0 000 2zm3.75-1.5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zm0 5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zm0 5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zM3 8a1 1 0 11-2 0 1 1 0 012 0zm-1 6a1 1 0 100-2 1 1 0 000 2z"></path>
+                      </svg>
+                    </summary>
+                          7993 Words
                     
 
                   </div>
@@ -775,6 +785,70 @@ HTTP 协议的第一个版本，只支持 GET 请求</li>
     </div>
   </main>
 </div>
+<script>
+ 
+ 
+ 
+ window.onload = function () {
+   const header = document.getElementById('post-header');
+   const headerHeight = header.offsetHeight;
+   
+   document.documentElement.style.scrollPaddingTop = headerHeight + 10 + "px";
+ }
+
+ const tocToggleButton = document.getElementById("toc-toggle");
+
+ const tippyInstance = tippy('#toc-toggle', {
+  trigger: 'click',
+  content: '<div id="table-of-contents">\x3cnav id=\x22TableOfContents\x22\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#c\x22\x3eC\x2b\x2b\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#各种排序的时间复杂度-空间复杂度-是否稳定-时间复杂度是否与初始序列有关\x22\x3e各种排序的时间复杂度，空间复杂度，是否稳定，时间复杂度是否与初始序列有关?\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#指针和引用的区别\x22\x3e指针和引用的区别？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#悬空指针和野指针有什么区别\x22\x3e悬空指针和野指针有什么区别？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#什么是内存泄漏-怎么产生的-如何检测\x22\x3e什么是内存泄漏？怎么产生的？如何检测？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#static-和-const-区别\x22\x3estatic 和 const 区别？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#const-和-define-的区别\x22\x3econst 和 define 的区别？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#struct-和-class-的区别\x22\x3estruct 和 class 的区别？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#sizeof-和-strlen-的区别\x22\x3esizeof 和 strlen 的区别？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#32位-64位系统中-各种常用内置数据类型占用的字节数\x22\x3e32位，64位系统中，各种常用内置数据类型占用的字节数？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#virtual-inline-decltype-volatile-static-const-关键字的作用-使用场景\x22\x3evirtual、inline、decltype、volatile、static、const 关键字的作用？使用场景？\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#virtual\x22\x3evirtual\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#inline\x22\x3einline\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#decltype\x22\x3edecltype\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#volatile\x22\x3evolatile\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#c-中函数指针的作用-由哪些属性唯一决定一个函数指针\x22\x3eC\x2b\x2b 中函数指针的作用？由哪些属性唯一决定一个函数指针？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#c-中如何唯一确定一个重载函数\x22\x3eC\x2b\x2b 中如何唯一确定一个重载函数？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#c-多态的实现机制-虚函数表的内部实现机制\x22\x3eC\x2b\x2b 多态的实现机制？虚函数表的内部实现机制？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#c-中重载-覆盖-隐藏的区别\x22\x3eC\x2b\x2b 中重载、覆盖、隐藏的区别？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#深拷贝与浅拷贝的区别\x22\x3e深拷贝与浅拷贝的区别？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#派生类中构造函数-析构函数调用顺序\x22\x3e派生类中构造函数、析构函数调用顺序？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#c-类中数据成员初始化顺序\x22\x3eC\x2b\x2b 类中数据成员初始化顺序？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#结构体内存对齐问题-结构体-类大小的计算\x22\x3e结构体内存对齐问题？结构体\/类大小的计算？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#static-cast-dynamic-cast-const-cast-reinpreter-cast-的区别\x22\x3estatic_cast、dynamic_cast、const_cast、reinpreter_cast 的区别？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#shared-ptr-unique-ptr-weak-ptr-的区别-auto-ptr-与-shared-ptr-的区别-weak-ptr-主要是为了解决什么问题的-shared-ptr-的内部实现\x22\x3eshared_ptr、unique_ptr、weak_ptr 的区别？auto_ptr 与 shared_ptr 的区别？weak_ptr 主要是为了解决什么问题的？shared_ptr 的内部实现？\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#auto-ptr-实现关键点\x22\x3eauto_ptr 实现关键点\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#new-delete-和-malloc-free-的区别\x22\x3enew\/delete 和 malloc\/free 的区别？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#new-operator-operator-new-placement-new-的区别\x22\x3enew operator、operator new、placement new 的区别？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#单例模式-懒汉式-饿汉式\x22\x3e单例模式？懒汉式？饿汉式？\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#单例模式的定义\x22\x3e单例模式的定义\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#懒汉式\x22\x3e懒汉式\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#饿汉式\x22\x3e饿汉式\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#参考\x22\x3e参考\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#计算机网络\x22\x3e计算机网络\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#tcp粘包问题-如何解决\x22\x3eTCP粘包问题？如何解决？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#如何使用udp建立可靠连接\x22\x3e如何使用UDP建立可靠连接？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#http-协议-各个版本的区别\x22\x3ehttp 协议：各个版本的区别？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#linux-常用网络命令的原理-ping-traceroute\x22\x3eLinux 常用网络命令的原理：ping、traceroute\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#dns-的作用-什么时候使用-tcp-什么时候使用-udp\x22\x3eDNS 的作用？什么时候使用 TCP?什么时候使用 UDP?\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#参考-1\x22\x3e参考\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#数据库\x22\x3e数据库\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#mysql-中-myisam-与-innodb-的区别\x22\x3eMySQL 中 MyISAM 与 InnoDB 的区别？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#索引-适合创建索引的条件-不适合创建索引的条件\x22\x3e索引？适合创建索引的条件？不适合创建索引的条件？\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#哪些情况适合建索引\x22\x3e哪些情况适合建索引？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#哪些情况不适合建索引\x22\x3e哪些情况不适合建索引？\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#索引优化策略-五个优化级别\x22\x3e索引优化策略？五个优化级别\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#存储过程\x22\x3e存储过程？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#触发器\x22\x3e触发器？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#参考-2\x22\x3e参考\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\n\x3c\/nav\x3e</div>',
+  allowHTML: true,
+  placement: 'bottom-start',
+  interactive: true,
+  arrow: false,
+  maxWidth: "none",
+  onHide: function () { tocToggleButton.classList.remove("hover"); },
+  onShow: function () { tocToggleButton.classList.add("hover"); },
+  onShown: function () {
+    selectTableOfContentsOption();
+
+    if (window.hasSetupTableOfContentsListeners) {
+      return;
+    }
+
+    const tableOfContents = document.getElementById("table-of-contents");
+    tableOfContents.addEventListener('click', function () {
+      
+      tippyInstance[0].hide();
+    });
+
+    window.hasSetupTableOfContentsListeners = true;
+  }
+ });
+
+ function selectTableOfContentsOption () {
+   const optionSelectedClass = 'table-of-contents-option-selected';
+
+   const tableOfContentsOptions = document.querySelectorAll("#table-of-contents > nav > ul li");
+
+   for (const option of tableOfContentsOptions) {
+     
+
+     const [child] = option.children;
+     if (child.tagName.toLowerCase() !== 'a') {
+       continue;
+     }
+
+     if (window.location.href === child.href) {
+       child.classList.add(optionSelectedClass);
+     } else {
+       child.classList.remove(optionSelectedClass);
+     }
+   }
+ }
+
+ window.onhashchange = selectTableOfContentsOption;
+</script>
+
 
   <div class="footer container-xl width-full p-responsive">
   <div

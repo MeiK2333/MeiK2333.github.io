@@ -28,8 +28,8 @@ let contributions;
 function switchYear(year) {
   let startDate;
   let endDate;
-  if (year != now.getFullYear().toString()) {
-    const date = new Date(`${year}-01-01 00:00:00`);
+  if (year !== now.getFullYear().toString()) {
+    const date = new Date(Number(year), 0, 1, 0, 0, 0, 0);
     startDate = new Date(date.getFullYear(), 0, 1);
     endDate = new Date(date.getFullYear(), 11, 31);
   } else {
@@ -60,7 +60,7 @@ function switchYear(year) {
 
   const yearList = document.querySelectorAll('.js-year-link');
   for (const elem of yearList) {
-    if (elem.innerText == year) {
+    if (elem.innerText === year) {
       elem.classList.add('selected');
     } else {
       elem.classList.remove('selected');
@@ -85,7 +85,7 @@ function monthly(year, month, posts) {
     </time>
   </li>`;
   }
-  let html = `
+  return `
   <div class="contribution-activity-listing float-left col-12 col-lg-10">
     <div class="width-full pb-4">
       <h3 class="h6 pr-2 py-1 border-bottom mb-3" style="height: 14px;">
@@ -133,7 +133,6 @@ function monthly(year, month, posts) {
       </div>
     </div>
   </div>`;
-  return html;
 }
 
 function yearList() {
@@ -156,7 +155,7 @@ function yearList() {
 
 function graph(year, posts, startDate, endDate) {
   const postsStr = posts.length === 1 ? "post" : "posts";
-  if (year == now.getFullYear().toString()) {
+  if (year === now.getFullYear().toString()) {
     document.querySelector('#posts-count').innerText = `${posts.length}  ${postsStr} in the last year`;
   } else {
     document.querySelector('#posts-count').innerText = `${posts.length}  ${postsStr} in ${year}`;
@@ -166,7 +165,7 @@ function graph(year, posts, startDate, endDate) {
   const count = {};
   for (const post of posts) {
     const date = `${post.date.getFullYear()}-${(post.date.getMonth() + 1).toString().padStart(2, '0')}-${post.date.getDate().toString().padStart(2, '0')}`;
-    if (count[date] == undefined) {
+    if (count[date] === undefined) {
       count[date] = 1;
     } else {
       count[date]++;
@@ -174,18 +173,19 @@ function graph(year, posts, startDate, endDate) {
   }
   const monthPos = [];
   let startMonth = -1;
+  const weekday = startDate.getDay();
   for (let i = 0; i < 53; i++) {
     html += `<g transform="translate(${i * 16}, 0)">`;
     for (let j = 0; j < 7; j++) {
-      const date = new Date(startDate.getTime() + (i * 7 + j) * 24 * 60 * 60 * 1000);
+      const date = new Date(startDate.getTime() + (i * 7 + j - weekday) * 24 * 60 * 60 * 1000);
       const dataDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-      if (date > endDate) {
+      if (date < startDate || date > endDate) {
         continue;
       }
 
-      if (j == 0) {
+      if (j === 0) {
         if (i <= 51) {
-          if (startMonth != date.getMonth()) {
+          if (startMonth !== date.getMonth()) {
             monthPos.push(i);
             startMonth = date.getMonth();
           }
@@ -193,7 +193,7 @@ function graph(year, posts, startDate, endDate) {
       }
 
       let c;
-      if (count[dataDate] == undefined) {
+      if (count[dataDate] === undefined) {
         c = 0;
       } else {
         c = count[dataDate];
@@ -225,7 +225,7 @@ function graph(year, posts, startDate, endDate) {
   }
   for (let i = 0; i < monthPos.length; i++) {
     const month = monthPos[i];
-    if (month == -1) {
+    if (month === -1) {
       continue;
     }
     html += `<text x="${15 * month + 16}" y="-9"
@@ -247,12 +247,15 @@ style="display: none;">Sat</text>
   document.querySelector('#graph-svg').innerHTML = html;
 }
 
-let svgElem;
+let svgElem = document.createElement('div');
+svgElem.style.cssText = 'pointer-events: none; display: none;';
+svgElem.classList.add(...["svg-tip", "svg-tip-one-line"]);
+document.body.appendChild(svgElem);
 
 function svgTip(elem, count, dateStr) {
-  svgElem = document.createElement('div');
-  svgElem.style.cssText = 'pointer-events: none; display: none;';
-  svgElem.classList.add(...["svg-tip", "svg-tip-one-line"]);
+  if (window.screen.width < 768) {
+    return;
+  }
   const rect = getCoords(elem);
   const date = new Date(dateStr);
   const dateFmt = `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
@@ -261,32 +264,32 @@ function svgTip(elem, count, dateStr) {
   } else {
     svgElem.innerHTML = `<strong>No posts</strong> on ${dateFmt}`;
   }
-  svgElem.style.top = `${rect.top - 50}px`;
-  svgElem.style.left = `${rect.left - 78}px`;
   svgElem.style.display = 'block';
-  document.body.appendChild(svgElem);
+  const tipRect = svgElem.getBoundingClientRect();
+  svgElem.style.top = `${rect.top - 50}px`;
+  svgElem.style.left = `${rect.left - tipRect.width / 2 + rect.width / 2}px`;
 }
 
 function hideTip() {
-  svgElem.remove();
+  svgElem.style.display = 'none';
 }
 
 function getCoords(elem) {
-  var box = elem.getBoundingClientRect();
+  const box = elem.getBoundingClientRect();
 
-  var body = document.body;
-  var docEl = document.documentElement;
+  const body = document.body;
+  const docEl = document.documentElement;
 
-  var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
-  var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+  const scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+  const scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
 
-  var clientTop = docEl.clientTop || body.clientTop || 0;
-  var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+  const clientTop = docEl.clientTop || body.clientTop || 0;
+  const clientLeft = docEl.clientLeft || body.clientLeft || 0;
 
-  var top = box.top + scrollTop - clientTop;
-  var left = box.left + scrollLeft - clientLeft;
+  const top = box.top + scrollTop - clientTop;
+  const left = box.left + scrollLeft - clientLeft;
 
-  return { top: Math.round(top), left: Math.round(left) };
+  return { top, left, width: box.width, height: box.height };
 }
 
 function relativeTime(dateStr) {
@@ -309,7 +312,7 @@ function relativeTime(dateStr) {
   if (days < 30) {
     return `${days} days ago`;
   }
-  if (date.getFullYear() == now.getFullYear()) {
+  if (date.getFullYear() === now.getFullYear()) {
     return `${date.getDate()} ${months[date.getMonth()]}`;
   }
   return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
