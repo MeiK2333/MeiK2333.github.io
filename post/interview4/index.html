@@ -850,6 +850,25 @@ HTTP 协议的第一个版本，只支持 GET 请求</li>
 </script>
 
 
+<div id="gitalk-container" class="gitalk-container"></div>
+<link rel="stylesheet" href='https://meik2333.com/css/gitalk.css'>
+<script src='https://meik2333.com/js/gitalk.min.js'></script>
+<script>
+  const gitalk = new Gitalk({
+    clientID: '4d2994f790117e7633bd',
+    clientSecret: 'da68dfaa74148e8440fae500dcf1751a21cbbec3',
+    repo: 'MeiK2333.github.io',
+    owner: 'MeiK2333',
+    admin: ['MeiK2333'],
+    id: eval("location.pathname"), 
+    distractionFreeMode: false 
+  });
+  (function() {
+    gitalk.render('gitalk-container');
+  })();
+</script>
+
+
   <div class="footer container-xl width-full p-responsive">
   <div
     class="position-relative d-flex flex-row-reverse flex-lg-row flex-wrap flex-lg-nowrap flex-justify-center flex-lg-justify-between flex-sm-items-center pt-6 pb-2 mt-6 f6 text-gray border-top border-gray-light ">
