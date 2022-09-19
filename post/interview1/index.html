@@ -129,8 +129,6 @@
   </header>
 </div>
   
-<script src="https://unpkg.com/@popperjs/core@2"></script>
-<script src="https://unpkg.com/tippy.js@6"></script>
 <div>
   <main>
     <div class="gisthead pagehead bg-gray-light pb-0 pt-3 mb-4">
@@ -175,16 +173,22 @@
         <div>
           <div class="js-gist-file-update-container js-task-list-container file-box">
             <div id="file-pytest" class="file my-2">
-              <div id="post-header" class="file-header d-flex flex-md-items-center flex-items-start sticky-header">
+              <div id="post-header" class="file-header d-flex flex-md-items-center flex-items-start sticky-header" style="z-index: 2">
                 <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
                   <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
                     
-                    <summary id="toc-toggle" class="btn btn-octicon m-0 mr-2 p-2" aria-haspopup="menu" aria-label="Table of Contents" role="button">
+                    <summary id="toc-toggle" onclick="clickToc()" class="btn btn-octicon m-0 mr-2 p-2">
                       <svg aria-hidden="true" viewBox="0 0 16 16" height="16" width="16" class="octicon octicon-list-unordered">
                         <path fill-rule="evenodd" d="M2 4a1 1 0 100-2 1 1 0 000 2zm3.75-1.5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zm0 5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zm0 5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zM3 8a1 1 0 11-2 0 1 1 0 012 0zm-1 6a1 1 0 100-2 1 1 0 000 2z"></path>
                       </svg>
                     </summary>
-                          5636 Words
+                    <details-menu class="SelectMenu" id="toc-details" style="display: none;">
+                      <div class="SelectMenu-modal rounded-3 mt-1" style="max-height: 340px;">
+                        <div class="SelectMenu-list SelectMenu-list--borderless p-2" style="overscroll-behavior: contain;" id="toc-list">
+                        </div>
+                      </div>
+                    </details-menu>
+                      5636 Words
                     
 
                   </div>
@@ -215,7 +219,7 @@
               </div>
 
 
-              <div class="Box-body px-5 pb-5">
+              <div class="Box-body px-5 pb-5" style="z-index: 1">
                 <article class="markdown-body entry-content container-lg"><p>秋招季，从牛客网上收集了一些 C++ 的面经。基本都是一线大厂的题目，应该有一定的代表性。</p>
 
 <p>本篇题目转自<a href="https://www.nowcoder.com/discuss/101712">《感谢牛客网！发一波面经！阿里、网易游戏、京东等offer。》</a>，答案是我按我自己的理解作答的，可能有些疏漏或错误。</p>
@@ -627,70 +631,8 @@ LRU 算法需要的条件较多，因此为了减少复杂度，很多时候应�
     </div>
   </main>
 </div>
-<script>
- 
- 
- 
- window.onload = function () {
-   const header = document.getElementById('post-header');
-   const headerHeight = header.offsetHeight;
-   
-   document.documentElement.style.scrollPaddingTop = headerHeight + 10 + "px";
- }
-
- const tocToggleButton = document.getElementById("toc-toggle");
-
- const tippyInstance = tippy('#toc-toggle', {
-  trigger: 'click',
-  content: '<div id="table-of-contents">\x3cnav id=\x22TableOfContents\x22\x3e\n\x3cul\x3e\n\x3cli\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#一些感慨\x22\x3e一些感慨\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#计算机网络\x22\x3e计算机网络\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#计算机网络分为哪几层\x22\x3e计算机网络分为哪几层？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#tcp-和-udp-有什么区别-什么场景使用-tcp-什么场景使用-udp-哪些应用层协议使用了-tcp-哪些使用了-udp\x22\x3eTCP 和 UDP 有什么区别？什么场景使用 TCP，什么场景使用 UDP？哪些应用层协议使用了 TCP，哪些使用了 UDP？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#什么是窗口滑动协议-什么是快速重传-什么是拥塞避免-什么是慢启动\x22\x3e什么是窗口滑动协议，什么是快速重传，什么是拥塞避免，什么是慢启动？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#tcp-连接需要几次握手-几次分手\x22\x3eTCP 连接需要几次握手？几次分手？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#当你输入域名访问一个网站的时候-背后的过程是什么\x22\x3e当你输入域名访问一个网站的时候，背后的过程是什么？\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#对于客户端-浏览器\x22\x3e对于客户端（浏览器）\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#对于服务器\x22\x3e对于服务器\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#什么是-https-协议-https-协议用到了哪种密钥\x22\x3e什么是 https 协议？https 协议用到了哪种密钥？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#什么是-socket\x22\x3e什么是 socket？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#什么是-io-什么是-nio-什么是-aio-什么是-netty-框架\x22\x3e什么是 IO，什么是 NIO，什么是 AIO，什么是 netty 框架？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#参考\x22\x3e参考\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#数据库\x22\x3e数据库\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#数据库常用的操作\x22\x3e数据库常用的操作\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#什么是左连接-什么是右连接-什么是全连接-什么是内连接\x22\x3e什么是左连接，什么是右连接，什么是全连接，什么是内连接？\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#创建表\x22\x3e创建表\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#student\x22\x3estudent\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#score\x22\x3escore\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#内连接\x22\x3e内连接\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#左连接\x22\x3e左连接\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#右连接\x22\x3e右连接\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#全连接\x22\x3e全连接\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#数据库的事务有哪些特性\x22\x3e数据库的事务有哪些特性？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#数据库中的隔离等级有哪些\x22\x3e数据库中的隔离等级有哪些？\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#未提交读\x22\x3e未提交读\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#已提交读\x22\x3e已提交读\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#可重复读\x22\x3e可重复读\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#可串行化\x22\x3e可串行化\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#数据库的索引有什么作用-用什么来实现的\x22\x3e数据库的索引有什么作用？用什么来实现的？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#b-树和-b-树有什么区别-为什么索引不用-b-树\x22\x3eB 树和 B\x2b 树有什么区别？为什么索引不用 B 树\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#什么是乐观锁-什么是悲观锁\x22\x3e什么是乐观锁，什么是悲观锁？\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#乐观锁\x22\x3e乐观锁\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#悲观锁\x22\x3e悲观锁\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#参考-1\x22\x3e参考\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#操作系统\x22\x3e操作系统\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#进程和线程的区别是什么\x22\x3e进程和线程的区别是什么？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#进程间通信的方式有什么-线程间通信的方式有什么\x22\x3e进程间通信的方式有什么？线程间通信的方式有什么？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#什么是缓存-有哪些缓存的更新算法\x22\x3e什么是缓存？有哪些缓存的更新算法？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#你用过什么linux命令\x22\x3e你用过什么linux命令？\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#参考-2\x22\x3e参考\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#数据结构与算法\x22\x3e数据结构与算法\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#总结\x22\x3e总结\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\n\x3c\/nav\x3e</div>',
-  allowHTML: true,
-  placement: 'bottom-start',
-  interactive: true,
-  arrow: false,
-  maxWidth: "none",
-  onHide: function () { tocToggleButton.classList.remove("hover"); },
-  onShow: function () { tocToggleButton.classList.add("hover"); },
-  onShown: function () {
-    selectTableOfContentsOption();
-
-    if (window.hasSetupTableOfContentsListeners) {
-      return;
-    }
-
-    const tableOfContents = document.getElementById("table-of-contents");
-    tableOfContents.addEventListener('click', function () {
-      
-      tippyInstance[0].hide();
-    });
-
-    window.hasSetupTableOfContentsListeners = true;
-  }
- });
-
- function selectTableOfContentsOption () {
-   const optionSelectedClass = 'table-of-contents-option-selected';
-
-   const tableOfContentsOptions = document.querySelectorAll("#table-of-contents > nav > ul li");
-
-   for (const option of tableOfContentsOptions) {
-     
-
-     const [child] = option.children;
-     if (child.tagName.toLowerCase() !== 'a') {
-       continue;
-     }
-
-     if (window.location.href === child.href) {
-       child.classList.add(optionSelectedClass);
-     } else {
-       child.classList.remove(optionSelectedClass);
-     }
-   }
- }
-
- window.onhashchange = selectTableOfContentsOption;
-</script>
-
+<script type="application/javascript" src='https://meik2333.com/js/toc.js'></script>
+<link rel="stylesheet" href='https://meik2333.com/css/toc.css' />
 
 <div id="gitalk-container" class="gitalk-container"></div>
 <link rel="stylesheet" href='https://meik2333.com/css/gitalk.css'>
@@ -736,6 +678,7 @@ LRU 算法需要的条件较多，因此为了减少复杂度，很多时候应�
 </body>
 
 <script type="application/javascript" src="https://meik2333.com/js/github-style.js"></script>
+
 
 
 

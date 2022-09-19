@@ -126,8 +126,6 @@
   </header>
 </div>
   
-<script src="https://unpkg.com/@popperjs/core@2"></script>
-<script src="https://unpkg.com/tippy.js@6"></script>
 <div>
   <main>
     <div class="gisthead pagehead bg-gray-light pb-0 pt-3 mb-4">
@@ -172,16 +170,22 @@
         <div>
           <div class="js-gist-file-update-container js-task-list-container file-box">
             <div id="file-pytest" class="file my-2">
-              <div id="post-header" class="file-header d-flex flex-md-items-center flex-items-start sticky-header">
+              <div id="post-header" class="file-header d-flex flex-md-items-center flex-items-start sticky-header" style="z-index: 2">
                 <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
                   <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
                     
-                    <summary id="toc-toggle" class="btn btn-octicon m-0 mr-2 p-2" aria-haspopup="menu" aria-label="Table of Contents" role="button">
+                    <summary id="toc-toggle" onclick="clickToc()" class="btn btn-octicon m-0 mr-2 p-2">
                       <svg aria-hidden="true" viewBox="0 0 16 16" height="16" width="16" class="octicon octicon-list-unordered">
                         <path fill-rule="evenodd" d="M2 4a1 1 0 100-2 1 1 0 000 2zm3.75-1.5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zm0 5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zm0 5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zM3 8a1 1 0 11-2 0 1 1 0 012 0zm-1 6a1 1 0 100-2 1 1 0 000 2z"></path>
                       </svg>
                     </summary>
-                          3776 Words
+                    <details-menu class="SelectMenu" id="toc-details" style="display: none;">
+                      <div class="SelectMenu-modal rounded-3 mt-1" style="max-height: 340px;">
+                        <div class="SelectMenu-list SelectMenu-list--borderless p-2" style="overscroll-behavior: contain;" id="toc-list">
+                        </div>
+                      </div>
+                    </details-menu>
+                      3776 Words
                     
 
                   </div>
@@ -212,7 +216,7 @@
               </div>
 
 
-              <div class="Box-body px-5 pb-5">
+              <div class="Box-body px-5 pb-5" style="z-index: 1">
                 <article class="markdown-body entry-content container-lg"><p>转自牛客网<a href="https://www.nowcoder.com/discuss/77507">《C++后台腾讯WXG实习面经》</a>，同样按我自己的理解进行了作答。</p>
 
 <h2 id="一颗二叉搜索树-找出树中的第-k-大节点">一颗二叉搜索树，找出树中的第 k 大节点</h2>
@@ -434,70 +438,8 @@ LT：水平触发，当有事件发生时，会持续通知。如果某个返回
     </div>
   </main>
 </div>
-<script>
- 
- 
- 
- window.onload = function () {
-   const header = document.getElementById('post-header');
-   const headerHeight = header.offsetHeight;
-   
-   document.documentElement.style.scrollPaddingTop = headerHeight + 10 + "px";
- }
-
- const tocToggleButton = document.getElementById("toc-toggle");
-
- const tippyInstance = tippy('#toc-toggle', {
-  trigger: 'click',
-  content: '<div id="table-of-contents">\x3cnav id=\x22TableOfContents\x22\x3e\n\x3cul\x3e\n\x3cli\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#一颗二叉搜索树-找出树中的第-k-大节点\x22\x3e一颗二叉搜索树，找出树中的第 k 大节点\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#fork-的过程\x22\x3efork 的过程\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#fork-vfork-以及-clone-的区别\x22\x3efork、vfork 以及 clone 的区别\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#fork-与-vfork\x22\x3efork 与 vfork\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#clone\x22\x3eclone\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#僵尸进程\x22\x3e僵尸进程\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#什么是僵尸进程\x22\x3e什么是僵尸进程\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#如何避免僵尸进程\x22\x3e如何避免僵尸进程\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#从汇编层去解释一下引用\x22\x3e从汇编层去解释一下引用\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#惊群效应\x22\x3e惊群效应\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#什么是惊群效应\x22\x3e什么是惊群效应\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#如何解决惊群问题\x22\x3e如何解决惊群问题\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#中断的作用\x22\x3e中断的作用\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#tcp-的连接关闭\x22\x3etcp 的连接关闭\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#time-wait-的作用\x22\x3eTIME_WAIT 的作用\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#如果网络延迟很高-但是又没有发生丢包-利用tcp会使吞吐量下降-该如何解决呢\x22\x3e如果网络延迟很高，但是又没有发生丢包，利用tcp会使吞吐量下降，该如何解决呢\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#tcp-的滑动窗口\x22\x3eTCP 的滑动窗口\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#tcp-的拥塞控制\x22\x3eTCP 的拥塞控制\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#如果网络延迟很高-但是又没有发生丢包-利用tcp会使吞吐量下降-该如何解决呢-1\x22\x3e如果网络延迟很高，但是又没有发生丢包，利用tcp会使吞吐量下降，该如何解决呢\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#ddos-攻击原理\x22\x3eDDos 攻击原理\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#数据库引擎\x22\x3e数据库引擎\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#数据库三范式\x22\x3e数据库三范式\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#网络层-数据链路层-传输层的设备有哪些\x22\x3e网络层、数据链路层、传输层的设备有哪些\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#网络层-传输层协议有哪些\x22\x3e网络层、传输层协议有哪些\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#网络层-数据链路层-传输层使用的寻址地址分别是什么\x22\x3e网络层、数据链路层、传输层使用的寻址地址分别是什么\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#内存分配原理\x22\x3e内存分配原理\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#avl-树-b-树-红黑树\x22\x3eAVL 树、B＋树、红黑树\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#poll-和-epoll-的区别\x22\x3epoll 和 epoll 的区别\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#epoll-中-et-模式与-lt-模式的区别\x22\x3eepoll 中 ET 模式与 LT 模式的区别\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#总结\x22\x3e总结\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#参考\x22\x3e参考\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\n\x3c\/nav\x3e</div>',
-  allowHTML: true,
-  placement: 'bottom-start',
-  interactive: true,
-  arrow: false,
-  maxWidth: "none",
-  onHide: function () { tocToggleButton.classList.remove("hover"); },
-  onShow: function () { tocToggleButton.classList.add("hover"); },
-  onShown: function () {
-    selectTableOfContentsOption();
-
-    if (window.hasSetupTableOfContentsListeners) {
-      return;
-    }
-
-    const tableOfContents = document.getElementById("table-of-contents");
-    tableOfContents.addEventListener('click', function () {
-      
-      tippyInstance[0].hide();
-    });
-
-    window.hasSetupTableOfContentsListeners = true;
-  }
- });
-
- function selectTableOfContentsOption () {
-   const optionSelectedClass = 'table-of-contents-option-selected';
-
-   const tableOfContentsOptions = document.querySelectorAll("#table-of-contents > nav > ul li");
-
-   for (const option of tableOfContentsOptions) {
-     
-
-     const [child] = option.children;
-     if (child.tagName.toLowerCase() !== 'a') {
-       continue;
-     }
-
-     if (window.location.href === child.href) {
-       child.classList.add(optionSelectedClass);
-     } else {
-       child.classList.remove(optionSelectedClass);
-     }
-   }
- }
-
- window.onhashchange = selectTableOfContentsOption;
-</script>
-
+<script type="application/javascript" src='https://meik2333.com/js/toc.js'></script>
+<link rel="stylesheet" href='https://meik2333.com/css/toc.css' />
 
 <div id="gitalk-container" class="gitalk-container"></div>
 <link rel="stylesheet" href='https://meik2333.com/css/gitalk.css'>
@@ -543,6 +485,7 @@ LT：水平触发，当有事件发生时，会持续通知。如果某个返回
 </body>
 
 <script type="application/javascript" src="https://meik2333.com/js/github-style.js"></script>
+
 
 
 

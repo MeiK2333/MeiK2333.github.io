@@ -126,8 +126,6 @@
   </header>
 </div>
   
-<script src="https://unpkg.com/@popperjs/core@2"></script>
-<script src="https://unpkg.com/tippy.js@6"></script>
 <div>
   <main>
     <div class="gisthead pagehead bg-gray-light pb-0 pt-3 mb-4">
@@ -172,16 +170,22 @@
         <div>
           <div class="js-gist-file-update-container js-task-list-container file-box">
             <div id="file-pytest" class="file my-2">
-              <div id="post-header" class="file-header d-flex flex-md-items-center flex-items-start sticky-header">
+              <div id="post-header" class="file-header d-flex flex-md-items-center flex-items-start sticky-header" style="z-index: 2">
                 <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
                   <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
                     
-                    <summary id="toc-toggle" class="btn btn-octicon m-0 mr-2 p-2" aria-haspopup="menu" aria-label="Table of Contents" role="button">
+                    <summary id="toc-toggle" onclick="clickToc()" class="btn btn-octicon m-0 mr-2 p-2">
                       <svg aria-hidden="true" viewBox="0 0 16 16" height="16" width="16" class="octicon octicon-list-unordered">
                         <path fill-rule="evenodd" d="M2 4a1 1 0 100-2 1 1 0 000 2zm3.75-1.5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zm0 5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zm0 5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zM3 8a1 1 0 11-2 0 1 1 0 012 0zm-1 6a1 1 0 100-2 1 1 0 000 2z"></path>
                       </svg>
                     </summary>
-                          2582 Words
+                    <details-menu class="SelectMenu" id="toc-details" style="display: none;">
+                      <div class="SelectMenu-modal rounded-3 mt-1" style="max-height: 340px;">
+                        <div class="SelectMenu-list SelectMenu-list--borderless p-2" style="overscroll-behavior: contain;" id="toc-list">
+                        </div>
+                      </div>
+                    </details-menu>
+                      2582 Words
                     
 
                   </div>
@@ -212,7 +216,7 @@
               </div>
 
 
-              <div class="Box-body px-5 pb-5">
+              <div class="Box-body px-5 pb-5" style="z-index: 1">
                 <article class="markdown-body entry-content container-lg"><p>翻译自<a href="https://docs.djangoproject.com/en/2.0/ref/models/fields/">官方文档</a>，django 中模型字段可用的参数及其含义。</p>
 
 <p>以下参数适用于所有字段类型，全部都是可选的。</p>
@@ -494,70 +498,8 @@
     </div>
   </main>
 </div>
-<script>
- 
- 
- 
- window.onload = function () {
-   const header = document.getElementById('post-header');
-   const headerHeight = header.offsetHeight;
-   
-   document.documentElement.style.scrollPaddingTop = headerHeight + 10 + "px";
- }
-
- const tocToggleButton = document.getElementById("toc-toggle");
-
- const tippyInstance = tippy('#toc-toggle', {
-  trigger: 'click',
-  content: '<div id="table-of-contents">\x3cnav id=\x22TableOfContents\x22\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#null\x22\x3enull\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#field-null\x22\x3eField.null\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#blank\x22\x3eblank\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#field-blank\x22\x3eField.blank\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#choices\x22\x3echoices\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#field-choices\x22\x3eField.choices\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#db-column\x22\x3edb_column\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#field-db-column\x22\x3eField.db_column\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#db-index\x22\x3edb_index\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#field-db-index\x22\x3eField.db_index\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#db-tablespace\x22\x3edb_tablespace\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#field-db-tablespace\x22\x3eField.db_tablespace\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#default\x22\x3edefault\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#field-default\x22\x3eField.default\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#editable\x22\x3eeditable\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#field-editable\x22\x3eField.editable\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#error-messages\x22\x3eerror_messages\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#field-error-messages\x22\x3eField.error_messages\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#help-text\x22\x3ehelp_text\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#field-help-text\x22\x3eField.help_text\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#primary-key\x22\x3eprimary_key\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#field-primary-key\x22\x3eField.primary_key\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#unique\x22\x3eunique\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#field-unique\x22\x3eField.unique\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#unique-for-date\x22\x3eunique_for_date\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#field-unique-for-date\x22\x3eField.unique_for_date\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#unique-for-month\x22\x3eunique_for_month\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#field-unique-for-month\x22\x3eField.unique_for_month\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#unique-for-year\x22\x3eunique_for_year\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#field-unique-for-year\x22\x3eField.unique_for_year\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#verbose-name\x22\x3everbose_name\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#field-verbose-name\x22\x3eField.verbose_name\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#validators\x22\x3evalidators\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#field-validators\x22\x3eField.validators\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#registering-and-fetching-lookups\x22\x3eRegistering and fetching lookups\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\n\x3c\/nav\x3e</div>',
-  allowHTML: true,
-  placement: 'bottom-start',
-  interactive: true,
-  arrow: false,
-  maxWidth: "none",
-  onHide: function () { tocToggleButton.classList.remove("hover"); },
-  onShow: function () { tocToggleButton.classList.add("hover"); },
-  onShown: function () {
-    selectTableOfContentsOption();
-
-    if (window.hasSetupTableOfContentsListeners) {
-      return;
-    }
-
-    const tableOfContents = document.getElementById("table-of-contents");
-    tableOfContents.addEventListener('click', function () {
-      
-      tippyInstance[0].hide();
-    });
-
-    window.hasSetupTableOfContentsListeners = true;
-  }
- });
-
- function selectTableOfContentsOption () {
-   const optionSelectedClass = 'table-of-contents-option-selected';
-
-   const tableOfContentsOptions = document.querySelectorAll("#table-of-contents > nav > ul li");
-
-   for (const option of tableOfContentsOptions) {
-     
-
-     const [child] = option.children;
-     if (child.tagName.toLowerCase() !== 'a') {
-       continue;
-     }
-
-     if (window.location.href === child.href) {
-       child.classList.add(optionSelectedClass);
-     } else {
-       child.classList.remove(optionSelectedClass);
-     }
-   }
- }
-
- window.onhashchange = selectTableOfContentsOption;
-</script>
-
+<script type="application/javascript" src='https://meik2333.com/js/toc.js'></script>
+<link rel="stylesheet" href='https://meik2333.com/css/toc.css' />
 
 <div id="gitalk-container" class="gitalk-container"></div>
 <link rel="stylesheet" href='https://meik2333.com/css/gitalk.css'>
@@ -603,6 +545,7 @@
 </body>
 
 <script type="application/javascript" src="https://meik2333.com/js/github-style.js"></script>
+
 
 
 

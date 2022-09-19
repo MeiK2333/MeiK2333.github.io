@@ -126,8 +126,6 @@
   </header>
 </div>
   
-<script src="https://unpkg.com/@popperjs/core@2"></script>
-<script src="https://unpkg.com/tippy.js@6"></script>
 <div>
   <main>
     <div class="gisthead pagehead bg-gray-light pb-0 pt-3 mb-4">
@@ -172,16 +170,22 @@
         <div>
           <div class="js-gist-file-update-container js-task-list-container file-box">
             <div id="file-pytest" class="file my-2">
-              <div id="post-header" class="file-header d-flex flex-md-items-center flex-items-start sticky-header">
+              <div id="post-header" class="file-header d-flex flex-md-items-center flex-items-start sticky-header" style="z-index: 2">
                 <div class="file-info d-flex flex-md-items-center flex-items-start flex-order-1 flex-auto">
                   <div class="text-mono f6 flex-auto pr-3 flex-order-2 flex-md-order-1 mt-2 mt-md-0">
                     
-                    <summary id="toc-toggle" class="btn btn-octicon m-0 mr-2 p-2" aria-haspopup="menu" aria-label="Table of Contents" role="button">
+                    <summary id="toc-toggle" onclick="clickToc()" class="btn btn-octicon m-0 mr-2 p-2">
                       <svg aria-hidden="true" viewBox="0 0 16 16" height="16" width="16" class="octicon octicon-list-unordered">
                         <path fill-rule="evenodd" d="M2 4a1 1 0 100-2 1 1 0 000 2zm3.75-1.5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zm0 5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zm0 5a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zM3 8a1 1 0 11-2 0 1 1 0 012 0zm-1 6a1 1 0 100-2 1 1 0 000 2z"></path>
                       </svg>
                     </summary>
-                          1164 Words
+                    <details-menu class="SelectMenu" id="toc-details" style="display: none;">
+                      <div class="SelectMenu-modal rounded-3 mt-1" style="max-height: 340px;">
+                        <div class="SelectMenu-list SelectMenu-list--borderless p-2" style="overscroll-behavior: contain;" id="toc-list">
+                        </div>
+                      </div>
+                    </details-menu>
+                      1164 Words
                     
 
                   </div>
@@ -212,7 +216,7 @@
               </div>
 
 
-              <div class="Box-body px-5 pb-5">
+              <div class="Box-body px-5 pb-5" style="z-index: 1">
                 <article class="markdown-body entry-content container-lg"><p>curl 不仅仅是一个编程时可以包含的函数库，也是一个功能强大的网站开发工具。仅仅使用其原生命令，就可以实现大部分网络爬虫的功能。</p>
 
 <h2 id="curl-的使用">curl 的使用</h2>
@@ -453,70 +457,8 @@ curl http://httpbin.org/cookies/set/key/value<span class="o">[</span>a-z<span cl
     </div>
   </main>
 </div>
-<script>
- 
- 
- 
- window.onload = function () {
-   const header = document.getElementById('post-header');
-   const headerHeight = header.offsetHeight;
-   
-   document.documentElement.style.scrollPaddingTop = headerHeight + 10 + "px";
- }
-
- const tocToggleButton = document.getElementById("toc-toggle");
-
- const tippyInstance = tippy('#toc-toggle', {
-  trigger: 'click',
-  content: '<div id="table-of-contents">\x3cnav id=\x22TableOfContents\x22\x3e\n\x3cul\x3e\n\x3cli\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#curl-的使用\x22\x3ecurl 的使用\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#url\x22\x3eurl\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#c-continue-at\x22\x3e-C, \x26ndash;continue-at\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#b-cookie\x22\x3e-b, \x26ndash;cookie\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#c-cookie-jar\x22\x3e-c, \x26ndash;cookie-jar\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#d-data\x22\x3e-d, \x26ndash;data\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#data-ascii\x22\x3e\x26ndash;data-ascii\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#data-urlencode\x22\x3e\x26ndash;data-urlencode\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#f-form\x22\x3e-F, \x26ndash;form\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#form-string\x22\x3e\x26ndash;form-string\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#g-get\x22\x3e-G, \x26ndash;get\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#g-globoff\x22\x3e-g, \x26ndash;globoff\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#i-head\x22\x3e-I, \x26ndash;head\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#h-header\x22\x3e-H, \x26ndash;header\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#0-http1-0\x22\x3e-0, \x26ndash;http1.0\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#http1-1\x22\x3e\x26ndash;http1.1\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#i-include\x22\x3e-i, \x26ndash;include\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#l-location\x22\x3e-L, \x26ndash;location\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#o-output\x22\x3e-o, \x26ndash;output\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#progress-bar\x22\x3e-#, \x26ndash;progress-bar\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#x-proxy\x22\x3e-x, \x26ndash;proxy\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#e-referer\x22\x3e-e, \x26ndash;referer\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#o-remote-name\x22\x3e-O, \x26ndash;remote-name\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#x-request\x22\x3e-X, \x26ndash;request\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#s-show-error\x22\x3e-S, \x26ndash;show-error\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#s-silent\x22\x3e-s, \x26ndash;silent\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#trace\x22\x3etrace\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#trace-ascii\x22\x3etrace-ascii\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#trace-time\x22\x3etrace-time\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#url-1\x22\x3e\x26ndash;url\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#a-user-agent\x22\x3e-A, \x26ndash;user-agent\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#v-verbose\x22\x3e-v, \x26ndash;verbose\x3c\/a\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#v-version\x22\x3e-V, \x26ndash;version\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3cli\x3e\x3ca href=\x22#拓展用法\x22\x3e拓展用法\x3c\/a\x3e\n\x3cul\x3e\n\x3cli\x3e\x3ca href=\x22#与-表示范围\x22\x3e\x3ccode\x3e[]\x3c\/code\x3e 与 \x3ccode\x3e{}\x3c\/code\x3e 表示范围\x3c\/a\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\x3c\/li\x3e\n\x3c\/ul\x3e\n\x3c\/nav\x3e</div>',
-  allowHTML: true,
-  placement: 'bottom-start',
-  interactive: true,
-  arrow: false,
-  maxWidth: "none",
-  onHide: function () { tocToggleButton.classList.remove("hover"); },
-  onShow: function () { tocToggleButton.classList.add("hover"); },
-  onShown: function () {
-    selectTableOfContentsOption();
-
-    if (window.hasSetupTableOfContentsListeners) {
-      return;
-    }
-
-    const tableOfContents = document.getElementById("table-of-contents");
-    tableOfContents.addEventListener('click', function () {
-      
-      tippyInstance[0].hide();
-    });
-
-    window.hasSetupTableOfContentsListeners = true;
-  }
- });
-
- function selectTableOfContentsOption () {
-   const optionSelectedClass = 'table-of-contents-option-selected';
-
-   const tableOfContentsOptions = document.querySelectorAll("#table-of-contents > nav > ul li");
-
-   for (const option of tableOfContentsOptions) {
-     
-
-     const [child] = option.children;
-     if (child.tagName.toLowerCase() !== 'a') {
-       continue;
-     }
-
-     if (window.location.href === child.href) {
-       child.classList.add(optionSelectedClass);
-     } else {
-       child.classList.remove(optionSelectedClass);
-     }
-   }
- }
-
- window.onhashchange = selectTableOfContentsOption;
-</script>
-
+<script type="application/javascript" src='https://meik2333.com/js/toc.js'></script>
+<link rel="stylesheet" href='https://meik2333.com/css/toc.css' />
 
 <div id="gitalk-container" class="gitalk-container"></div>
 <link rel="stylesheet" href='https://meik2333.com/css/gitalk.css'>
@@ -562,6 +504,7 @@ curl http://httpbin.org/cookies/set/key/value<span class="o">[</span>a-z<span cl
 </body>
 
 <script type="application/javascript" src="https://meik2333.com/js/github-style.js"></script>
+
 
 
 
